@@ -100,6 +100,102 @@
     transform: translateY(0);
 }
 
+#recipe-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#save-status {
+    display: block;
+    margin-top: 10px;
+    color: #0073aa;
+    font-weight: bold;
+}
+
+/* SAVED RECIPES LIST DISPLY STYLES */
+.user-saved-recipes {
+    margin: 20px 0;
+}
+
+.saved-recipes-list {
+    list-style: none;
+    padding: 0;
+}
+
+.saved-recipe-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.dietary-tags {
+    margin: 8px 0;
+}
+
+.dietary-tag {
+    display: inline-block;
+    background: #e0f7fa;
+    color: #00796b;
+    padding: 2px 8px;
+    margin-right: 5px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+
+.view-recipe-btn {
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Modal Styles */
+.recipe-modal {
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.recipe-modal.show {
+    display: block;
+    opacity: 1;
+}
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease 0.15s; /* Slight delay */
+}
+.recipe-modal.show .modal-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+
 @keyframes rg-spin {
     to { transform: rotate(360deg); }
 }

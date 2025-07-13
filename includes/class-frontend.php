@@ -55,6 +55,64 @@ add_shortcode('recipe_generator', function($atts) {
         </form>
         
         <div id="recipe-results" style="display:none;"></div>
+        <div id="recipe-actions" style="display:none;">
+            <button id="save-recipe-btn" class="rg-submit">Save to Favorites</button>
+            <span id="save-status"></span>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+});
+
+add_shortcode('user_saved_recipes', function($atts) {
+    if (!is_user_logged_in()) {
+        return '<p>Please log in to view your saved recipes.</p>';
+    }
+
+    $saved_recipes = get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) ?: [];
+    
+    if (empty($saved_recipes)) {
+        return '<p>You have no saved recipes yet.</p>';
+    }
+
+    wp_localize_script(
+        'recipe-generator-frontend',
+        'recipeGeneratorFrontendVars',
+        [
+            'saved_recipes' => $saved_recipes
+        ]
+    );
+    
+    ob_start(); ?>
+    <div class="user-saved-recipes">
+        <h3>Your Saved Recipes</h3>
+        <ul class="saved-recipes-list">
+            <?php foreach ($saved_recipes as $recipe_id => $recipe) : 
+                $dietary_tags = !empty($recipe['data']['dietary_tags']) ? $recipe['data']['dietary_tags'] : [];
+                ?>
+                <li class="saved-recipe-item" data-recipe-id="<?php echo esc_attr($recipe_id); ?>">
+                    <div class="recipe-summary">
+                        <h4><?php echo esc_html($recipe['name']); ?></h4>
+                        <?php if (!empty($dietary_tags)) : ?>
+                            <div class="dietary-tags">
+                                <?php foreach ($dietary_tags as $tag) : ?>
+                                    <span class="dietary-tag"><?php echo esc_html($tag); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                        <button class="view-recipe-btn">View Recipe</button>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="recipe-modal" class="recipe-modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-recipe-content"></div>
+        </div>
     </div>
     <?php
     return ob_get_clean();

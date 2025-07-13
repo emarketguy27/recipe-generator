@@ -56,7 +56,8 @@ class Recipe_Generator {
     public function enqueue_frontend_assets() {
         // Only load if shortcode is present or on specific pages
         global $post;
-        if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'recipe_generator')) {
+        if (is_a($post, 'WP_Post') && (has_shortcode($post->post_content, 'recipe_generator') || 
+         has_shortcode($post->post_content, 'user_saved_recipes'))) {
             wp_enqueue_style(
                 'recipe-generator-frontend',
                 RECIPE_GENERATOR_URL . 'assets/css/frontend.css',
@@ -74,11 +75,12 @@ class Recipe_Generator {
             
             wp_localize_script(
                 'recipe-generator-frontend',
-                'recipeGeneratorFrontendVars', // Different var name to avoid conflicts
+                'recipeGeneratorFrontendVars',
                 [
                     'ajaxurl' => admin_url('admin-ajax.php'),
                     'nonce' => wp_create_nonce('recipe_generator_frontend_nonce'),
-                    'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator')
+                    'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator'),
+                    'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
                 ]
             );
         }
