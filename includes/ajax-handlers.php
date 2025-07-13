@@ -66,50 +66,6 @@ add_action('wp_ajax_recipe_generator_reset_dietary_options', function() {
     wp_send_json_success();
 });
 
-// add_action('wp_ajax_recipe_generator_test_connection', function() {
-//     check_ajax_referer('recipe_generator_test_connection', 'nonce');
-    
-//     if (!current_user_can('manage_options')) {
-//         wp_send_json_error(__('Permission denied.', 'recipe-generator'));
-//     }
-
-//     $providers = Recipe_Generator_Providers::get_instance();
-//     $selected_provider = get_option('recipe_generator_selected_provider', '');
-//     $api_endpoint = $providers->get_endpoint($selected_provider);
-//     $api_key = get_option('recipe_generator_api_key', '');
-
-//     if (empty($api_key)) {
-//         wp_send_json_error(__('API key is not configured.', 'recipe-generator'));
-//     }
-
-//     if (empty($api_endpoint)) {
-//         wp_send_json_error(__('No API endpoint configured for this provider.', 'recipe-generator'));
-//     }
-
-//     // Simple ping request (adjust based on provider requirements)
-//     $response = wp_remote_get($api_endpoint, [
-//         'headers' => [
-//             'Authorization' => 'Bearer ' . $api_key,
-//             'Content-Type' => 'application/json'
-//         ],
-//         'timeout' => 10
-//     ]);
-
-//     if (is_wp_error($response)) {
-//         wp_send_json_error($response->get_error_message());
-//     }
-
-//     $response_code = wp_remote_retrieve_response_code($response);
-    
-//     if ($response_code === 200) {
-//         wp_send_json_success(__('API connection successful!', 'recipe-generator'));
-//     } else {
-//         wp_send_json_error(sprintf(
-//             __('API returned status code: %d', 'recipe-generator'),
-//             $response_code
-//         ));
-//     }
-// });
 add_action('wp_ajax_recipe_generator_test_connection', function() {
     check_ajax_referer('recipe_generator_test_connection', 'nonce');
     
@@ -250,6 +206,29 @@ add_action('wp_ajax_recipe_generator_test_prompt', function() {
 add_action('wp_ajax_recipe_generator_generate_recipe', 'recipe_generator_handle_frontend_request');
 add_action('wp_ajax_nopriv_recipe_generator_generate_recipe', 'recipe_generator_handle_frontend_request');
 
+// function recipe_generator_handle_frontend_request() {
+//     check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+    
+//     $args = [
+//         'servings' => !empty($_POST['servings']) ? absint($_POST['servings']) : 4,
+//         'include_ingredients' => !empty($_POST['include']) ? sanitize_text_field($_POST['include']) : '',
+//         'exclude_ingredients' => !empty($_POST['exclude']) ? sanitize_text_field($_POST['exclude']) : '',
+//         'dietary' => !empty($_POST['dietary']) ? array_map('sanitize_key', $_POST['dietary']) : [],
+//         'cuisine' => !empty($_POST['cuisine']) ? sanitize_text_field($_POST['cuisine']) : '',
+//         'skill_level' => !empty($_POST['skill_level']) ? sanitize_text_field($_POST['skill_level']) : 'beginner'
+//     ];
+    
+//     $api_handler = Recipe_Generator_API_Handler::get_instance();
+//     $result = $api_handler->handle_prompt_request($args);
+    
+//     if (is_wp_error($result)) {
+//         wp_send_json_error($result->get_error_message());
+//     }
+    
+//     wp_send_json_success([
+//         'recipe' => $result
+//     ]);
+// }
 function recipe_generator_handle_frontend_request() {
     check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
     
@@ -257,9 +236,7 @@ function recipe_generator_handle_frontend_request() {
         'servings' => !empty($_POST['servings']) ? absint($_POST['servings']) : 4,
         'include_ingredients' => !empty($_POST['include']) ? sanitize_text_field($_POST['include']) : '',
         'exclude_ingredients' => !empty($_POST['exclude']) ? sanitize_text_field($_POST['exclude']) : '',
-        'dietary' => !empty($_POST['dietary']) ? array_map('sanitize_key', $_POST['dietary']) : [],
-        'cuisine' => !empty($_POST['cuisine']) ? sanitize_text_field($_POST['cuisine']) : '',
-        'skill_level' => !empty($_POST['skill_level']) ? sanitize_text_field($_POST['skill_level']) : 'beginner'
+        'dietary' => !empty($_POST['dietary']) ? array_map('sanitize_key', $_POST['dietary']) : []
     ];
     
     $api_handler = Recipe_Generator_API_Handler::get_instance();
@@ -268,8 +245,66 @@ function recipe_generator_handle_frontend_request() {
     if (is_wp_error($result)) {
         wp_send_json_error($result->get_error_message());
     }
-    
+
+    // Just return the formatted response that we know works in admin
     wp_send_json_success([
-        'recipe' => $result
+        'html' => $result['formatted_response']
     ]);
+}
+
+// Standalone helper function
+function recipe_generator_format_recipe_for_display($recipe_data) {
+    if (is_string($recipe_data)) {
+        $recipe = json_decode($recipe_data, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return '<div class="error">Failed to parse recipe data</div>';
+        }
+    } else {
+        $recipe = $recipe_data;
+    }
+    
+    // Basic validation
+    if (!isset($recipe['recipe_name'])) {
+        return '<div class="error">Invalid recipe format received</div>';
+    }
+    
+    ob_start(); ?>
+    <div class="recipe-container">
+        <h2><?php echo esc_html($recipe['recipe_name']); ?></h2>
+        <?php if (!empty($recipe['description'])) : ?>
+            <p class="description"><?php echo esc_html($recipe['description']); ?></p>
+        <?php endif; ?>
+        
+        <div class="recipe-meta">
+            <?php if (!empty($recipe['servings'])) : ?>
+                <span>Servings: <?php echo esc_html($recipe['servings']); ?></span>
+            <?php endif; ?>
+            <?php if (!empty($recipe['preparation_time'])) : ?>
+                <span>Prep: <?php echo esc_html($recipe['preparation_time']); ?></span>
+            <?php endif; ?>
+            <?php if (!empty($recipe['cooking_time'])) : ?>
+                <span>Cook: <?php echo esc_html($recipe['cooking_time']); ?></span>
+            <?php endif; ?>
+        </div>
+        
+        <?php if (!empty($recipe['ingredients'])) : ?>
+            <h3>Ingredients</h3>
+            <ul>
+                <?php foreach ((array)$recipe['ingredients'] as $ingredient) : ?>
+                    <li><?php echo esc_html($ingredient); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+        
+        <?php if (!empty($recipe['method'])) : ?>
+            <h3>Method</h3>
+            <ol>
+                <?php foreach ((array)$recipe['method'] as $step) : ?>
+                    <li><?php echo esc_html($step); ?></li>
+                <?php endforeach; ?>
+            </ol>
+        <?php endif; ?>
+    </div>
+    <?php
+    return ob_get_clean();
 }

@@ -5,16 +5,17 @@ jQuery(document).ready(function($) {
         var $form = $(this);
         var $results = $('#recipe-results');
         var $loading = $('.rg-loading');
+        var $submitBtn = $form.find('.rg-submit');
         
         // Show loading state
-        $form.hide();
+        $submitBtn.prop('disabled', true);
         $loading.show();
-        $results.hide();
+        $results.hide().empty().removeClass('show');
         
         // Prepare data
         var formData = {
             action: 'recipe_generator_generate_recipe',
-            _wpnonce: $form.find('input[name="recipe_nonce"]').val(),
+            _wpnonce: $form.find('input[name="_wpnonce"]').val(),
             servings: $form.find('#rg-servings').val(),
             include: $form.find('#rg-include').val(),
             exclude: $form.find('#rg-exclude').val(),
@@ -24,23 +25,28 @@ jQuery(document).ready(function($) {
         };
         
         // Make the request
-        $.post(recipeGeneratorVars.ajaxurl, formData, function(response) {
+        $.post(recipeGeneratorFrontendVars.ajaxurl, formData, function(response) {
             if (response.success) {
-                $results.html(response.data.recipe).fadeIn();
+                $results.html(response.data.html).addClass('show').show();
+                
+                // Smooth scroll to results with proper positioning
+                $('html, body').stop().animate({
+                    scrollTop: $results.offset().top - 150
+                }, 500);
             } else {
                 $results.html(
                     '<div class="error">' + 
-                    (response.data || recipeGeneratorVars.errorOccurred) + 
+                    (response.data || recipeGeneratorFrontendVars.errorOccurred) + 
                     '</div>'
-                ).fadeIn();
+                ).addClass('show').show();
             }
         }).fail(function() {
             $results.html(
-                '<div class="error">' + recipeGeneratorVars.errorOccurred + '</div>'
-            ).fadeIn();
+                '<div class="error">' + recipeGeneratorFrontendVars.errorOccurred + '</div>'
+            ).addClass('show').show();
         }).always(function() {
             $loading.hide();
-            $form.show();
+            $submitBtn.prop('disabled', false);
         });
     });
 });

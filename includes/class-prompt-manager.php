@@ -53,11 +53,11 @@ class Recipe_Generator_Prompt_Manager {
             "ingredients": ["item1", "item2"],
             "method": ["step1", "step2"],
             "nutritional_information": {
-                "calories": 300,
-                "carbs": 20,
-                "net carbs": 10,
-                "protein": 20,
-                "fat": 30
+                "calories": 300 kCal,
+                "carbs": 20g,
+                "net carbs": 10g,
+                "protein": 20g,
+                "fat": 30g
             },
             "dietary_tags": ["keto", "low-carb"]
         }
@@ -114,7 +114,7 @@ class Recipe_Generator_Prompt_Manager {
 
     public function generate_prompt($args) {
         $defaults = [
-            'servings' => 4,
+            'servings' => 2,
             'include_ingredients' => '',
             'exclude_ingredients' => '',
             'dietary' => [],

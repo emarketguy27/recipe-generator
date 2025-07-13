@@ -11,11 +11,11 @@ add_shortcode('recipe_generator', function($atts) {
     ob_start(); ?>
     <div class="recipe-generator-frontend">
         <form id="recipe-generator-form">
-            <?php wp_nonce_field('recipe_generator_generate_recipe', 'recipe_nonce'); ?>
+            <?php wp_nonce_field('recipe_generator_ajax_nonce', '_wpnonce'); ?>
             
             <div class="form-group">
                 <label for="rg-servings"><?php esc_html_e('Servings', 'recipe-generator'); ?></label>
-                <input type="number" id="rg-servings" name="servings" min="1" max="20" value="4">
+                <input type="number" id="rg-servings" name="servings" min="1" max="20" value="2">
             </div>
             
             <div class="form-group">
