@@ -1,4 +1,31 @@
-jQuery(document).ready(function($) {
+jQuery(document).ready(function($) {    
+    // Copy shortcode functionality
+    $('.copy-shortcode').on('click', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const shortcode = $btn.data('clipboard-text');
+        const $temp = $('<textarea>');
+        
+        $('body').append($temp);
+        $temp.val(shortcode).select();
+        
+        try {
+            document.execCommand('copy');
+            $btn.text('Copied!');
+            
+            // Revert button text after 2 seconds
+            setTimeout(() => {
+                $btn.text('Copy');
+            }, 2000);
+            
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+            $btn.text('Error');
+        }
+        
+        $temp.remove();
+    });
+
     // Handle prompt reset
     $('#reset-prompt').on('click', function(e) {
         e.preventDefault();

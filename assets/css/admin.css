@@ -55,7 +55,71 @@
         }
     }
 }
+/* Shortcode Reference Section */
+.shortcode-reference {
+    background: #fff;
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+}
 
+.shortcode-card {
+    border: 1px solid #ccd0d4;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    background: #f6f7f7;
+}
+
+.shortcode-example {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.shortcode-example code {
+    background: #1d2327;
+    color: #f0f0f1;
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.copy-shortcode {
+    background: #2271b1;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.copy-shortcode:hover {
+    background: #135e96;
+}
+
+.copy-shortcode:active {
+    background: #0a4b78;
+}
+
+.shortcode-description {
+    background: white;
+    padding: 15px;
+    border-left: 4px solid #2271b1;
+}
+
+.shortcode-description p {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.shortcode-description strong {
+    color: #1d2327;
+}
 /* API Configuration Section */
 .connection-test {
     width: 100%!important;

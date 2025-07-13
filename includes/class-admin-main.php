@@ -16,19 +16,61 @@ class Recipe_Generator_Admin_Main {
         );
     }
 
+    // public function render_main_page() {
+    //     if (!current_user_can('manage_options')) {
+    //         wp_die(__('You do not have sufficient permissions.', 'recipe-generator'));
+    //     }
+        
+    //     echo '<div class="wrap">';
+    //     echo '<h1>' . esc_html__('Recipe Generator', 'recipe-generator') . '</h1>';
+    //     echo '<p>' . esc_html__('Welcome to the Recipe Generator plugin.', 'recipe-generator') . '</p>';
+        
+    //     // Link to AI Settings page
+    //     $ai_settings_url = admin_url('admin.php?page=recipe-generator-ai-settings');
+    //     echo '<p><a href="' . esc_url($ai_settings_url) . '" class="button">' . esc_html__('Go to AI Settings', 'recipe-generator') . '</a></p>';
+        
+    //     echo '</div>';
+    // }
     public function render_main_page() {
-        if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions.', 'recipe-generator'));
-        }
-        
-        echo '<div class="wrap">';
-        echo '<h1>' . esc_html__('Recipe Generator', 'recipe-generator') . '</h1>';
-        echo '<p>' . esc_html__('Welcome to the Recipe Generator plugin.', 'recipe-generator') . '</p>';
-        
-        // Link to AI Settings page
-        $ai_settings_url = admin_url('admin.php?page=recipe-generator-ai-settings');
-        echo '<p><a href="' . esc_url($ai_settings_url) . '" class="button">' . esc_html__('Go to AI Settings', 'recipe-generator') . '</a></p>';
-        
-        echo '</div>';
+        ?>
+        <div class="wrap recipe-generator-admin">
+            <h1>Recipe Generator</h1>
+            
+            <!-- Existing content... -->
+            
+            <div class="shortcode-reference">
+                <h2>Shortcode Reference</h2>
+                
+                <div class="shortcode-card">
+                    <h3>Recipe Generator Form</h3>
+                    <div class="shortcode-example">
+                        <code>[recipe_generator]</code>
+                        <button class="copy-shortcode" data-clipboard-text="[recipe_generator]">
+                            Copy
+                        </button>
+                    </div>
+                    <div class="shortcode-description">
+                        <p>Displays the recipe generation form on any page or post. Users can generate AI-powered recipes by filling out the form.</p>
+                        <p><strong>Implementation:</strong> Simply paste this shortcode into any WordPress post, page, or widget area.</p>
+                    </div>
+                </div>
+                
+                <div class="shortcode-card">
+                    <h3>Saved Recipes List</h3>
+                    <div class="shortcode-example">
+                        <code>[user_saved_recipes]</code>
+                        <button class="copy-shortcode" data-clipboard-text="[user_saved_recipes]">
+                            Copy
+                        </button>
+                    </div>
+                    <div class="shortcode-description">
+                        <p>Displays a logged-in user's saved recipes with the ability to view them in a modal.</p>
+                        <p><strong>Implementation:</strong> Add to any page where users should view their saved recipes. Only works for logged-in users.</p>
+                        <p><strong>Note:</strong> Make sure this is placed on a page accessible only to logged-in users.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
     }
 }

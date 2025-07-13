@@ -91,7 +91,6 @@ class Recipe_Generator {
         if (strpos($hook, 'recipe-generator') === false) {
             return;
         }
-
         // Enqueue admin CSS
         wp_enqueue_style(
             'recipe-generator-admin',
