@@ -43,6 +43,7 @@ class Recipe_Generator {
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-ai-settings.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-main.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-frontend.php';
+        require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
     }
 
     public function init() {
@@ -143,6 +144,7 @@ add_action('plugins_loaded', function() {
     if (is_admin()) {
         new Recipe_Generator_Admin_Main();
         new Recipe_Generator_Admin_AI_Settings();
+        new Recipe_Generator_Admin_Saved_Recipes();
     }
     
     // Future: Initialize frontend components here if needed

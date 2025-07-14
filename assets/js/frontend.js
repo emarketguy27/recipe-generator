@@ -32,7 +32,7 @@ jQuery(document).ready(function($) {
                 
                 // Smooth scroll to results with proper positioning
                 $('html, body').stop().animate({
-                    scrollTop: $results.offset().top - 150
+                    scrollTop: $results.offset().top - 80
                 }, 500);
             } else {
                 $results.html(

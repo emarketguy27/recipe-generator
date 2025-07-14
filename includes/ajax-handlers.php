@@ -207,7 +207,120 @@ add_action('wp_ajax_recipe_generator_generate_recipe', 'recipe_generator_handle_
 add_action('wp_ajax_nopriv_recipe_generator_generate_recipe', 'recipe_generator_handle_frontend_request');
 add_action('wp_ajax_save_ai_recipe_to_favorites', 'handle_save_ai_recipe_to_favorites');
 
+add_action('wp_ajax_delete_saved_recipe', function() {
+    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
+    
+    if (!is_user_logged_in()) {
+        wp_send_json_error('Authentication required');
+    }
+    
+    $user_id = get_current_user_id();
+    $recipe_id = sanitize_text_field($_POST['recipe_id']);
+    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    
+    if (isset($saved_recipes[$recipe_id])) {
+        unset($saved_recipes[$recipe_id]);
+        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+        wp_send_json_success();
+    }
+    
+    wp_send_json_error('Recipe not found');
+});
 
+add_action('admin_action_delete_recipe', function() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions.', 'recipe-generator'));
+    }
+
+    $recipe_id = sanitize_text_field($_GET['recipe_id']);
+    $user_id = absint($_GET['user_id']);
+
+    check_admin_referer('delete_recipe_' . $recipe_id);
+
+    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    
+    if (isset($saved_recipes[$recipe_id])) {
+        unset($saved_recipes[$recipe_id]);
+        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+    }
+
+    wp_redirect(admin_url('admin.php?page=recipe-generator-saved-recipes'));
+    exit;
+});
+
+add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
+    error_log('Bulk create request received: ' . print_r($_REQUEST, true)); // Debug
+
+    try {
+        check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+    
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(__('Permission denied.', 'recipe-generator'));
+        }
+
+        $recipes = isset($_POST['recipes']) ? (array)$_POST['recipes'] : [];
+        $created = 0;
+        $created_posts = [];
+        
+        foreach ($recipes as $recipe_data) {
+            $recipe_id = sanitize_text_field($recipe_data['id']);
+            $user_id = absint($recipe_data['user_id']);
+            
+            $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+            
+            if (isset($saved_recipes[$recipe_id])) {
+                $recipe = $saved_recipes[$recipe_id];
+                
+                // Skip if post already exists
+                if (recipe_generator_find_recipe_post($recipe_id)) {
+                    continue;
+                }
+                
+                $post_id = wp_insert_post([
+                    'post_title'   => $recipe['name'],
+                    'post_content' => $recipe['html'],
+                    'post_status' => 'draft',
+                    'post_author' => $user_id,
+                    'post_type'   => 'post'
+                ]);
+                
+                if (!is_wp_error($post_id)) {
+                    // Set category and tags
+                    $recipe_category = get_category_by_slug('recipe');
+                    if ($recipe_category) {
+                        wp_set_post_categories($post_id, [$recipe_category->term_id]);
+                    }
+                    
+                    if (!empty($recipe['dietary_tags'])) {
+                        wp_set_post_tags($post_id, $recipe['dietary_tags']);
+                    }
+                    
+                    update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
+                    update_post_meta($post_id, '_recipe_original_user', $user_id);
+                    
+                    $created++;
+                    $created_posts[] = [
+                        'recipe_id' => $recipe_id,
+                        'post_id' => $post_id,
+                        'edit_link' => get_edit_post_link($post_id)
+                    ];
+                }
+            }
+        }
+        
+        wp_send_json_success([
+            'count' => $created,
+            'created_posts' => $created_posts,
+            'message' => sprintf(_n('Created %d post', 'Created %d posts', $created), $created)
+        ]);
+
+    } catch (Exception $e) {
+        error_log('Error in bulk create: ' . $e->getMessage());
+        wp_send_json_error(__('An unexpected error occurred.', 'recipe-generator'));
+    }
+});
+
+// Standalone helper functions
 function recipe_generator_handle_frontend_request() {
     check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
     
@@ -231,7 +344,6 @@ function recipe_generator_handle_frontend_request() {
     ]);
 }
 
-// Standalone helper function
 function recipe_generator_format_recipe_for_display($recipe_data) {
     if (is_string($recipe_data)) {
         $recipe = json_decode($recipe_data, true);
@@ -305,45 +417,51 @@ function handle_save_ai_recipe_to_favorites() {
     
     $recipe_html = wp_kses_post($_POST['recipe_html']);
     
-    // Extract recipe name from HTML (fallback to ID if not found)
+    // Extract recipe name from HTML
     $recipe_name = 'AI Recipe';
     if (preg_match('/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i', $recipe_html, $matches)) {
         $recipe_name = sanitize_text_field(strip_tags($matches[1]));
     }
 
+    // Extract description from HTML
+    $description = '';
+    if (preg_match('/<p class="recipe-description">(.*?)<\/p>/i', $recipe_html, $matches)) {
+        $description = wp_strip_all_tags($matches[1]);
+    }
+
+    // Extract dietary tags from HTML
+    $dietary_tags = [];
+    if (preg_match_all('/<span class="dietary-tag">(.*?)<\/span>/i', $recipe_html, $matches)) {
+        $dietary_tags = array_map('sanitize_text_field', $matches[1]);
+    }
+
     // Get existing saved recipes
     $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
     
-    // Add new recipe
+    // Add new recipe with all metadata
     $saved_recipes[$recipe_id] = [
         'id' => $recipe_id,
         'name' => $recipe_name,
+        'description' => $description,
         'html' => $recipe_html,
+        'dietary_tags' => $dietary_tags, // Store the extracted tags
         'saved_at' => current_time('mysql'),
         'saved_at_gmt' => current_time('mysql', true)
     ];
 
     update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
     
-    wp_send_json_success();
+    wp_send_json_success([
+        'recipe_name' => $recipe_name,
+        'recipe_id' => $recipe_id
+    ]);
 }
 
-add_action('wp_ajax_delete_saved_recipe', function() {
-    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
-    
-    if (!is_user_logged_in()) {
-        wp_send_json_error('Authentication required');
-    }
-    
-    $user_id = get_current_user_id();
-    $recipe_id = sanitize_text_field($_POST['recipe_id']);
-    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
-    
-    if (isset($saved_recipes[$recipe_id])) {
-        unset($saved_recipes[$recipe_id]);
-        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
-        wp_send_json_success();
-    }
-    
-    wp_send_json_error('Recipe not found');
-});
+function recipe_generator_find_recipe_post($recipe_id) {
+    global $wpdb;
+    return $wpdb->get_var($wpdb->prepare(
+        "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_recipe_generator_id' AND meta_value = %s LIMIT 1",
+        $recipe_id
+    ));
+}
+

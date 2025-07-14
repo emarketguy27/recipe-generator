@@ -117,28 +117,6 @@ jQuery(document).ready(function($) {
     });
 
     // Test API Connection
-    // $('#test-api-connection').on('click', function() {
-    //     var $button = $(this);
-    //     var $result = $('#test-connection-result');
-        
-    //     $button.prop('disabled', true);
-    //     $result.html('<span class="spinner is-active" style="float:none; margin:0;"></span>');
-        
-    //     $.post(ajaxurl, {
-    //         action: 'recipe_generator_test_connection',
-    //         nonce: $button.data('nonce')
-    //     }, function(response) {
-    //         if (response.success) {
-    //             $result.html('<span style="color:#46b450;">✓ ' + response.data + '</span>');
-    //         } else {
-    //             $result.html('<span style="color:#dc3232;">✗ ' + response.data + '</span>');
-    //         }
-    //     }).fail(function() {
-    //         $result.html('<span style="color:#dc3232;">✗ ' + recipeGeneratorVars.errorOccurred + '</span>');
-    //     }).always(function() {
-    //         $button.prop('disabled', false);
-    //     });
-    // });
     $('#test-api-connection').on('click', function() {
         var $button = $(this);
         var $result = $('#test-connection-result');
@@ -203,5 +181,116 @@ jQuery(document).ready(function($) {
             $button.prop('disabled', false).text(recipeGeneratorVars.testPrompt);
             $loadingBar.removeClass('active');
         });
+    });
+
+    // View recipe modal
+    $(document).on('click', '.view-recipe', function(e) {
+        e.preventDefault();
+        
+        try {
+            var recipeHtml = $(this).data('recipe-html');
+            if (typeof recipeHtml === 'string') {
+                recipeHtml = JSON.parse(recipeHtml);
+            }
+            
+            var $modal = $('<div>').addClass('recipe-modal').css({
+                'position': 'fixed',
+                'top': '0',
+                'left': '0',
+                'width': '100%',
+                'height': '100%',
+                'background': 'rgba(0,0,0,0.8)',
+                'z-index': '99999',
+                'overflow-y': 'auto'
+            });
+            
+            var $content = $('<div>').addClass('modal-content').css({
+                'background': '#fff',
+                'margin': '2rem auto',
+                'padding': '20px',
+                'max-width': '800px',
+                'position': 'relative'
+            });
+            
+            $content.append('<span class="close-modal" style="position:absolute;top:10px;right:10px;cursor:pointer;font-size:20px;">&times;</span>');
+            $content.append('<div class="recipe-content">' + recipeHtml + '</div>');
+            $modal.append($content);
+            
+            $('body').append($modal);
+            
+            $modal.on('click', '.close-modal', function() {
+                $modal.remove();
+            });
+            
+            $(document).keyup(function(e) {
+                if (e.key === "Escape") {
+                    $modal.remove();
+                }
+            });
+        } catch (error) {
+            console.error('Error displaying recipe:', error);
+            alert(recipeGeneratorVars.errorOccurred);
+        }
+    });
+
+    // Handle bulk action form submission
+    $('#doaction, #doaction2').on('click', function(e) {
+        if ($('select[name="action"]').val() === 'create_post') {
+            e.preventDefault();
+            
+            // Collect all selected recipes with their user IDs
+            var recipes = [];
+            $('input[name="recipe[]"]:checked').each(function() {
+                recipes.push({
+                    id: $(this).val(),
+                    user_id: $(this).data('user-id')
+                });
+            });
+            
+            if (recipes.length === 0) {
+                alert('No recipes selected');
+                return;
+            }
+            
+            // Show processing indicator
+            var $button = $(this);
+            $button.prop('disabled', true).text('Processing...');
+            
+            // Send via AJAX
+            $.post(ajaxurl, {
+                action: 'recipe_generator_bulk_create_posts',
+                recipes: recipes,
+                _wpnonce: recipeGeneratorVars.nonce
+            }, function(response) {
+                if (response.success) {
+                    // Update status indicators for created posts
+                    if (response.data.created_posts && response.data.created_posts.length) {
+                        response.data.created_posts.forEach(function(post) {
+                            var $row = $('input[value="' + post.recipe_id + '"]').closest('tr');
+                            $row.find('.column-post_status').html(
+                                '<span class="recipe-status">' +
+                                '<span class="dashicons dashicons-edit"></span> ' +
+                                'Draft <a href="' + post.edit_link + '" target="_blank">(Edit)</a>' +
+                                '</span>'
+                            );
+                        });
+                    }
+                    
+                    // Show success message
+                    $('#wpbody-content').before(
+                        '<div class="notice notice-success is-dismissible"><p>' +
+                        response.data.message + ' ' +
+                        '<a href="' + adminurl + 'edit.php?post_status=draft&post_type=post">View drafts</a>' +
+                        '</p></div>'
+                    );
+                } else {
+                    alert('Error: ' + (response.data || 'Operation failed'));
+                    $button.prop('disabled', false).text('Apply');
+                }
+            }).fail(function() {
+                alert('Connection error. Please try again.');
+                $button.prop('disabled', false).text('Apply');
+            });
+        }
     });
 });

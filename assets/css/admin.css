@@ -59,6 +59,7 @@
         gap: 1em;
     }
 }
+
 /* Shortcode Reference Section */
 .shortcode-reference {
     background: #fff;
@@ -67,7 +68,6 @@
     border-radius: 4px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.04);
 }
-
 .shortcode-card {
     border: 1px solid #ccd0d4;
     padding: 20px;
@@ -75,14 +75,12 @@
     border-radius: 4px;
     background: #f6f7f7;
 }
-
 .shortcode-example {
     display: flex;
     align-items: center;
     gap: 10px;
     margin: 15px 0;
 }
-
 .shortcode-example code {
     background: #1d2327;
     color: #f0f0f1;
@@ -90,7 +88,6 @@
     border-radius: 3px;
     font-size: 14px;
 }
-
 .copy-shortcode {
     background: #2271b1;
     color: white;
@@ -101,29 +98,25 @@
     font-size: 13px;
     transition: background 0.2s;
 }
-
 .copy-shortcode:hover {
     background: #135e96;
 }
-
 .copy-shortcode:active {
     background: #0a4b78;
 }
-
 .shortcode-description {
     background: white;
     padding: 15px;
     border-left: 4px solid #2271b1;
 }
-
 .shortcode-description p {
     margin-top: 0;
     margin-bottom: 10px;
 }
-
 .shortcode-description strong {
     color: #1d2327;
 }
+
 /* API Configuration Section */
 .connection-test {
     width: 100%!important;
@@ -281,6 +274,114 @@
     color: #50575e;
 }
 
+/* Saved Recipes Table */
+.wp-list-table .column-recipe_name {
+    width: 20%;
+}
+.wp-list-table .column-description {
+    width: 35%;
+}
+.wp-list-table .column-dietary_tags {
+    width: 15%;
+}
+.wp-list-table .column-saved_date {
+    width: 10%;
+}
+.wp-list-table .column-user_name {
+    width: 10%;
+}
+.wp-list-table .column-post_status {
+    width: 10%;
+}
+
+/* Post Status column */
+.column-post_status {
+    width: 120px;
+}
+.recipe-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+.recipe-status .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+/* Status colors */
+.recipe-status .dashicons-yes-alt { color: #46b450; }
+.recipe-status .dashicons-edit { color: #ffb900; }
+.recipe-status .dashicons-clock { color: #00a0d2; }
+.recipe-status .dashicons-calendar { color: #826eb4; }
+.recipe-status .dashicons-lock { color: #a7aaad; }
+.recipe-status .dashicons-trash { color: #d63638; }
+.recipe-status .dashicons-warning { color: #d63638; }
+.recipe-status .dashicons-no-alt { color: #a7aaad; }
+
+/* Bulk Actions */
+.tablenav.top .bulkactions {
+    margin-bottom: 10px;
+}
+/* Bulk action processing */
+.wp-list-table .processing-row {
+    opacity: 0.5;
+    background-color: #f9f9f9;
+}
+/* Admin notices */
+.notice.recipe-generator-notice {
+    margin: 5px 0 15px;
+    padding: 10px 12px;
+}
+/* Checkbox column */
+.column-cb {
+    width: 40px;
+}
+
+/* Recipe Post Indicator */
+.post-state .recipe-source {
+    display: inline-block;
+    color: #2271b1;
+    font-weight: 500;
+}
+/* Recipe Modal */
+.recipe-modal .modal-content {
+    background: #fff;
+    margin: 2rem auto;
+    padding: 20px;
+    max-width: 800px;
+    position: relative;
+}
+.recipe-modal .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+.recipe-modal .recipe-content {
+    margin-top: 20px;
+}
+.recipe-modal .recipe-content h2 {
+    margin-top: 0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .wp-list-table .column-actions {
+        display: none;
+    }
+    .wp-list-table .column-recipe_name .row-actions {
+        display: block;
+        margin-top: 4px;
+    }
+    .wp-list-table .column-cb {
+        padding-left: 10px !important;
+    }
+    .wp-list-table .check-column {
+        padding: 8px 0 0 3px;
+    }
+}
 @keyframes loadingAnimation {
     0% { background-color: #2271b1; width: 0%; }
     50% { background-color: #72aee6; width: 45%; }
