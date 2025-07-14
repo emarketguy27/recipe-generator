@@ -151,6 +151,7 @@ class Recipe_Generator_Admin_AI_Settings {
         
         <div class="wrap recipe-generator-settings">
             <h1><?php esc_html_e('AI Settings', 'recipe-generator'); ?></h1>
+            <p><strong>Set up your API, Technical Parameters, Prompt, User Options, and Testing...</strong></p>
             
             <?php settings_errors('recipe_generator_messages'); ?>
             
@@ -217,7 +218,7 @@ class Recipe_Generator_Admin_AI_Settings {
                                     class="regular-text" 
                                     placeholder="<?php esc_attr_e('Enter new provider name', 'recipe-generator'); ?>">
                                 <p class="description">
-                                    <?php esc_html_e('Add a provider not in the list above', 'recipe-generator'); ?>
+                                    <?php esc_html_e('Add a new LLM API provider', 'recipe-generator'); ?>
                                 </p>
                             </td>
                             </tr>
@@ -466,7 +467,7 @@ class Recipe_Generator_Admin_AI_Settings {
         $dietary_options = Recipe_Generator_Prompt_Manager::get_instance()->get_dietary_options();
         ?>
         <div class="settings-section">
-            <h2 class="title"><?php esc_html_e('Test Prompt', 'recipe-generator'); ?></h2>
+            <h2 class="title"><?php esc_html_e('Test Prompt & Response', 'recipe-generator'); ?></h2>
             <div id="prompt-test-interface">
                 <table class="form-table">
                     <tbody class="form-test-prompt">
