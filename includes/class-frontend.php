@@ -70,6 +70,7 @@ add_shortcode('user_saved_recipes', function($atts) {
     }
 
     $saved_recipes = get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) ?: [];
+    $recipe_count = count($saved_recipes);
     
     if (empty($saved_recipes)) {
         return '<p>You have no saved recipes yet.</p>';
@@ -85,26 +86,31 @@ add_shortcode('user_saved_recipes', function($atts) {
     
     ob_start(); ?>
     <div class="user-saved-recipes">
-        <h3>Your Saved Recipes</h3>
-        <ul class="saved-recipes-list">
-            <?php foreach ($saved_recipes as $recipe_id => $recipe) : 
-                $dietary_tags = !empty($recipe['data']['dietary_tags']) ? $recipe['data']['dietary_tags'] : [];
-                ?>
-                <li class="saved-recipe-item" data-recipe-id="<?php echo esc_attr($recipe_id); ?>">
-                    <div class="recipe-summary">
-                        <h4><?php echo esc_html($recipe['name']); ?></h4>
-                        <?php if (!empty($dietary_tags)) : ?>
-                            <div class="dietary-tags">
-                                <?php foreach ($dietary_tags as $tag) : ?>
-                                    <span class="dietary-tag"><?php echo esc_html($tag); ?></span>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                        <button class="view-recipe-btn">View Recipe</button>
-                    </div>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <h3>Your Saved Recipes <span class="recipe-count">(<?php echo $recipe_count; ?>)</span></h3>
+        
+        <?php if ($recipe_count > 0) : ?>
+            <ul class="saved-recipes-list">
+                <?php foreach ($saved_recipes as $recipe_id => $recipe) : 
+                    $dietary_tags = !empty($recipe['data']['dietary_tags']) ? $recipe['data']['dietary_tags'] : [];
+                    ?>
+                    <li class="saved-recipe-item" data-recipe-id="<?php echo esc_attr($recipe_id); ?>">
+                        <div class="recipe-summary">
+                            <h4><?php echo esc_html($recipe['name']); ?></h4>
+                            <?php if (!empty($dietary_tags)) : ?>
+                                <div class="dietary-tags">
+                                    <?php foreach ($dietary_tags as $tag) : ?>
+                                        <span class="dietary-tag"><?php echo esc_html($tag); ?></span>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                            <button class="view-recipe-btn">View Recipe</button>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else : ?>
+            <p>You have no saved recipes yet.</p>
+        <?php endif; ?>
     </div>
 
     <!-- Modal Structure -->

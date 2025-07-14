@@ -71,6 +71,13 @@ jQuery(document).ready(function($) {
             if (response.success) {
                 $btn.text('Saved!').prop('disabled', true);
                 $status.text('Recipe saved to your favorites!');
+                
+                // Update the count if on saved recipes page
+                const $countDisplay = $('.recipe-count');
+                if ($countDisplay.length) {
+                    const currentCount = parseInt($countDisplay.text().replace(/[()]/g, '')) || 0;
+                    $countDisplay.text('(' + (currentCount + 1) + ')');
+                }
             } else {
                 $status.text('Error: ' + (response.data || 'Could not save recipe'));
                 $btn.prop('disabled', false);
@@ -118,6 +125,14 @@ jQuery(document).ready(function($) {
         }
     });
 
+    // Example for future delete functionality
+    function updateRecipeCount(newCount) {
+        const $countDisplay = $('.recipe-count');
+        if ($countDisplay.length) {
+            $countDisplay.text('(' + newCount + ')');
+        }
+    }
+    
     // Close modal
     $(document).on('click', '.close-modal, .recipe-modal', function(e) {
         // Only close if clicking directly on overlay or close button
