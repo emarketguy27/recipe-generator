@@ -132,7 +132,7 @@ jQuery(document).ready(function($) {
             $countDisplay.text('(' + newCount + ')');
         }
     }
-    
+
     // Close modal
     $(document).on('click', '.close-modal, .recipe-modal', function(e) {
         // Only close if clicking directly on overlay or close button
@@ -161,5 +161,149 @@ jQuery(document).ready(function($) {
         if ($(e.target).hasClass('recipe-modal')) {
             closeModal();
         }
+    });
+
+    $(document).on('click', '.print-recipe', function() {
+        const printContent = $('#modal-recipe-content').html();
+        const printWindow = window.open('', '', '');
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${document.title}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    h2 { color: #222; margin-bottom: 10px; }
+                    .recipe-meta { display: flex; justify-content: space-between; margin-bottom: 0px; color: #666; }
+                    .recipe-section { margin-bottom: 5px; }
+                    ul, ol { padding-left: 20px; }
+                    .dietary-tag { 
+                        display: inline-block;
+                        background: #e0f7fa;
+                        padding: 2px 8px;
+                        margin-right: 5px;
+                        border: 1px solid;
+                        border-radius: 12px;
+                        font-size: 0.8em;
+                    }
+                    @page { margin: 1cm; }
+                </style>
+            </head>
+            <body>
+                ${printContent}
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                            window.close();
+                        }, 200);
+                    }
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    });
+
+    $(document).on('click', '.share-recipe', function() {
+        if (navigator.share && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            // Mobile devices with share support
+            const recipeTitle = $('#modal-recipe-content h2').text() || 'Check out this recipe';
+            const recipeText = $('#modal-recipe-content').text().substring(0, 200) + '...';
+            const shareUrl = window.location.href.split('?')[0];
+            
+            navigator.share({
+                title: recipeTitle,
+                text: recipeText,
+                url: shareUrl
+            }).catch(err => {
+                console.log('Share failed:', err);
+            });
+        } else {
+            // Desktop - show share options modal
+            $('#share-options-modal').show();
+        }
+    });
+
+    // Close share modal
+    $(document).on('click', '.close-share-modal, .share-modal', function(e) {
+        if ($(e.target).hasClass('share-modal') || $(e.target).hasClass('close-share-modal')) {
+            $('#share-options-modal').hide();
+        }
+    });
+
+    // Platform-specific sharing
+    $(document).on('click', '.share-btn', function(e) {
+        e.preventDefault();
+        const platform = $(this).data('platform');
+        const recipeTitle = encodeURIComponent($('#modal-recipe-content h2').text() || 'Check out this recipe');
+        const recipeUrl = encodeURIComponent(window.location.href.split('?')[0]);
+        const recipeText = encodeURIComponent($('#modal-recipe-content').text().substring(0, 300) + '...');
+        
+        let shareUrl = '';
+        
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${recipeUrl}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${recipeTitle}&url=${recipeUrl}`;
+                break;
+            case 'pinterest':
+                // Note: Pinterest requires an image - using a placeholder
+                const imageUrl = encodeURIComponent('https://via.placeholder.com/300x200?text=Recipe');
+                shareUrl = `https://pinterest.com/pin/create/button/?url=${recipeUrl}&media=${imageUrl}&description=${recipeTitle}`;
+                break;
+            case 'reddit':
+                shareUrl = `https://www.reddit.com/submit?url=${recipeUrl}&title=${recipeTitle}`;
+                break;
+            case 'email':
+                shareUrl = `mailto:?subject=${recipeTitle}&body=${recipeText}%0A%0ARead more: ${recipeUrl}`;
+                break;
+        }
+        
+        if (platform === 'email') {
+            window.location.href = shareUrl;
+        } else {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        }
+        
+        $('#share-options-modal').hide();
+    });
+    $(document).on('click', '.delete-recipe', function() {
+        if (!confirm('Are you sure you want to delete this recipe?')) {
+            return;
+        }
+        
+        const $modal = $('#recipe-modal');
+        const recipeId = $('.saved-recipe-item[style*="display: block"]').data('recipe-id') || 
+                        $('.saved-recipe-item').first().data('recipe-id');
+        
+        $.post(recipeGeneratorFrontendVars.ajaxurl, {
+            action: 'delete_saved_recipe',
+            recipe_id: recipeId,
+            _wpnonce: recipeGeneratorFrontendVars.nonce
+        }, function(response) {
+            if (response.success) {
+                // Close modal and remove from list
+                $modal.hide();
+                $(`.saved-recipe-item[data-recipe-id="${recipeId}"]`).remove();
+                
+                // Update count
+                const $count = $('.recipe-count');
+                if ($count.length) {
+                    const current = parseInt($count.text().match(/\d+/)[0]) || 0;
+                    $count.text(`(${current - 1})`);
+                }
+                
+                // Show feedback if no recipes left
+                if ($('.saved-recipe-item').length === 0) {
+                    $('.saved-recipes-list').html('<p>You have no saved recipes.</p>');
+                }
+            } else {
+                alert('Error: ' + (response.data || 'Could not delete recipe'));
+            }
+        });
     });
 });

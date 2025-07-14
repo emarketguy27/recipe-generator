@@ -327,3 +327,23 @@ function handle_save_ai_recipe_to_favorites() {
     
     wp_send_json_success();
 }
+
+add_action('wp_ajax_delete_saved_recipe', function() {
+    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
+    
+    if (!is_user_logged_in()) {
+        wp_send_json_error('Authentication required');
+    }
+    
+    $user_id = get_current_user_id();
+    $recipe_id = sanitize_text_field($_POST['recipe_id']);
+    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    
+    if (isset($saved_recipes[$recipe_id])) {
+        unset($saved_recipes[$recipe_id]);
+        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+        wp_send_json_success();
+    }
+    
+    wp_send_json_error('Recipe not found');
+});

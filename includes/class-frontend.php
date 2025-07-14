@@ -117,7 +117,41 @@ add_shortcode('user_saved_recipes', function($atts) {
     <div id="recipe-modal" class="recipe-modal" style="display:none;">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
+            <div class="modal-actions">
+                <button class="modal-action share-recipe" title="Share Recipe">
+                    <span class="dashicons dashicons-share"></span> Share
+                </button>
+                <button class="modal-action print-recipe" title="Print Recipe">
+                    <span class="dashicons dashicons-printer"></span> Print
+                </button>
+                <button class="modal-action delete-recipe" title="Delete Recipe">
+                    <span class="dashicons dashicons-trash"></span> Delete
+                </button>
+            </div>
             <div id="modal-recipe-content"></div>
+        </div>
+    </div>
+    <div id="share-options-modal" class="share-modal" style="display:none;">
+        <div class="share-modal-content">
+            <span class="close-share-modal">&times;</span>
+            <h4>Share Recipe</h4>
+            <div class="share-buttons">
+                <a href="#" class="share-btn facebook" data-platform="facebook">
+                    <span class="dashicons dashicons-facebook"></span> Facebook
+                </a>
+                <a href="#" class="share-btn twitter" data-platform="twitter">
+                    <span class="dashicons dashicons-twitter"></span> Twitter
+                </a>
+                <a href="#" class="share-btn pinterest" data-platform="pinterest">
+                    <span class="dashicons dashicons-pinterest"></span> Pinterest
+                </a>
+                <a href="#" class="share-btn reddit" data-platform="reddit">
+                    <span class="dashicons dashicons-reddit"></span> Reddit
+                </a>
+                <a href="#" class="share-btn email" data-platform="email">
+                    <span class="dashicons dashicons-email"></span> Email
+                </a>
+            </div>
         </div>
     </div>
     <?php
