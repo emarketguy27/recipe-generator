@@ -88,7 +88,7 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // Unique ID creations for cipes being saved to user meta
+    // Unique ID creations for recipes being saved to user meta
     function generateRecipeId(html) {
         // Create hash from timestamp + random number + first 100 chars of recipe
         const timestamp = Date.now().toString(36);
@@ -124,14 +124,6 @@ jQuery(document).ready(function($) {
             }, 10);
         }
     });
-
-    // Example for future delete functionality
-    function updateRecipeCount(newCount) {
-        const $countDisplay = $('.recipe-count');
-        if ($countDisplay.length) {
-            $countDisplay.text('(' + newCount + ')');
-        }
-    }
 
     // Close modal
     $(document).on('click', '.close-modal, .recipe-modal', function(e) {
@@ -266,11 +258,12 @@ jQuery(document).ready(function($) {
         if (platform === 'email') {
             window.location.href = shareUrl;
         } else {
-            window.open(shareUrl, '_blank', 'width=600,height=400');
+            window.open(shareUrl, '_blank', '');
         }
         
         $('#share-options-modal').hide();
     });
+
     $(document).on('click', '.delete-recipe', function() {
         if (!confirm('Are you sure you want to delete this recipe?')) {
             return;
