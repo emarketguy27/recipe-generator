@@ -124,6 +124,9 @@ add_shortcode('user_saved_recipes', function($atts) {
                 <button class="modal-action print-recipe" title="Print Recipe">
                     <span class="dashicons dashicons-printer"></span> Print
                 </button>
+                <a href="#" class="modal-action view-post-btn" style="display:none;" title="View Full Post">
+                    <span class="dashicons dashicons-external"></span> View Post
+                </a>
                 <button class="modal-action delete-recipe" title="Delete Recipe">
                     <span class="dashicons dashicons-trash"></span> Delete
                 </button>
@@ -135,22 +138,26 @@ add_shortcode('user_saved_recipes', function($atts) {
         <div class="share-modal-content">
             <span class="close-share-modal">&times;</span>
             <h4>Share Recipe</h4>
+            <p style="font-size: .8rem;">Social sharing is only available when the saved recipe has an associated post - you can still email or copy/paste.</p>
             <div class="share-buttons">
-                <a href="#" class="share-btn facebook" data-platform="facebook">
+                <a href="#" class="share-btn modal-action platform-share-btn facebook disabled" data-platform="facebook">
                     <span class="dashicons dashicons-facebook"></span> Facebook
                 </a>
-                <a href="#" class="share-btn twitter" data-platform="twitter">
-                    <span class="dashicons dashicons-twitter"></span> Twitter
+                <a href="#" class="share-btn modal-action platform-share-btn twitter disabled" data-platform="twitter">
+                    <span class="dashicons dashicons-twitter"></span> X (Twitter)
                 </a>
-                <a href="#" class="share-btn pinterest" data-platform="pinterest">
+                <a href="#" class="share-btn modal-action platform-share-btn pinterest disabled" data-platform="pinterest">
                     <span class="dashicons dashicons-pinterest"></span> Pinterest
                 </a>
-                <a href="#" class="share-btn reddit" data-platform="reddit">
+                <a href="#" class="share-btn modal-action platform-share-btn reddit disabled" data-platform="reddit">
                     <span class="dashicons dashicons-reddit"></span> Reddit
                 </a>
-                <a href="#" class="share-btn email" data-platform="email">
+                <a href="#" class="share-btn modal-action email-recipe" data-platform="email">
                     <span class="dashicons dashicons-email"></span> Email
                 </a>
+                <button class="share-btn modal-action copy-recipe" title="Copy Recipe">
+                    <span class="dashicons dashicons-clipboard"></span> Copy
+                </button>
             </div>
         </div>
     </div>

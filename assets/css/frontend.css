@@ -1,3 +1,6 @@
+* {
+    font-size: var(--wp--preset--font-size--medium);
+}
 .recipe-generator-frontend {
     /* max-width: 600px; */
     margin: 0 auto;
@@ -247,37 +250,39 @@
     border-bottom: 1px solid #0073aa60;
 }
 .modal-action {
-    background: #abb8c3;
+    display: flex;
+    align-items: center;
     border: none;
     padding: 8px 12px;
     border-radius: 4px;
+    color: white;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: background 0.2s;
+    gap: 8px;
+    transition: all 0.3s ease;
 }
 .modal-action:hover {
-    background: #e0e0e0;
+    opacity: .8;
+    box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.3);
 }
 .modal-action .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 1.1rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--wp--preset--color--accent-3);
+    line-height: 1.2rem;
 }
-.delete-recipe {
+/* .delete-recipe {
     color: #d63638;
     margin-left: auto;
 }
 .delete-recipe:hover {
     background: #f53030;
     color: whitesmoke;
-}
+} */
 .modal-action.copied {
     background-color: #4CAF50;
     color: white;
 }
-
 .modal-action .dashicons-yes {
     margin-right: 5px;
     vertical-align: middle;
@@ -324,29 +329,32 @@
     gap: 10px;
     margin-top: 15px;
 }
-.share-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px;
-    border-radius: 4px;
-    text-decoration: none;
-    color: white;
-    font-weight: 500;
+.share-recipe, .print-recipe, .view-post-btn {
+    background: #0073aa60;
+    width: 6em;
 }
-.share-btn .dashicons {
-    font-size: 20px;
-}
-.share-btn:hover {
-    opacity: 0.9;
-    color: white;
+.delete-recipe {
+    background: #ff000052;
+    width: 6em;
+    margin-left: auto;
 }
 .facebook { background: #3b5998; }
 .twitter { background: #1da1f2; }
 .pinterest { background: #e60023; }
 .reddit { background: #ff4500; }
-.email { background: #6c757d; }
+.email-recipe { background: black; }
+.copy-recipe { background: black; }
 
+/* Disabled state for platform buttons */
+.modal-action.platform-share-btn.disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+/* Email/copy buttons stay fully visible */
+.email-recipe, .copy-recipe {
+    opacity: 1 !important;
+}
 
 
 @media print {

@@ -320,6 +320,17 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
     }
 });
 
+add_action('wp_ajax_check_recipe_post', function() {
+    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
+    $recipe_id = sanitize_text_field($_POST['recipe_id']);
+    $post_id = recipe_generator_find_recipe_post($recipe_id);
+    
+    wp_send_json_success([
+        'has_post' => (bool)$post_id,
+        'post_url' => $post_id ? get_permalink($post_id) : null
+    ]);
+});
+
 // Standalone helper functions
 function recipe_generator_handle_frontend_request() {
     check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');

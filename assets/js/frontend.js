@@ -130,27 +130,50 @@ jQuery(document).ready(function($) {
         const $modalContent = $('#modal-recipe-content');
 
         $modal.data('current-recipe-id', recipeId);
-        
-        // Use the localized data
-        if (recipeGeneratorFrontendVars.saved_recipes && 
-            recipeGeneratorFrontendVars.saved_recipes[recipeId]) {
-            $modalContent.html(recipeGeneratorFrontendVars.saved_recipes[recipeId].html);
 
-            $modal.show();
-            setTimeout(() => {
-                $modal.addClass('show');
-            }, 10);
+        $.post(recipeGeneratorFrontendVars.ajaxurl, {
+            action: 'check_recipe_post',
+            recipe_id: recipeId,
+            _wpnonce: recipeGeneratorFrontendVars.nonce
+        }, function(response) {
+            const hasPost = response.data.has_post;
+            const postUrl = response.data.post_url;
+
+            const $viewPostBtn = $modal.find('.view-post-btn');
+            if (hasPost && postUrl) {
+                $viewPostBtn.show().attr('href', postUrl);
+            } else {
+                $viewPostBtn.hide().removeAttr('href');
+            }
             
-            // Smooth scroll to top of modal
-            $modalContent.scrollTop(0);
-        } else {
-            console.error('Recipe not found:', recipeId);
-            $modalContent.html('<p>Error: Recipe could not be loaded</p>');
-            $modal.show();
-            setTimeout(() => {
-                $modal.addClass('show');
-            }, 10);
-        }
+            // Store post status in modal data
+            $modal.data('has-post', hasPost);
+            $modal.data('post-url', postUrl);
+            
+            // Toggle platform share buttons
+            $('.platform-share-btn').toggleClass('disabled', !hasPost);
+        
+            // Use the localized data
+            if (recipeGeneratorFrontendVars.saved_recipes && 
+                recipeGeneratorFrontendVars.saved_recipes[recipeId]) {
+                $modalContent.html(recipeGeneratorFrontendVars.saved_recipes[recipeId].html);
+
+                $modal.show();
+                setTimeout(() => {
+                    $modal.addClass('show');
+                }, 10);
+                
+                // Smooth scroll to top of modal
+                $modalContent.scrollTop(0);
+            } else {
+                console.error('Recipe not found:', recipeId);
+                $modalContent.html('<p>Error: Recipe could not be loaded</p>');
+                $modal.show();
+                setTimeout(() => {
+                    $modal.addClass('show');
+                }, 10);
+            }
+        });
     });
 
     // Close modal
@@ -183,6 +206,105 @@ jQuery(document).ready(function($) {
         }
     });
 
+    // Close share modal
+    $(document).on('click', '.close-share-modal, .share-modal', function(e) {
+        if ($(e.target).hasClass('share-modal') || $(e.target).hasClass('close-share-modal')) {
+            $('#share-options-modal').hide();
+        }
+    });
+
+    // Platform-specific sharing
+    $(document).on('click', '.share-btn', function(e) {
+        e.preventDefault();
+        const platform = $(this).data('platform');
+        const recipeTitle = encodeURIComponent($('#modal-recipe-content h2').text() || 'Check out this recipe');
+        const recipeUrl = encodeURIComponent(window.location.href.split('?')[0]);
+        const recipeText = encodeURIComponent($('#modal-recipe-content').text().substring(0, 300) + '...');
+        
+        let shareUrl = '';
+        
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${recipeUrl}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${recipeTitle}&url=${recipeUrl}`;
+                break;
+            case 'pinterest':
+                // Note: Pinterest requires an image - using a placeholder
+                const imageUrl = encodeURIComponent('https://via.placeholder.com/300x200?text=Recipe');
+                shareUrl = `https://pinterest.com/pin/create/button/?url=${recipeUrl}&media=${imageUrl}&description=${recipeTitle}`;
+                break;
+            case 'reddit':
+                shareUrl = `https://www.reddit.com/submit?url=${recipeUrl}&title=${recipeTitle}`;
+                break;
+        }        
+        $('#share-options-modal').hide();
+    });
+
+    // Platform share handlers (only when enabled)
+    $(document).on('click', '.platform-share-btn:not(.disabled)', function(e) {
+        e.preventDefault();
+        const platform = $(this).data('platform');
+        const postUrl = $('#recipe-modal').data('post-url');
+        
+        switch(platform) {
+            case 'facebook':
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`, '_blank');
+                break;
+            case 'twitter':
+                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}`, '_blank');
+                break;
+            case 'pinterest':
+                window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(postUrl)}`, '_blank');
+                break;
+            case 'reddit':
+                window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(postUrl)}`, '_blank');
+                break;
+            // Add other platforms
+        }
+    });
+
+    $(document).on('click', '.delete-recipe', function() {
+        if (!confirm('Are you sure you want to delete this recipe?')) {
+            return;
+        }
+        
+        const $modal = $('#recipe-modal');
+        const recipeId = $modal.data('current-recipe-id');
+
+        if (!recipeId) {
+            alert('Error: Could not identify recipe to delete');
+            return;
+        }
+        
+        $.post(recipeGeneratorFrontendVars.ajaxurl, {
+            action: 'delete_saved_recipe',
+            recipe_id: recipeId,
+            _wpnonce: recipeGeneratorFrontendVars.nonce
+        }, function(response) {
+            if (response.success) {
+                // Close modal and remove from list
+                $modal.hide();
+                $(`.saved-recipe-item[data-recipe-id="${recipeId}"]`).remove();
+                
+                // Update count
+                const $count = $('.recipe-count');
+                if ($count.length) {
+                    const current = parseInt($count.text().match(/\d+/)[0]) || 0;
+                    $count.text(`(${current - 1})`);
+                }
+                
+                // Show feedback if no recipes left
+                if ($('.saved-recipe-item').length === 0) {
+                    $('.saved-recipes-list').html('<p>You have no saved recipes.</p>');
+                }
+            } else {
+                alert('Error: ' + (response.data || 'Could not delete recipe'));
+            }
+        });
+    });
+    
     $(document).on('click', '.print-recipe', function() {
         const printContent = $('#modal-recipe-content').html();
         const printWindow = window.open('', '', '');
@@ -246,89 +368,143 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // Close share modal
-    $(document).on('click', '.close-share-modal, .share-modal', function(e) {
-        if ($(e.target).hasClass('share-modal') || $(e.target).hasClass('close-share-modal')) {
-            $('#share-options-modal').hide();
-        }
-    });
-
-    // Platform-specific sharing
-    $(document).on('click', '.share-btn', function(e) {
-        e.preventDefault();
-        const platform = $(this).data('platform');
-        const recipeTitle = encodeURIComponent($('#modal-recipe-content h2').text() || 'Check out this recipe');
-        const recipeUrl = encodeURIComponent(window.location.href.split('?')[0]);
-        const recipeText = encodeURIComponent($('#modal-recipe-content').text().substring(0, 300) + '...');
+    $(document).on('click', '.copy-recipe', function() {
+        // Get the recipe content container PROPERLY
+        const recipeContent = $('#modal-recipe-content .recipe-json-output').clone();
         
-        let shareUrl = '';
+        // Extract all recipe components DIRECTLY from the HTML structure
+        const title = recipeContent.find('h2').text().trim();
+        const description = recipeContent.find('p.recipe-description').text().trim();
         
-        switch(platform) {
-            case 'facebook':
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${recipeUrl}`;
-                break;
-            case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?text=${recipeTitle}&url=${recipeUrl}`;
-                break;
-            case 'pinterest':
-                // Note: Pinterest requires an image - using a placeholder
-                const imageUrl = encodeURIComponent('https://via.placeholder.com/300x200?text=Recipe');
-                shareUrl = `https://pinterest.com/pin/create/button/?url=${recipeUrl}&media=${imageUrl}&description=${recipeTitle}`;
-                break;
-            case 'reddit':
-                shareUrl = `https://www.reddit.com/submit?url=${recipeUrl}&title=${recipeTitle}`;
-                break;
-            case 'email':
-                shareUrl = `mailto:?subject=${recipeTitle}&body=${recipeText}%0A%0ARead more: ${recipeUrl}`;
-                break;
-        }
+        // Get metadata - SERVINGS, PREP TIME, COOK TIME
+        const servings = recipeContent.find('.meta-group:contains("Servings") p').text().replace('Servings:', '').trim();
+        const prepTime = recipeContent.find('.meta-group:contains("Prep Time") p').text().replace('Prep Time:', '').trim();
+        const cookTime = recipeContent.find('.meta-group:contains("Cook Time") p').text().replace('Cook Time:', '').trim();
         
-        if (platform === 'email') {
-            window.location.href = shareUrl;
-        } else {
-            window.open(shareUrl, '_blank', '');
-        }
-        
-        $('#share-options-modal').hide();
-    });
-
-    $(document).on('click', '.delete-recipe', function() {
-        if (!confirm('Are you sure you want to delete this recipe?')) {
-            return;
-        }
-        
-        const $modal = $('#recipe-modal');
-        const recipeId = $modal.data('current-recipe-id');
-
-        if (!recipeId) {
-            alert('Error: Could not identify recipe to delete');
-            return;
-        }
-        
-        $.post(recipeGeneratorFrontendVars.ajaxurl, {
-            action: 'delete_saved_recipe',
-            recipe_id: recipeId,
-            _wpnonce: recipeGeneratorFrontendVars.nonce
-        }, function(response) {
-            if (response.success) {
-                // Close modal and remove from list
-                $modal.hide();
-                $(`.saved-recipe-item[data-recipe-id="${recipeId}"]`).remove();
-                
-                // Update count
-                const $count = $('.recipe-count');
-                if ($count.length) {
-                    const current = parseInt($count.text().match(/\d+/)[0]) || 0;
-                    $count.text(`(${current - 1})`);
-                }
-                
-                // Show feedback if no recipes left
-                if ($('.saved-recipe-item').length === 0) {
-                    $('.saved-recipes-list').html('<p>You have no saved recipes.</p>');
-                }
-            } else {
-                alert('Error: ' + (response.data || 'Could not delete recipe'));
-            }
+        // Get dietary tags
+        const dietaryTags = [];
+        recipeContent.find('.dietary-tag').each(function() {
+            dietaryTags.push($(this).text().trim());
         });
+        
+        // Get ingredients
+        const ingredients = [];
+        recipeContent.find('.recipe-ingredients li').each(function() {
+            ingredients.push('• ' + $(this).text().trim());
+        });
+        
+        // Get instructions
+        const instructions = [];
+        recipeContent.find('.recipe-instructions li').each(function(i) {
+            instructions.push(`${i+1}. ${$(this).text().trim()}`);
+        });
+        
+        // Get nutrition (if exists)
+        const nutrition = [];
+        recipeContent.find('.recipe-nutrition li').each(function() {
+            nutrition.push($(this).text().trim());
+        });
+        
+        // Build the final text output
+        const recipeText = `
+    ${title.toUpperCase()}
+    ${description ? '\n' + description + '\n' : ''}
+
+    Servings: ${servings} | Prep Time: ${prepTime} | Cook Time: ${cookTime}
+    ${dietaryTags.length ? 'Dietary: ' + dietaryTags.join(', ') + '\n' : ''}
+
+    INGREDIENTS:
+    ${ingredients.join('\n')}
+
+    INSTRUCTIONS:
+    ${instructions.join('\n')}
+
+    ${nutrition.length ? '\nNUTRITION:\n' + nutrition.join('\n') : ''}
+
+    --- 
+    Recipe from ${window.location.hostname}
+    `.trim();
+
+        // SIMPLE clipboard copy (no fancy functions needed)
+        const textarea = document.createElement('textarea');
+        textarea.value = recipeText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        try {
+            document.execCommand('copy');
+            const $button = $(this);
+            const originalText = $button.html();
+            $button.html('<span class="dashicons dashicons-yes"></span> Copied!');
+            setTimeout(() => $button.html(originalText), 2000);
+        } catch (err) {
+            prompt('Press Ctrl+C to copy:', recipeText);
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    });
+
+    $(document).on('click', '.email-recipe', function(e) {
+        e.preventDefault();
+        
+        // Get the recipe content container
+        const $recipe = $('#modal-recipe-content .recipe-json-output');
+        const staticSubjectPrefix = "Check out this recipe: ";
+         
+        
+        // Extract all components (same as print/copy)
+        const title = $recipe.find('h2').text().trim();
+        const description = $recipe.find('p.recipe-description').text().trim();
+        
+        // Get metadata
+        const metaItems = [];
+        $recipe.find('.meta-group').each(function() {
+            metaItems.push($(this).find('p').text().trim());
+        });
+        
+        // Format ingredients
+        const ingredients = [];
+        $recipe.find('.recipe-ingredients li').each(function() {
+            ingredients.push('• ' + $(this).text().trim());
+        });
+        
+        // Format instructions
+        const instructions = [];
+        $recipe.find('.recipe-instructions li').each(function(i) {
+            instructions.push(`${i+1}. ${$(this).text().trim()}`);
+        });
+        
+        // Format nutrition if exists
+        let nutrition = [];
+        $recipe.find('.recipe-nutrition li').each(function() {
+            nutrition.push($(this).text().trim());
+        });
+        
+        // Build email body (same formatting as print)
+        const emailBody = `
+    ${title.toUpperCase()}
+    ${description ? '\n' + description + '\n' : ''}
+
+    ${metaItems.join(' | ')}
+    ${nutrition.length ? '\nNUTRITION:\n' + nutrition.join('\n') : ''}
+
+    INGREDIENTS:
+    ${ingredients.join('\n')}
+
+    INSTRUCTIONS:
+    ${instructions.join('\n')}
+
+    --- 
+    Sent from ${window.location.hostname}
+    `.trim();
+        
+        // Encode for mailto link
+        const emailSubject = staticSubjectPrefix + title;
+        const encodedBody = encodeURIComponent(emailBody);
+        // const encodedSubject = encodeURIComponent(title);
+        const encodedSubject = encodeURIComponent(emailSubject);
+        
+        // Open email client
+        window.location.href = `mailto:?subject=${encodedSubject}&body=${encodedBody}`;
     });
 });
