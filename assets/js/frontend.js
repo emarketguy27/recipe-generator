@@ -9,8 +9,28 @@ jQuery(document).ready(function($) {
         
         // Show loading state
         $submitBtn.prop('disabled', true);
+        $submitBtn.addClass('clicked');
         $loading.show();
-        $results.hide().empty().removeClass('show');
+        // $results.hide().empty().removeClass('show');
+        // Loading message sequence
+        const messages = [
+            "Analyzing your ingredients...",
+            "Checking your Dietary Requirements...",
+            "Consulting our chef AI...",
+            "Verifying Nutrition...",
+            "Finalizing the perfect recipe..."
+        ];
+        
+        let currentMessage = 0;
+        $('.loading-text').text(messages[currentMessage]);
+        
+        // Cycle through messages every 3 seconds
+        const messageInterval = setInterval(() => {
+            currentMessage = (currentMessage + 1) % messages.length;
+            $('.loading-text').fadeOut(300, function() {
+                $(this).text(messages[currentMessage]).fadeIn(300);
+            });
+        }, 3500);
         
         // Prepare data
         var formData = {
@@ -27,12 +47,13 @@ jQuery(document).ready(function($) {
         // Make the request
         $.post(recipeGeneratorFrontendVars.ajaxurl, formData, function(response) {
             if (response.success) {
+                clearInterval(messageInterval);
                 $results.html(response.data.html).addClass('show').show();
                 $('#recipe-actions').show();
                 
                 // Smooth scroll to results with proper positioning
                 $('html, body').stop().animate({
-                    scrollTop: $results.offset().top - 80
+                    scrollTop: $results.offset().top - 140
                 }, 500);
             } else {
                 $results.html(
@@ -48,6 +69,7 @@ jQuery(document).ready(function($) {
         }).always(function() {
             $loading.hide();
             $submitBtn.prop('disabled', false);
+            $submitBtn.removeClass('clicked');
         });
     });
 
@@ -60,6 +82,7 @@ jQuery(document).ready(function($) {
         const recipeId = generateRecipeId(recipeHtml);
         
         $btn.prop('disabled', true);
+        $btn.addClass('clicked');
         $status.text('Saving...');
         
         $.post(recipeGeneratorFrontendVars.ajaxurl, {
@@ -70,6 +93,7 @@ jQuery(document).ready(function($) {
         }, function(response) {
             if (response.success) {
                 $btn.text('Saved!').prop('disabled', true);
+                $btn.toggleClass('saved');
                 $status.text('Recipe saved to your favorites!');
                 
                 // Update the count if on saved recipes page
@@ -85,6 +109,8 @@ jQuery(document).ready(function($) {
         }).fail(function() {
             $status.text('Connection error. Please try again.');
             $btn.prop('disabled', false);
+        }).always(function() {
+            $btn.removeClass('clicked');
         });
     });
 

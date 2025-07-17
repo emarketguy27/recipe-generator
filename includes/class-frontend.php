@@ -44,19 +44,19 @@ add_shortcode('recipe_generator', function($atts) {
                 </div>
             <?php endif; ?>
             
-            <button type="submit" class="rg-submit">
+            <button type="submit" class="rg-submit wp-element-button">
                 <?php esc_html_e('Generate Recipe', 'recipe-generator'); ?>
             </button>
             
             <div class="rg-loading" style="display:none;">
                 <div class="rg-spinner"></div>
-                <span><?php esc_html_e('Creating your recipe...', 'recipe-generator'); ?></span>
+                <p class="loading-text">Crafting your perfect recipe...</p>
             </div>
         </form>
         
         <div id="recipe-results" style="display:none;"></div>
         <div id="recipe-actions" style="display:none;">
-            <button id="save-recipe-btn" class="rg-submit">Save to Favorites</button>
+            <button id="save-recipe-btn" class="rg-submit wp-element-button">Save to Favorites</button>
             <span id="save-status"></span>
         </div>
     </div>
@@ -103,7 +103,7 @@ add_shortcode('user_saved_recipes', function($atts) {
                                     <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
-                            <button class="view-recipe-btn">View Recipe</button>
+                            <button class="view-recipe-btn wp-element-button">View Recipe</button>
                         </div>
                     </li>
                 <?php endforeach; ?>

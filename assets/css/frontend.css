@@ -29,31 +29,35 @@
 .dietary-options {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px;
 }
 .dietary-option {
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 8px 12px;
-    background: #0073aa70;
+    padding: 4px 12px;
+    margin-bottom: 0;
+    /* background: #0073aa70; */
+    border: 1px solid #0073aa70;
     border-radius: 4px;
     cursor: pointer;
+    transition: all .3s ease;
 }
 .dietary-option:hover {
     background: #0073aa;
 }
 .rg-submit {
-    background: #2271b1;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+    border-radius: 8px;
+    transition: all .3s ease;
 }
 .rg-submit:hover {
-    background: #135e96;
+    opacity: .8;
+    scale: 1.05;
+}
+.rg-submit.clicked {
+    animation: clicked 1.5s;
+    animation-delay: .5s;
+    animation-iteration-count: 2;
 }
 .rg-loading {
     display: none;
@@ -79,23 +83,56 @@
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.5s ease;
-    .recipe-tags {
-        .dietary-tag {
-            background: cadetblue;
-            padding: 2px 8px;
-            border-radius: 8px;
-            color: navajowhite;
+    h2, h4 {
+        font-size: 120%;
+        font-weight: 700;
+    }
+    h4 {
+        display: flex;
+        align-items: center;
+        text-indent: .6em;
+        &::before {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 2rem;
+            border-radius: 6px;
+            background: linear-gradient(0deg,var(--wp--preset--color--accent-3) 0%, var(--wp--preset--color--accent-1) 100%);
         }
     }
 }
 #recipe-results.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0px);
+    border-top: 1px solid #0073aa2e;
+}
+.dietary-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .3em;
+    background: cadetblue;
+    padding: 2px 8px;
+    border-radius: 8px;
+    color: navajowhite;
+    text-transform: capitalize;
 }
 .recipe-meta {
     display: flex;
     justify-content: space-between;
     gap: 1em;
+}
+.meta-group {
+    display: flex;
+    align-items: center;
+    gap: .3em;
+    .dashicons {
+        width: 2rem;
+        height: 2rem;
+        font-size: 2rem;
+        color: var(--wp--preset--color--accent-1);
+        text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.6);
+
+    }
 }
 #recipe-actions {
     margin-top: 20px;
@@ -107,45 +144,50 @@
     color: #0073aa;
     font-weight: bold;
 }
+#save-recipe-btn.saved {
+    background: mediumseagreen;
+}
+#save-recipe-btn.saved:before {
+    content: "✓ ";
+}
 
-/* SAVED RECIPES LIST DISPLY STYLES */
+/* SAVED RECIPES LIST DISPLAY STYLES */
 .user-saved-recipes {
     margin: 20px 0;
+    h3 {
+        margin-block-start: 0;
+        font-weight: 700;
+        span {
+            font-weight: 300;
+            font-size: .9rem;
+        }
+    }
 }
 .saved-recipes-list {
     list-style: none;
     padding: 0;
 }
 .saved-recipe-item {
-    border: 1px solid #dddddd31;
+    border: 1px solid #0073aa29;
     padding: 4px;
-    margin-bottom: 10px;
+    margin-top: 10px;
     border-radius: 4px;
     .recipe-summary {
         h4 {
+            font-weight: 600;
             margin-block: 0;
+            text-wrap: balance;
+            margin-bottom: .5em;
         }
     }
 }
 .dietary-tags {
     margin: 8px 0;
 }
-.dietary-tag {
-    display: inline-block;
-    background: #e0f7fa;
-    color: #00796b;
-    padding: 2px 8px;
-    margin-right: 5px;
-    border-radius: 12px;
-    font-size: 0.8em;
-}
 .view-recipe-btn {
-    background: #0073aa;
-    color: white;
-    border: none;
     padding: 5px 10px;
-    border-radius: 3px;
-    cursor: pointer;
+    border-radius: 8px;
+    transition: all .3s ease;
 }
 
 /* Modal Styles */
@@ -166,7 +208,7 @@
     opacity: 1;
 }
 .modal-content {
-    background-color: #c3c4c7;
+    background-color: ghostwhite;
     color: var(--wp--preset--color--contrast);
     margin: 5% auto;
     padding: 20px;
@@ -202,10 +244,10 @@
     gap: 10px;
     margin-top: 2em;
     padding-bottom: 1em;
-    border-bottom: 1px solid #eeeeee42;
+    border-bottom: 1px solid #0073aa60;
 }
 .modal-action {
-    background: #f0f0f1;
+    background: #abb8c3;
     border: none;
     padding: 8px 12px;
     border-radius: 4px;
@@ -228,7 +270,8 @@
     margin-left: auto;
 }
 .delete-recipe:hover {
-    background: #f8e8e8;
+    background: #f53030;
+    color: whitesmoke;
 }
 
 /* Share Modal */
@@ -331,3 +374,8 @@
     100% { transform: rotate(360deg); }
 }
 
+@keyframes clicked {
+    0% { scale: 1;}
+    50% { scale: 1.02;}
+    100% { scale: 1.;}
+}

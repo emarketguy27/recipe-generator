@@ -199,7 +199,7 @@ class Recipe_Generator_API_Handler {
         ob_start(); ?>
         <div class="recipe-json-output">
             <?php if (!empty($recipe_data['recipe_name'])) : ?>
-                <h3><?php echo esc_html($recipe_data['recipe_name']); ?></h3>
+                <h2><?php echo esc_html($recipe_data['recipe_name']); ?></h2>
             <?php endif; ?>
             
             <?php if (!empty($recipe_data['description'])) : ?>
@@ -208,15 +208,26 @@ class Recipe_Generator_API_Handler {
             
             <div class="recipe-meta">
                 <?php if (!empty($recipe_data['servings'])) : ?>
-                    <p><strong><?php esc_html_e('Servings:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['servings']); ?></p>
+                    <div class="meta-group">
+                        <span class="dashicons dashicons-groups"></span>
+                        <p><strong><?php esc_html_e('Servings:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['servings']); ?></p>
+                    </div>
                 <?php endif; ?>
                 
                 <?php if (!empty($recipe_data['preparation_time'])) : ?>
-                    <p><strong><?php esc_html_e('Prep Time:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['preparation_time']); ?></p>
+                    <div class="meta-group">
+                        <span class="dashicons dashicons-clock"></span>
+                        <p><strong><?php esc_html_e('Prep Time:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['preparation_time']); ?></p>
+                    </div>
+                    
                 <?php endif; ?>
                 
                 <?php if (!empty($recipe_data['cooking_time'])) : ?>
-                    <p><strong><?php esc_html_e('Cook Time:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['cooking_time']); ?></p>
+                    <div class="meta-group">
+                        <span class="dashicons dashicons-food"></span>
+                        <p><strong><?php esc_html_e('Cook Time:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['cooking_time']); ?></p>
+                    </div>
+                    
                 <?php endif; ?>
             </div>
             
@@ -250,7 +261,7 @@ class Recipe_Generator_API_Handler {
             <?php if (!empty($recipe_data['dietary_tags'])) : ?>
                 <div class="recipe-tags">
                     <?php foreach ((array)$recipe_data['dietary_tags'] as $tag) : ?>
-                        <span class="dietary-tag"><?php echo esc_html($tag); ?></span>
+                        <span class="dietary-tag"><span class="dashicons dashicons-tag"></span><?php echo esc_html($tag); ?></span>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
