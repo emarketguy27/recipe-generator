@@ -273,7 +273,15 @@
     background: #f53030;
     color: whitesmoke;
 }
+.modal-action.copied {
+    background-color: #4CAF50;
+    color: white;
+}
 
+.modal-action .dashicons-yes {
+    margin-right: 5px;
+    vertical-align: middle;
+}
 /* Share Modal */
 .share-modal {
     position: fixed;

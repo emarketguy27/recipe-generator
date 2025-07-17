@@ -128,6 +128,8 @@ jQuery(document).ready(function($) {
         const recipeId = $item.data('recipe-id');
         const $modal = $('#recipe-modal');
         const $modalContent = $('#modal-recipe-content');
+
+        $modal.data('current-recipe-id', recipeId);
         
         // Use the localized data
         if (recipeGeneratorFrontendVars.saved_recipes && 
@@ -296,8 +298,12 @@ jQuery(document).ready(function($) {
         }
         
         const $modal = $('#recipe-modal');
-        const recipeId = $('.saved-recipe-item[style*="display: block"]').data('recipe-id') || 
-                        $('.saved-recipe-item').first().data('recipe-id');
+        const recipeId = $modal.data('current-recipe-id');
+
+        if (!recipeId) {
+            alert('Error: Could not identify recipe to delete');
+            return;
+        }
         
         $.post(recipeGeneratorFrontendVars.ajaxurl, {
             action: 'delete_saved_recipe',
