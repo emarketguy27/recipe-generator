@@ -61,12 +61,21 @@ class Recipe_Generator {
                     'singular_name' => 'AI Recipe'
                 ],
                 'public' => true,
-                'show_ui' => true,
-                'show_in_rest' => true, // Critical for block editor
-                'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],
+                'show_in_rest' => true,  // Important for block editor
+                'supports' => [
+                    'title', 
+                    'editor', 
+                    'author', 
+                    'thumbnail',
+                    'excerpt',
+                    'comments', 
+                    'custom-fields'],
+                'taxonomies' => ['category', 'post_tag'],  // Keep existing taxonomy support
+                'has_archive' => true,
                 'rewrite' => ['slug' => 'ai-recipes'],
                 'capability_type' => 'post',
-                'has_archive' => true
+                'map_meta_cap' => true,
+                'menu_icon' => 'dashicons-food'
             ]);
             
             // Flush rewrite rules on activation
@@ -74,10 +83,10 @@ class Recipe_Generator {
         }
     }
 
-    public function flush_rewrite_rules() {
-        $this->register_post_types();
-        flush_rewrite_rules();
-    }
+    // public function flush_rewrite_rules() {
+    //     $this->register_post_types();
+    //     flush_rewrite_rules();
+    // }
     
     /*** Enqueue frontend assets ***/
     public function enqueue_frontend_assets() {

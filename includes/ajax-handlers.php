@@ -411,7 +411,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
             'post_content' => implode("\n\n", $blocks),
             'post_status'  => 'draft',
             'post_author'  => $user_id,
-            'post_type'    => 'post'
+            'post_type'    => 'ai_recipe'
         ]);
         
         if (is_wp_error($post_id)) {

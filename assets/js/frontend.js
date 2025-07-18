@@ -132,6 +132,7 @@ jQuery(document).ready(function($) {
     }
 
     $(document).on('click', '.view-recipe-btn', function() {
+        console.log("view Recipe Clicked");
         const $item = $(this).closest('.saved-recipe-item');
         const recipeId = $item.data('recipe-id');
         const $modal = $('#recipe-modal');
