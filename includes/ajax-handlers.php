@@ -249,75 +249,204 @@ add_action('admin_action_delete_recipe', function() {
 });
 
 add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
-    error_log('Bulk create request received: ' . print_r($_REQUEST, true)); // Debug
-
-    try {
-        check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
     
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Permission denied.', 'recipe-generator'));
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(__('Permission denied.', 'recipe-generator'));
+    }
+
+    error_log('[Recipe Generator] Bulk create initiated');
+    $recipes = isset($_POST['recipes']) ? (array)$_POST['recipes'] : [];
+    $created = 0;
+    $created_posts = [];
+    
+    foreach ($recipes as $recipe_data) {
+        $recipe_id = sanitize_text_field($recipe_data['id']);
+        $user_id = absint($recipe_data['user_id']);
+        
+        // Get the full recipe data
+        $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+        
+        if (!isset($saved_recipes[$recipe_id])) {
+            error_log("[Recipe Generator] Recipe not found: {$recipe_id}");
+            continue;
+        }
+        
+        $recipe = $saved_recipes[$recipe_id];
+        error_log('[Recipe Generator] Processing recipe: ' . $recipe['name']);
+
+        // Parse HTML content
+        $dom = new DOMDocument();
+        @$dom->loadHTML($recipe['html']);
+        $xpath = new DOMXPath($dom);
+        
+        // Extract all elements
+        $servings = $xpath->query("//p[contains(., 'Servings:')]")->item(0)->nodeValue ?? '';
+        $prep_time = $xpath->query("//p[contains(., 'Prep Time:')]")->item(0)->nodeValue ?? '';
+        $cook_time = $xpath->query("//p[contains(., 'Cook Time:')]")->item(0)->nodeValue ?? '';
+        
+        $ingredients = [];
+        $ingredient_nodes = $xpath->query("//ul[@class='recipe-ingredients']/li");
+        foreach ($ingredient_nodes as $node) {
+            $ingredients[] = trim($node->nodeValue);
+        }
+        
+        $instructions = [];
+        $instruction_nodes = $xpath->query("//ol[@class='recipe-instructions']/li");
+        foreach ($instruction_nodes as $node) {
+            $instructions[] = trim($node->nodeValue);
+        }
+        
+        $nutrition = [];
+        $nutrition_nodes = $xpath->query("//ul[@class='recipe-nutrition']/li");
+        foreach ($nutrition_nodes as $node) {
+            $nutrition[] = trim($node->nodeValue);
         }
 
-        $recipes = isset($_POST['recipes']) ? (array)$_POST['recipes'] : [];
-        $created = 0;
-        $created_posts = [];
+        // Generate block content
+        $blocks = [];
+
+        $blocks[] = '<!-- wp:group {"layout":{"type":"constrained","wideSize":"800px"},"style":{"spacing":{"padding":{"top":"20px","bottom":"20px"}}}} -->';
+        $blocks[] = '<div class="wp-block-group">';
         
-        foreach ($recipes as $recipe_data) {
-            $recipe_id = sanitize_text_field($recipe_data['id']);
-            $user_id = absint($recipe_data['user_id']);
-            
-            $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
-            
-            if (isset($saved_recipes[$recipe_id])) {
-                $recipe = $saved_recipes[$recipe_id];
-                
-                // Skip if post already exists
-                if (recipe_generator_find_recipe_post($recipe_id)) {
-                    continue;
-                }
-                
-                $post_id = wp_insert_post([
-                    'post_title'   => $recipe['name'],
-                    'post_content' => $recipe['html'],
-                    'post_status' => 'draft',
-                    'post_author' => $user_id,
-                    'post_type'   => 'post'
-                ]);
-                
-                if (!is_wp_error($post_id)) {
-                    // Set category and tags
-                    $recipe_category = get_category_by_slug('recipe');
-                    if ($recipe_category) {
-                        wp_set_post_categories($post_id, [$recipe_category->term_id]);
-                    }
-                    
-                    if (!empty($recipe['dietary_tags'])) {
-                        wp_set_post_tags($post_id, $recipe['dietary_tags']);
-                    }
-                    
-                    update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
-                    update_post_meta($post_id, '_recipe_original_user', $user_id);
-                    
-                    $created++;
-                    $created_posts[] = [
-                        'recipe_id' => $recipe_id,
-                        'post_id' => $post_id,
-                        'edit_link' => get_edit_post_link($post_id)
-                    ];
-                }
+        // 1. Description
+        if (!empty($recipe['description'])) {
+            $blocks[] = '<!-- wp:paragraph --><p>' . esc_html($recipe['description']) . '</p><!-- /wp:paragraph -->';
+        }
+
+        // 2. Meta Group 1 (Times/Servings)
+        $meta_items = [
+            'servings' => [
+                'icon' => 'groups',
+                // 'label' => 'Servings',
+                'value' => $servings
+            ],
+            'prep_time' => [
+                'icon' => 'clock',
+                // 'label' => 'Prep',
+                'value' => $prep_time
+            ],
+            'cook_time' => [
+                'icon' => 'food',
+                // 'label' => 'Cook',
+                'value' => $cook_time
+            ]
+        ];
+
+        $blocks[] = '<!-- wp:group {"style":{"spacing":{"blockGap":"0.5em"}},"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between"}} -->';
+        $blocks[] = '<div class="wp-block-group">';
+
+        foreach ($meta_items as $item) {
+            if (!empty($item['value'])) {
+                $blocks[] = sprintf(
+                    '<!-- wp:paragraph {"style":{"layout":{"selfStretch":"fixed","flexSize":"auto"}},"className":"recipe-meta-item"} -->
+                    <p class="recipe-meta-item" style="display:inline-flex;align-items:center;gap:0.3em;margin:0 !important;">
+                        <span class="dashicons dashicons-%s" style="font-size:1.4em;width:auto;height:auto;color:var(--wp--preset--color--accent-1)"></span>
+                        <span>%s: %s</span>
+                    </p>
+                    <!-- /wp:paragraph -->',
+                    esc_attr($item['icon']),
+                    esc_html($item['label']),
+                    esc_html($item['value'])
+                );
             }
         }
-        
-        wp_send_json_success([
-            'count' => $created,
-            'created_posts' => $created_posts,
-            'message' => sprintf(_n('Created %d post', 'Created %d posts', $created), $created)
-        ]);
 
-    } catch (Exception $e) {
-        error_log('Error in bulk create: ' . $e->getMessage());
-        wp_send_json_error(__('An unexpected error occurred.', 'recipe-generator'));
+        $blocks[] = '</div>';
+        $blocks[] = '<!-- /wp:group -->';
+
+        // 3. Meta Group 2 (Dietary Tags)
+        if (!empty($recipe['dietary_tags'])) {
+            $blocks[] = '<!-- wp:group {"layout":{"type":"constrained"},"style":{"spacing":{"margin":{"top":"1em","bottom":"1em"}}}} -->';
+            $blocks[] = '<div class="wp-block-group">';
+            
+            // Let WordPress handle the term rendering
+            $blocks[] = '<!-- wp:post-terms {"term":"post_tag"} /-->';
+            
+            $blocks[] = '</div>';
+            $blocks[] = '<!-- /wp:group -->';
+            
+            // Add the terms after the block is created
+            add_action('wp_insert_post', function($post_id) use ($recipe) {
+                if (!empty($recipe['dietary_tags'])) {
+                    wp_set_post_tags($post_id, $recipe['dietary_tags']);
+                }
+            }, 10, 1);
+        }
+        
+        // 4. Ingredients
+        if (!empty($ingredients)) {
+            $blocks[] = '<!-- wp:heading {"level":3} --><h3>Ingredients</h3><!-- /wp:heading -->';
+            $ingredient_blocks = array_map(function($item) {
+                return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
+            }, $ingredients);
+            $blocks[] = '<!-- wp:list --><ul>' . implode('', $ingredient_blocks) . '</ul><!-- /wp:list -->';
+        }
+        
+        // 5. Instructions
+        if (!empty($instructions)) {
+            $blocks[] = '<!-- wp:heading {"level":3} --><h3>Instructions</h3><!-- /wp:heading -->';
+            $instruction_blocks = array_map(function($item) {
+                return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
+            }, $instructions);
+            $blocks[] = '<!-- wp:list {"ordered":true} --><ol>' . implode('', $instruction_blocks) . '</ol><!-- /wp:list -->';
+        }
+        
+        // 6. Nutrition
+        if (!empty($nutrition)) {
+            $blocks[] = '<!-- wp:heading {"level":3} --><h3>Nutritional Information</h3><!-- /wp:heading -->';
+            $nutrition_blocks = array_map(function($item) {
+                return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
+            }, $nutrition);
+            $blocks[] = '<!-- wp:list --><ul>' . implode('', $nutrition_blocks) . '</ul><!-- /wp:list -->';
+        }
+        $blocks[] = '</div>';
+        $blocks[] = '<!-- /wp:group -->';
+        
+        error_log('[Recipe Generator] Generated blocks structure: ' . print_r($blocks, true));
+        
+        // Create the post
+        $post_id = wp_insert_post([
+            'post_title'   => $recipe['name'],
+            'post_content' => implode("\n\n", $blocks),
+            'post_status'  => 'draft',
+            'post_author'  => $user_id,
+            'post_type'    => 'post'
+        ]);
+        
+        if (is_wp_error($post_id)) {
+            error_log('[Recipe Generator] Post creation failed: ' . $post_id->get_error_message());
+            continue;
+        }
+
+        // Set category and tags
+        if ($recipe_category = get_category_by_slug('recipe')) {
+            wp_set_post_categories($post_id, [$recipe_category->term_id]);
+        }
+        
+        if (!empty($recipe['dietary_tags'])) {
+            wp_set_post_tags($post_id, $recipe['dietary_tags']);
+        }
+
+        // Add custom meta
+        update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
+        update_post_meta($post_id, '_recipe_original_user', $user_id);
+        
+        $created++;
+        $created_posts[] = [
+            'recipe_id' => $recipe_id,
+            'post_id' => $post_id,
+            'edit_link' => get_edit_post_link($post_id, 'raw')
+        ];
+        
+        error_log("[Recipe Generator] Successfully created post ID: {$post_id}");
     }
+    
+    wp_send_json_success([
+        'count' => $created,
+        'created_posts' => $created_posts,
+        'message' => sprintf(_n('Created %d post', 'Created %d posts', $created), $created)
+    ]);
 });
 
 add_action('wp_ajax_check_recipe_post', function() {

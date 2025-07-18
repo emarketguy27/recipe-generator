@@ -7,6 +7,7 @@ class Recipe_Generator_Admin_Saved_Recipes {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_submenu_page'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
+        
     }
 
     public function add_submenu_page() {
@@ -62,92 +63,274 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     }
 
     // Handle bulk actions
-    public function process_bulk_action() {
-        error_log('Bulk action triggered: ' . $this->current_action()); // Debug
+    // public function process_bulk_action() {
+    //     error_log('Bulk action triggered: ' . $this->current_action()); // Debug
 
-        if (!current_user_can('manage_options')) {
+    //     if (!current_user_can('manage_options')) {
+    //         return;
+    //     }
+
+    //     $recipe_ids = isset($_REQUEST['recipe']) ? (array)$_REQUEST['recipe'] : [];
+    //     $user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
+
+    //     if (empty($recipe_ids) || empty($user_id)) {
+    //         return;
+    //     }
+
+    //     switch ($this->current_action()) {
+    //         case 'create_post':
+    //             foreach ($recipe_ids as $index => $recipe_id) {
+    //                 $user_id = $user_ids[$index] ?? 0;
+    //                 error_log("Processing recipe $recipe_id for user $user_id");
+                    
+    //                 $result = $this->create_recipe_post($recipe_id, $user_id);
+    //                 if ($result) {
+    //                     error_log("Created post ID: $result");
+    //                 } else {
+    //                     error_log("Failed to create post for recipe $recipe_id");
+    //                 }
+    //             }
+    //             break;
+                
+    //         case 'delete':
+    //             $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    //             foreach ($recipe_ids as $recipe_id) {
+    //                 if (isset($saved_recipes[$recipe_id])) {
+    //                     unset($saved_recipes[$recipe_id]);
+    //                 }
+    //             }
+    //             update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+    //             break;
+    //     }
+    //     add_action('admin_notices', function() {
+    //         echo '<div class="notice notice-success is-dismissible"><p>Bulk action completed.</p></div>';
+    //     });
+    // }
+    public function process_bulk_action() {
+        if ($this->current_action() !== 'delete' || !current_user_can('manage_options')) {
             return;
         }
+        error_log('Bulk delete request received: ' . print_r($_REQUEST, true)); // Debug
 
         $recipe_ids = isset($_REQUEST['recipe']) ? (array)$_REQUEST['recipe'] : [];
         $user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
-
-        error_log('Recipe IDs: ' . print_r($recipe_ids, true)); // Debug
-        // error_log('User IDs: ' . print_r($user_ids, true)); // Debug
 
         if (empty($recipe_ids) || empty($user_id)) {
             return;
         }
 
-        switch ($this->current_action()) {
-            case 'create_post':
-                foreach ($recipe_ids as $index => $recipe_id) {
-                    $user_id = $user_ids[$index] ?? 0;
-                    error_log("Processing recipe $recipe_id for user $user_id");
-                    
-                    $result = $this->create_recipe_post($recipe_id, $user_id);
-                    if ($result) {
-                        error_log("Created post ID: $result");
-                    } else {
-                        error_log("Failed to create post for recipe $recipe_id");
-                    }
-                }
-                break;
-                
-            case 'delete':
-                $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
-                foreach ($recipe_ids as $recipe_id) {
-                    if (isset($saved_recipes[$recipe_id])) {
-                        unset($saved_recipes[$recipe_id]);
-                    }
-                }
-                update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
-                break;
+        $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+        foreach ($recipe_ids as $recipe_id) {
+            unset($saved_recipes[$recipe_id]);
         }
-        add_action('admin_notices', function() {
-            echo '<div class="notice notice-success is-dismissible"><p>Bulk action completed.</p></div>';
-        });
+        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
     }
 
     // Method to create WordPress post from recipe
+    // private function create_recipe_post($recipe_id, $user_id) {
+    //     $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+        
+    //     if (!isset($saved_recipes[$recipe_id])) {
+    //         return false;
+    //     }
+
+    //     $recipe = $saved_recipes[$recipe_id];
+        
+    //     // Create post
+    //     $post_id = wp_insert_post([
+    //         'post_title'   => $recipe['name'],
+    //         'post_content' => $recipe['html'],
+    //         'post_status' => 'publish',
+    //         'post_author' => $user_id,
+    //         'post_type'   => 'post'
+    //     ]);
+
+    //     if (is_wp_error($post_id)) {
+    //         return false;
+    //     }
+
+    //     // Set Recipe category
+    //     $recipe_category = get_category_by_slug('recipe');
+    //     if ($recipe_category) {
+    //         wp_set_post_categories($post_id, [$recipe_category->term_id]);
+    //     }
+
+    //     // Set dietary tags as post tags
+    //     if (!empty($recipe['dietary_tags'])) {
+    //         wp_set_post_tags($post_id, $recipe['dietary_tags']);
+    //     }
+
+    //     // Add custom meta
+    //     update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
+    //     update_post_meta($post_id, '_recipe_original_user', $user_id);
+
+    //     return true;
+    // }
     private function create_recipe_post($recipe_id, $user_id) {
+        error_log("Recipe Creation Instigated - create_recipe_post()");
         $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
         
         if (!isset($saved_recipes[$recipe_id])) {
+            error_log("Recipe $recipe_id not found for user $user_id");
             return false;
         }
 
         $recipe = $saved_recipes[$recipe_id];
         
-        // Create post
+        // Build blocks array
+        $blocks = [];
+        
+        // 1. Title (handled by post_title)
+        
+        // 2. Description
+        if (!empty($recipe['description'])) {
+            $blocks[] = [
+                'blockName' => 'core/paragraph',
+                'attrs' => [],
+                'innerHTML' => '<p>' . esc_html($recipe['description']) . '</p>'
+            ];
+        }
+        
+        // 3. Recipe Meta (simple paragraph for now)
+        $meta = [];
+        if (!empty($recipe['servings'])) $meta[] = 'Servings: ' . $recipe['servings'];
+        if (!empty($recipe['preparation_time'])) $meta[] = 'Prep: ' . $recipe['preparation_time'];
+        if (!empty($recipe['cooking_time'])) $meta[] = 'Cook: ' . $recipe['cooking_time'];
+        
+        if (!empty($meta)) {
+            $blocks[] = [
+                'blockName' => 'core/paragraph',
+                'attrs' => [],
+                'innerHTML' => '<p>' . implode(' | ', $meta) . '</p>'
+            ];
+        }
+        
+        // 4. Ingredients
+        if (!empty($recipe['ingredients'])) {
+            $blocks[] = [
+                'blockName' => 'core/heading',
+                'attrs' => ['level' => 3],
+                'innerHTML' => '<h3>Ingredients</h3>'
+            ];
+            
+            $ingredient_items = array_map(function($item) {
+                return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
+            }, $recipe['ingredients']);
+            
+            $blocks[] = [
+                'blockName' => 'core/list',
+                'attrs' => [],
+                'innerHTML' => '<ul>' . implode('', $ingredient_items) . '</ul>'
+            ];
+        }
+        
+        // 5. Instructions
+        if (!empty($recipe['method'])) {
+            $blocks[] = [
+                'blockName' => 'core/heading',
+                'attrs' => ['level' => 3],
+                'innerHTML' => '<h3>Instructions</h3>'
+            ];
+            
+            $method_items = array_map(function($item) {
+                return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
+            }, $recipe['method']);
+            
+            $blocks[] = [
+                'blockName' => 'core/list',
+                'attrs' => ['ordered' => true],
+                'innerHTML' => '<ol>' . implode('', $method_items) . '</ol>'
+            ];
+        }
+        
+        // Create the post
         $post_id = wp_insert_post([
-            'post_title'   => $recipe['name'],
-            'post_content' => $recipe['html'],
-            'post_status' => 'publish',
+            'post_title' => $recipe['name'],
+            'post_content' => serialize_blocks($blocks),
+            'post_status' => 'draft',
             'post_author' => $user_id,
-            'post_type'   => 'post'
+            'post_type' => 'ai_recipe',
+            'meta_input' => [
+                '_recipe_generator_id' => $recipe_id,
+                '_recipe_original_user' => $user_id
+            ]
         ]);
-
+        
         if (is_wp_error($post_id)) {
+            error_log('Post creation failed: ' . $post_id->get_error_message());
             return false;
         }
-
-        // Set Recipe category
-        $recipe_category = get_category_by_slug('recipe');
-        if ($recipe_category) {
+        
+        // Set taxonomy terms
+        if ($recipe_category = get_category_by_slug('recipe')) {
             wp_set_post_categories($post_id, [$recipe_category->term_id]);
         }
-
-        // Set dietary tags as post tags
+        
         if (!empty($recipe['dietary_tags'])) {
             wp_set_post_tags($post_id, $recipe['dietary_tags']);
         }
+        
+        return $post_id;
+    }
 
-        // Add custom meta
-        update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
-        update_post_meta($post_id, '_recipe_original_user', $user_id);
+    // Helper methods for block creation
+    private function create_paragraph_block($content) {
+        return [
+            'blockName' => 'core/paragraph',
+            'attrs' => [],
+            'innerBlocks' => [],
+            'innerHTML' => '<p>' . esc_html($content) . '</p>',
+            'innerContent' => ['<p>' . esc_html($content) . '</p>']
+        ];
+    }
 
-        return true;
+    private function create_heading_block($content, $level = 2) {
+        return [
+            'blockName' => 'core/heading',
+            'attrs' => ['level' => $level],
+            'innerBlocks' => [],
+            'innerHTML' => '<h' . $level . '>' . esc_html($content) . '</h' . $level . '>',
+            'innerContent' => ['<h' . $level . '>' . esc_html($content) . '</h' . $level . '>']
+        ];
+    }
+
+    private function create_list_block($items, $ordered = false) {
+        $list_items = array_map(function($item) {
+            return [
+                'blockName' => 'core/list-item',
+                'attrs' => [],
+                'innerHTML' => '<li>' . esc_html($item) . '</li>',
+                'innerContent' => ['<li>' . esc_html($item) . '</li>']
+            ];
+        }, $items);
+
+        return [
+            'blockName' => 'core/list',
+            'attrs' => ['ordered' => $ordered],
+            'innerBlocks' => $list_items,
+            'innerHTML' => $ordered ? '<ol></ol>' : '<ul></ul>',
+            'innerContent' => array_fill(0, count($list_items) * 2, null)
+        ];
+    }
+
+    private function create_columns_block($inner_blocks) {
+        $columns = array_map(function($block) {
+            return [
+                'blockName' => 'core/column',
+                'attrs' => [],
+                'innerBlocks' => [$block],
+                'innerHTML' => '<div class="wp-block-column"></div>',
+                'innerContent' => ['', '']
+            ];
+        }, $inner_blocks);
+
+        return [
+            'blockName' => 'core/columns',
+            'attrs' => [],
+            'innerBlocks' => $columns,
+            'innerHTML' => '<div class="wp-block-columns"></div>',
+            'innerContent' => array_fill(0, count($columns) * 2, null)
+        ];
     }
 
     public function __construct() {

@@ -283,6 +283,7 @@ jQuery(document).ready(function($) {
                         '<a href="' + adminurl + 'edit.php?post_status=draft&post_type=post">View drafts</a>' +
                         '</p></div>'
                     );
+                    window.location.reload();
                 } else {
                     alert('Error: ' + (response.data || 'Operation failed'));
                     $button.prop('disabled', false).text('Apply');

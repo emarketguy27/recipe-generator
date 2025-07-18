@@ -271,14 +271,6 @@
     color: var(--wp--preset--color--accent-3);
     line-height: 1.2rem;
 }
-/* .delete-recipe {
-    color: #d63638;
-    margin-left: auto;
-}
-.delete-recipe:hover {
-    background: #f53030;
-    color: whitesmoke;
-} */
 .modal-action.copied {
     background-color: #4CAF50;
     color: white;
