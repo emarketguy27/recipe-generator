@@ -81,6 +81,12 @@ jQuery(document).ready(function($) {
         // Generate unique ID from recipe content
         const recipeId = generateRecipeId(recipeHtml);
         
+        // Extract dietary tags from the generated recipe HTML
+        const dietaryTags = [];
+        $('#recipe-results .dietary-tag').each(function() {
+            dietaryTags.push($(this).text().trim());
+        });
+
         $btn.prop('disabled', true);
         $btn.addClass('clicked');
         $status.text('Saving...');
@@ -89,6 +95,7 @@ jQuery(document).ready(function($) {
             action: 'save_ai_recipe_to_favorites',
             recipe_id: recipeId,
             recipe_html: recipeHtml,
+            dietary_tags: dietaryTags, // Add the tags to the AJAX request
             _wpnonce: recipeGeneratorFrontendVars.nonce
         }, function(response) {
             if (response.success) {
@@ -112,6 +119,7 @@ jQuery(document).ready(function($) {
         }).always(function() {
             $btn.removeClass('clicked');
         });
+        console.log('Collected dietary tags:', dietaryTags);
     });
 
     // Unique ID creations for recipes being saved to user meta

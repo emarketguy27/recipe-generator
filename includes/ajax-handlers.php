@@ -570,11 +570,24 @@ function handle_save_ai_recipe_to_favorites() {
     }
 
     // Extract dietary tags from HTML
+    // $dietary_tags = [];
+    // if (preg_match_all('/<span class="dietary-tag">(.*?)<\/span>/i', $recipe_html, $matches)) {
+    //     $dietary_tags = array_map('sanitize_text_field', $matches[1]);
+    // }
     $dietary_tags = [];
-    if (preg_match_all('/<span class="dietary-tag">(.*?)<\/span>/i', $recipe_html, $matches)) {
-        $dietary_tags = array_map('sanitize_text_field', $matches[1]);
+    if (isset($_POST['dietary_tags'])) {
+        if (is_array($_POST['dietary_tags'])) {
+            $dietary_tags = array_map('sanitize_text_field', $_POST['dietary_tags']);
+        } else {
+            // Handle both comma-separated and other string formats
+            $tags_string = sanitize_text_field($_POST['dietary_tags']);
+            $dietary_tags = array_filter(array_map('trim', explode(',', $tags_string)));
+        }
     }
 
+    error_log('Received dietary_tags: ' . print_r($_POST['dietary_tags'], true));
+    error_log('Processed dietary_tags: ' . print_r($dietary_tags, true));
+    
     // Get existing saved recipes
     $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
     
