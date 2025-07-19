@@ -361,7 +361,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
             $blocks[] = '<div class="wp-block-group">';
             
             // Let WordPress handle the term rendering
-            $blocks[] = '<!-- wp:post-terms {"term":"post_tag"} /-->';
+            $blocks[] = '<!-- wp:post-terms {"term":"ai_recipe_tag"} /-->';
             
             $blocks[] = '</div>';
             $blocks[] = '<!-- /wp:group -->';
@@ -369,7 +369,17 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
             // Add the terms after the block is created
             add_action('wp_insert_post', function($post_id) use ($recipe) {
                 if (!empty($recipe['dietary_tags'])) {
-                    wp_set_post_tags($post_id, $recipe['dietary_tags']);
+                    $term_ids = array();
+                    foreach ($recipe['dietary_tags'] as $tag_name) {
+                        $term = term_exists($tag_name, 'ai_recipe_tag');
+                        if (!$term) {
+                            $term = wp_insert_term($tag_name, 'ai_recipe_tag');
+                        }
+                        if (!is_wp_error($term)) {
+                            $term_ids[] = (int)$term['term_id'];
+                        }
+                    }
+                    wp_set_object_terms($post_id, $term_ids, 'ai_recipe_tag');
                 }
             }, 10, 1);
         }
@@ -420,12 +430,24 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         }
 
         // Set category and tags
-        if ($recipe_category = get_category_by_slug('recipe')) {
-            wp_set_post_categories($post_id, [$recipe_category->term_id]);
+        $default_category = get_term_by('slug', 'main-dishes', 'ai_recipe_category');
+        if ($default_category) {
+            wp_set_object_terms($post_id, $default_category->term_id, 'ai_recipe_category');
         }
         
         if (!empty($recipe['dietary_tags'])) {
-            wp_set_post_tags($post_id, $recipe['dietary_tags']);
+            // Convert tag names to term IDs or create new terms
+            $term_ids = array();
+            foreach ($recipe['dietary_tags'] as $tag_name) {
+                $term = term_exists($tag_name, 'ai_recipe_tag');
+                if (!$term) {
+                    $term = wp_insert_term($tag_name, 'ai_recipe_tag');
+                }
+                if (!is_wp_error($term)) {
+                    $term_ids[] = (int)$term['term_id'];
+                }
+            }
+            wp_set_object_terms($post_id, $term_ids, 'ai_recipe_tag');
         }
 
         // Add custom meta

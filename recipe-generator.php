@@ -33,6 +33,9 @@ class Recipe_Generator {
 
         // Register frontend assets hook
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+
+        // Register Custom Taxonomies
+        add_action('init', [$this, 'init_recipe_taxonomies'], 20);
     }
 
     private function includes() {
@@ -47,80 +50,130 @@ class Recipe_Generator {
     }
 
     public function init() {
-        // Initialize admin interface
-        // if (is_admin()) {
-        //     new Recipe_Generator_Admin_AI_Settings();
-        // }
     }
 
     public function register_post_types() {
         if (!post_type_exists('ai_recipe')) {
-            register_post_type('ai_recipe', [
+            $args = [
                 'labels' => [
-                    'name' => 'AI Recipes',
-                    'singular_name' => 'AI Recipe'
+                    'name' => __('AI Recipes', 'recipe-generator'),
+                    'singular_name' => __('AI Recipe', 'recipe-generator'),
+                    'add_new' => __('Add New', 'recipe-generator'),
+                    'add_new_item' => __('Add New Recipe', 'recipe-generator'),
+                    'edit_item' => __('Edit Recipe', 'recipe-generator'),
+                    'new_item' => __('New Recipe', 'recipe-generator'),
+                    'view_item' => __('View Recipe', 'recipe-generator'),
+                    'view_items' => __('View Recipes', 'recipe-generator'),
+                    'taxonomies' => [],
+                    'search_items' => __('Search Recipes', 'recipe-generator'),
+                    'not_found' => __('No recipes found', 'recipe-generator'),
+                    'not_found_in_trash' => __('No recipes found in Trash', 'recipe-generator'),
+                    'all_items' => __('All Recipes', 'recipe-generator'),
+                    'archives' => __('Recipe Archives', 'recipe-generator'),
+                    'attributes' => __('Recipe Attributes', 'recipe-generator'),
+                    'insert_into_item' => __('Insert into recipe', 'recipe-generator')
                 ],
                 'public' => true,
-                'show_in_rest' => true,  // Important for block editor
-                'supports' => [
-                    'title', 
-                    'editor', 
-                    'author', 
-                    'thumbnail',
-                    'excerpt',
-                    'comments', 
-                    'custom-fields'],
-                'taxonomies' => ['category', 'post_tag'],  // Keep existing taxonomy support
+                'publicly_queryable' => true,
+                'show_ui' => true,
+                'show_in_menu' => true,
+                'show_in_nav_menus' => true,
+                'show_in_rest' => true,
+                'rest_base' => 'ai-recipes',
                 'has_archive' => true,
-                'rewrite' => ['slug' => 'ai-recipes'],
+                'rewrite' => [
+                    'slug' => 'ai-recipes',
+                    'with_front' => false
+                ],
+                'supports' => [
+                    'title', 'editor', 'author', 'thumbnail',
+                    'excerpt', 'comments', 'custom-fields'
+                ],
+                // 'taxonomies' => ['category', 'post_tag'],
                 'capability_type' => 'post',
                 'map_meta_cap' => true,
-                'menu_icon' => 'dashicons-food'
-            ]);
-            
-            // Flush rewrite rules on activation
-            register_activation_hook(__FILE__, [$this, 'flush_rewrite_rules']);
+                'menu_icon' => 'dashicons-food',
+                'menu_position' => 5,
+                'hierarchical' => false,
+                'can_export' => true
+            ];
+
+            register_post_type('ai_recipe', $args);            
         }
     }
 
-    // public function flush_rewrite_rules() {
-    //     $this->register_post_types();
-    //     flush_rewrite_rules();
-    // }
-    
-    /*** Enqueue frontend assets ***/
-    // public function enqueue_frontend_assets() {
-    //     // Only load if shortcode is present or on specific pages
-    //     global $post;
-    //     if (is_a($post, 'WP_Post') && (has_shortcode($post->post_content, 'recipe_generator') || 
-    //      has_shortcode($post->post_content, 'user_saved_recipes'))) {
-    //         wp_enqueue_style(
-    //             'recipe-generator-frontend',
-    //             RECIPE_GENERATOR_URL . 'assets/css/frontend.css',
-    //             [],
-    //             RECIPE_GENERATOR_VERSION
-    //         );
-            
-    //         wp_enqueue_script(
-    //             'recipe-generator-frontend',
-    //             RECIPE_GENERATOR_URL . 'assets/js/frontend.js',
-    //             ['jquery'],
-    //             RECIPE_GENERATOR_VERSION,
-    //             true
-    //         );
-            
-    //         wp_localize_script(
-    //             'recipe-generator-frontend',
-    //             'recipeGeneratorFrontendVars',
-    //             [
-    //                 'ajaxurl' => admin_url('admin-ajax.php'),
-    //                 'nonce' => wp_create_nonce('recipe_generator_frontend_nonce'),
-    //                 'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator'),
-    //                 'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
-    //             ]
-    //         );
-    //     }
-    // }
+    private function register_recipe_taxonomies() {
+        // Recipe Categories (hierarchical)
+        register_taxonomy('ai_recipe_category', 'ai_recipe', [
+            'hierarchical' => true,
+            'labels' => [
+                'name' => __('Recipe Categories', 'recipe-generator'),
+                'singular_name' => __('Recipe Category', 'recipe-generator'),
+                'search_items' => __('Search Recipe Categories', 'recipe-generator'),
+                'all_items' => __('All Recipe Categories', 'recipe-generator'),
+                'parent_item' => __('Parent Category', 'recipe-generator'),
+                'parent_item_colon' => __('Parent Category:', 'recipe-generator'),
+                'edit_item' => __('Edit Category', 'recipe-generator'),
+                'update_item' => __('Update Category', 'recipe-generator'),
+                'add_new_item' => __('Add New Category', 'recipe-generator'),
+                'new_item_name' => __('New Category Name', 'recipe-generator'),
+                'menu_name' => __('Categories', 'recipe-generator'),
+            ],
+            'show_ui' => true,
+            'show_admin_column' => true,
+            'show_in_rest' => true,
+            'rewrite' => [
+                'slug' => 'recipe-category',
+                'with_front' => false
+            ],
+            'capabilities' => [
+                'manage_terms' => 'manage_categories',
+                'edit_terms' => 'manage_categories',
+                'delete_terms' => 'manage_categories',
+                'assign_terms' => 'edit_posts'
+            ],
+            'public' => true,
+            'query_var' => true
+        ]);
+
+        // Dietary Tags (non-hierarchical)
+        register_taxonomy('ai_recipe_tag', 'ai_recipe', [
+            'hierarchical' => false,
+            'labels' => [
+                'name' => __('Dietary Tags', 'recipe-generator'),
+                'singular_name' => __('Dietary Tag', 'recipe-generator'),
+                'search_items' => __('Search Tags', 'recipe-generator'),
+                'popular_items' => __('Popular Tags', 'recipe-generator'),
+                'all_items' => __('All Tags', 'recipe-generator'),
+                'edit_item' => __('Edit Tag', 'recipe-generator'),
+                'update_item' => __('Update Tag', 'recipe-generator'),
+                'add_new_item' => __('Add New Tag', 'recipe-generator'),
+                'new_item_name' => __('New Tag Name', 'recipe-generator'),
+                'separate_items_with_commas' => __('Separate tags with commas', 'recipe-generator'),
+                'add_or_remove_items' => __('Add or remove tags', 'recipe-generator'),
+                'choose_from_most_used' => __('Choose from most used tags', 'recipe-generator'),
+                'menu_name' => __('Dietary Tags', 'recipe-generator'),
+            ],
+            'show_ui' => true,
+            'show_admin_column' => true,
+            'show_in_rest' => true,
+            'rewrite' => [
+                'slug' => 'dietary-tag',
+                'with_front' => false
+            ],
+            'capabilities' => [
+                'manage_terms' => 'manage_categories',
+                'edit_terms' => 'manage_categories',
+                'delete_terms' => 'manage_categories',
+                'assign_terms' => 'edit_posts'
+            ],
+            'public' => true,
+            'query_var' => true
+        ]);
+    }
+    public function init_recipe_taxonomies() { // To keep recipe taxonomies registration private
+        $this->register_recipe_taxonomies();
+    }
 
     public function enqueue_frontend_assets() {
         // Always register the scripts/styles (but don't enqueue yet)
@@ -177,7 +230,6 @@ class Recipe_Generator {
         }
     }
 
-
     /*** Enqueue Admin assets ***/
     public function enqueue_admin_assets($hook) {
         // Only load on our plugin pages
@@ -227,8 +279,42 @@ class Recipe_Generator {
 // Initialize the plugin
 Recipe_Generator::get_instance();
 
+register_activation_hook(__FILE__, function() {
+    Recipe_Generator::get_instance()->register_post_types();
+    flush_rewrite_rules();
+});
+
 register_deactivation_hook(__FILE__, function() {
-    // Deactivation code if needed
+    // 1. Remove taxonomy connections
+    unregister_taxonomy_for_object_type('category', 'ai_recipe');
+    unregister_taxonomy_for_object_type('post_tag', 'ai_recipe');
+
+    flush_rewrite_rules();
+
+    // 2. Optional: Remove test posts (use only during development)
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        $posts = get_posts([
+            'post_type' => 'ai_recipe',
+            'posts_per_page' => -1,
+            'post_status' => 'any'
+        ]);
+        
+        foreach ($posts as $post) {
+            wp_delete_post($post->ID, true);
+        }
+        
+        // Clean up terms if needed
+        $terms = get_terms([
+            'taxonomy' => ['ai_recipe_category', 'ai_recipe_tag'],
+            'hide_empty' => false
+        ]);
+        
+        foreach ($terms as $term) {
+            wp_delete_term($term->term_id, $term->taxonomy);
+        }
+    }
+
+    wp_cache_flush();
 });
 
 add_action('plugins_loaded', function() {
@@ -246,9 +332,6 @@ add_action('plugins_loaded', function() {
 });
 
 add_action('init', [Recipe_Generator::get_instance(), 'register_post_types']);
-// add_action('init', function() {
-//     error_log('Custom post types registered: ' . print_r(get_post_types(['public' => true], true)));
-// });
 
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
