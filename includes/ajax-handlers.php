@@ -318,17 +318,17 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         $meta_items = [
             'servings' => [
                 'icon' => 'groups',
-                // 'label' => 'Servings',
+                'label' => '',
                 'value' => $servings
             ],
             'prep_time' => [
                 'icon' => 'clock',
-                // 'label' => 'Prep',
+                'label' => '',
                 'value' => $prep_time
             ],
             'cook_time' => [
                 'icon' => 'food',
-                // 'label' => 'Cook',
+                'label' => '',
                 'value' => $cook_time
             ]
         ];

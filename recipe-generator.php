@@ -31,9 +31,6 @@ class Recipe_Generator {
         // Initialize components
         add_action('plugins_loaded', array($this, 'init'));
 
-        // Register frontend assets hook
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
-
         // Register Custom Taxonomies
         add_action('init', [$this, 'init_recipe_taxonomies'], 20);
     }
@@ -175,60 +172,60 @@ class Recipe_Generator {
         $this->register_recipe_taxonomies();
     }
 
-    public function enqueue_frontend_assets() {
-        // Always register the scripts/styles (but don't enqueue yet)
-        wp_register_style(
-            'recipe-generator-frontend',
-            RECIPE_GENERATOR_URL . 'assets/css/frontend.css',
-            [],
-            RECIPE_GENERATOR_VERSION
-        );
+    // public function enqueue_frontend_assets() {
+    //     // Always register the scripts/styles (but don't enqueue yet)
+    //     wp_register_style(
+    //         'recipe-generator-frontend',
+    //         RECIPE_GENERATOR_URL . 'assets/css/frontend.css',
+    //         [],
+    //         RECIPE_GENERATOR_VERSION
+    //     );
         
-        wp_register_script(
-            'recipe-generator-frontend',
-            RECIPE_GENERATOR_URL . 'assets/js/frontend.js',
-            ['jquery'],
-            RECIPE_GENERATOR_VERSION,
-            true
-        );
+    //     wp_register_script(
+    //         'recipe-generator-frontend',
+    //         RECIPE_GENERATOR_URL . 'assets/js/frontend.js',
+    //         ['jquery'],
+    //         RECIPE_GENERATOR_VERSION,
+    //         true
+    //     );
         
-        wp_localize_script(
-            'recipe-generator-frontend',
-            'recipeGeneratorFrontendVars',
-            [
-                'ajaxurl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('recipe_generator_frontend_nonce'),
-                'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator'),
-                'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
-            ]
-        );
+    //     wp_localize_script(
+    //         'recipe-generator-frontend',
+    //         'recipeGeneratorFrontendVars',
+    //         [
+    //             'ajaxurl' => admin_url('admin-ajax.php'),
+    //             'nonce' => wp_create_nonce('recipe_generator_frontend_nonce'),
+    //             'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator'),
+    //             'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
+    //         ]
+    //     );
         
-        // Check if we should enqueue
-        global $post;
-        $should_enqueue = false;
+    //     // Check if we should enqueue
+    //     global $post;
+    //     $should_enqueue = false;
         
-        // Case 1: Shortcode in regular post content
-        if (is_a($post, 'WP_Post') && 
-            (has_shortcode($post->post_content, 'recipe_generator') || 
-            has_shortcode($post->post_content, 'user_saved_recipes'))) {
-            $should_enqueue = true;
-        }
+    //     // Case 1: Shortcode in regular post content
+    //     if (is_a($post, 'WP_Post') && 
+    //         (has_shortcode($post->post_content, 'recipe_generator') || 
+    //         has_shortcode($post->post_content, 'user_saved_recipes'))) {
+    //         $should_enqueue = true;
+    //     }
         
-        // Case 2: On AI Recipe single template
-        if (is_singular('ai_recipe')) {
-            $should_enqueue = true;
-        }
+    //     // Case 2: On AI Recipe single template
+    //     if (is_singular('ai_recipe')) {
+    //         $should_enqueue = true;
+    //     }
         
-        // Case 3: On AI Recipe archive
-        if (is_post_type_archive('ai_recipe')) {
-            $should_enqueue = true;
-        }
+    //     // Case 3: On AI Recipe archive
+    //     if (is_post_type_archive('ai_recipe')) {
+    //         $should_enqueue = true;
+    //     }
         
-        if ($should_enqueue) {
-            wp_enqueue_style('recipe-generator-frontend');
-            wp_enqueue_script('recipe-generator-frontend');
-        }
-    }
+    //     if ($should_enqueue) {
+    //         wp_enqueue_style('recipe-generator-frontend');
+    //         wp_enqueue_script('recipe-generator-frontend');
+    //     }
+    // }
 
     /*** Enqueue Admin assets ***/
     public function enqueue_admin_assets($hook) {
