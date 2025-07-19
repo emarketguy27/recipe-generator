@@ -75,14 +75,6 @@ add_shortcode('user_saved_recipes', function($atts) {
     if (empty($saved_recipes)) {
         return '<p>You have no saved recipes yet.</p>';
     }
-
-    wp_localize_script(
-        'recipe-generator-frontend',
-        'recipeGeneratorFrontendVars',
-        [
-            'saved_recipes' => $saved_recipes
-        ]
-    );
     
     ob_start(); ?>
     <div class="user-saved-recipes">

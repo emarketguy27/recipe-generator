@@ -257,7 +257,7 @@
     border-radius: 4px;
     color: white;
     cursor: pointer;
-    gap: 8px;
+    gap: 1em;
     transition: all 0.3s ease;
 }
 .modal-action:hover {
@@ -265,7 +265,7 @@
     box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.3);
 }
 .modal-action .dashicons {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     width: 1.2rem;
     height: 1.2rem;
     color: var(--wp--preset--color--accent-3);
@@ -324,11 +324,13 @@
 .share-recipe, .print-recipe, .view-post-btn {
     background: #0073aa60;
     width: 6em;
+    column-gap: 10px;
 }
 .delete-recipe {
     background: #ff000052;
     width: 6em;
     margin-left: auto;
+    column-gap: 10px;
 }
 .facebook { background: #3b5998; }
 .twitter { background: #1da1f2; }
