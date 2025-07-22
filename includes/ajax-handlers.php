@@ -413,8 +413,6 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         $blocks[] = '</div>';
         $blocks[] = '<!-- /wp:group -->';
         
-        error_log('[Recipe Generator] Generated blocks structure: ' . print_r($blocks, true));
-        
         // Create the post
         $post_id = wp_insert_post([
             'post_title'   => $recipe['name'],

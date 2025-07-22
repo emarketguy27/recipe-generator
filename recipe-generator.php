@@ -13,6 +13,7 @@ defined('ABSPATH') || exit;
 define('RECIPE_GENERATOR_VERSION', '1.0.0');
 define('RECIPE_GENERATOR_PATH', plugin_dir_path(__FILE__));
 define('RECIPE_GENERATOR_URL', plugin_dir_url(__FILE__));
+define('RECIPE_GENERATOR_TEMPLATES_PATH', RECIPE_GENERATOR_PATH . 'templates/');
 
 class Recipe_Generator {
     private static $instance;
@@ -44,11 +45,13 @@ class Recipe_Generator {
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-main.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-frontend.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
+        require_once RECIPE_GENERATOR_PATH . 'includes/class-template-loader.php';
     }
 
     public function init() {
     }
 
+    // Reister Custom Post Type
     public function register_post_types() {
         if (!post_type_exists('ai_recipe')) {
             $args = [
@@ -99,6 +102,7 @@ class Recipe_Generator {
         }
     }
 
+    // register & init Custom Post Type Taxonimies
     private function register_recipe_taxonomies() {
         // Recipe Categories (hierarchical)
         register_taxonomy('ai_recipe_category', 'ai_recipe', [
@@ -171,61 +175,6 @@ class Recipe_Generator {
     public function init_recipe_taxonomies() { // To keep recipe taxonomies registration private
         $this->register_recipe_taxonomies();
     }
-
-    // public function enqueue_frontend_assets() {
-    //     // Always register the scripts/styles (but don't enqueue yet)
-    //     wp_register_style(
-    //         'recipe-generator-frontend',
-    //         RECIPE_GENERATOR_URL . 'assets/css/frontend.css',
-    //         [],
-    //         RECIPE_GENERATOR_VERSION
-    //     );
-        
-    //     wp_register_script(
-    //         'recipe-generator-frontend',
-    //         RECIPE_GENERATOR_URL . 'assets/js/frontend.js',
-    //         ['jquery'],
-    //         RECIPE_GENERATOR_VERSION,
-    //         true
-    //     );
-        
-    //     wp_localize_script(
-    //         'recipe-generator-frontend',
-    //         'recipeGeneratorFrontendVars',
-    //         [
-    //             'ajaxurl' => admin_url('admin-ajax.php'),
-    //             'nonce' => wp_create_nonce('recipe_generator_frontend_nonce'),
-    //             'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator'),
-    //             'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
-    //         ]
-    //     );
-        
-    //     // Check if we should enqueue
-    //     global $post;
-    //     $should_enqueue = false;
-        
-    //     // Case 1: Shortcode in regular post content
-    //     if (is_a($post, 'WP_Post') && 
-    //         (has_shortcode($post->post_content, 'recipe_generator') || 
-    //         has_shortcode($post->post_content, 'user_saved_recipes'))) {
-    //         $should_enqueue = true;
-    //     }
-        
-    //     // Case 2: On AI Recipe single template
-    //     if (is_singular('ai_recipe')) {
-    //         $should_enqueue = true;
-    //     }
-        
-    //     // Case 3: On AI Recipe archive
-    //     if (is_post_type_archive('ai_recipe')) {
-    //         $should_enqueue = true;
-    //     }
-        
-    //     if ($should_enqueue) {
-    //         wp_enqueue_style('recipe-generator-frontend');
-    //         wp_enqueue_script('recipe-generator-frontend');
-    //     }
-    // }
 
     /*** Enqueue Admin assets ***/
     public function enqueue_admin_assets($hook) {
@@ -324,11 +273,47 @@ add_action('plugins_loaded', function() {
         new Recipe_Generator_Admin_AI_Settings();
         new Recipe_Generator_Admin_Saved_Recipes();
     }
-    
     // Future: Initialize frontend components here if needed
 });
 
 add_action('init', [Recipe_Generator::get_instance(), 'register_post_types']);
 
+/*** Register Custom Block Templates ***/
+add_action('init', function() {
+    // Only register templates if block themes are supported
+    if (function_exists('register_block_template')) {
+        Recipe_Generator_Template_Loader::register_templates();
+    }
+}, 20);
+
+add_filter('archive_template_hierarchy', function($templates) {
+    if (is_post_type_archive('ai_recipe') || 
+        is_tax('ai_recipe_tag') || 
+        is_tax('ai_recipe_category')) {
+        array_unshift($templates, 'archive-recipe.php');
+    }
+    return $templates;
+});
+
+// Temp Debug to check registration of all templates
+add_action('init', function() {
+    if (current_user_can('edit_theme_options')) {
+        $template = get_block_template('recipe-generator//archive-recipe', 'wp_template');
+        error_log(print_r($template, true));
+    }
+}, 99);
+
+add_action('admin_init', function() {
+    if (current_user_can('edit_theme_options')) {
+        $template = get_block_template('recipe-generator//archive-recipes', 'wp_template');
+        error_log(print_r([
+            'template_exists' => !!$template,
+            'template_details' => $template ? $template->slug : 'Not found',
+            'taxonomy_object' => get_taxonomy('ai_recipe_tag')
+        ], true));
+    }
+});
+
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
+
