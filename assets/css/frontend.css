@@ -1,5 +1,5 @@
 * {
-    font-size: var(--wp--preset--font-size--medium);
+    /* font-size: var(--wp--preset--font-size--medium); */
 }
 .recipe-generator-frontend {
     /* max-width: 600px; */
@@ -109,15 +109,23 @@
     transform: translateY(0px);
     border-top: 1px solid #0073aa2e;
 }
-.dietary-tag {
+.dietary-tag, .is-style-post-terms-1 a {
     display: inline-flex;
+    justify-content: center;
     align-items: center;
+    width: 5em;
     gap: .3em;
-    background: cadetblue;
-    padding: 2px 8px;
+    background: var(--wp--preset--color--accent-1);
+    padding: 0px 8px;
     border-radius: 8px;
-    color: navajowhite;
+    color: var(--wp-preset--color--accent-2);
     text-transform: capitalize;
+    transition: all .3s ease;
+    &:hover {
+        background: var(--wp--preset--color--accent-3);
+        color: var(--wp--preset--color--accent-2);
+        text-decoration: none;
+    }
 }
 .recipe-meta {
     display: flex;

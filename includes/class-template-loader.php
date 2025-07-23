@@ -26,6 +26,13 @@ class Recipe_Generator_Template_Loader {
             'content'     => self::get_template_content('single-recipe-with-sidebar'),
         ]);
 
+        // Register single recipe with aside template - fully SEO Optimised
+        register_block_template('recipe-generator//single-recipe-with-aside', [
+            'title'       => __('Recipe Template with Aside', 'recipe-generator'),
+            'description' => __('Pre-designed template for AI-recipe posts - with all elements SEO Optimized', 'recipe-generator'),
+            'content'     => self::get_template_content('single-recipe-with-aside'),
+        ]);
+
         // Regsiter Recipes Archive Template
         register_block_template( 'recipe-generator//archive-recipe', [
             'title'       => __( 'Recipe Archive', 'recipe-generator' ),

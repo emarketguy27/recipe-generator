@@ -355,34 +355,34 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         $blocks[] = '</div>';
         $blocks[] = '<!-- /wp:group -->';
 
-        // 3. Meta Group 2 (Dietary Tags)
-        if (!empty($recipe['dietary_tags'])) {
-            $blocks[] = '<!-- wp:group {"layout":{"type":"constrained"},"style":{"spacing":{"margin":{"top":"1em","bottom":"1em"}}}} -->';
-            $blocks[] = '<div class="wp-block-group">';
+        // 3. Meta Group 2 (Dietary Tags) - Commented out to avoid duplication in recipe template
+        // if (!empty($recipe['dietary_tags'])) {
+        //     $blocks[] = '<!-- wp:group {"layout":{"type":"constrained"},"style":{"spacing":{"margin":{"top":"1em","bottom":"1em"}}}} -->';
+        //     $blocks[] = '<div class="wp-block-group">';
             
-            // Let WordPress handle the term rendering
-            $blocks[] = '<!-- wp:post-terms {"term":"ai_recipe_tag"} /-->';
+        //     // Let WordPress handle the term rendering
+        //     $blocks[] = '<!-- wp:post-terms {"term":"ai_recipe_tag"} /-->';
             
-            $blocks[] = '</div>';
-            $blocks[] = '<!-- /wp:group -->';
+        //     $blocks[] = '</div>';
+        //     $blocks[] = '<!-- /wp:group -->';
             
-            // Add the terms after the block is created
-            add_action('wp_insert_post', function($post_id) use ($recipe) {
-                if (!empty($recipe['dietary_tags'])) {
-                    $term_ids = array();
-                    foreach ($recipe['dietary_tags'] as $tag_name) {
-                        $term = term_exists($tag_name, 'ai_recipe_tag');
-                        if (!$term) {
-                            $term = wp_insert_term($tag_name, 'ai_recipe_tag');
-                        }
-                        if (!is_wp_error($term)) {
-                            $term_ids[] = (int)$term['term_id'];
-                        }
-                    }
-                    wp_set_object_terms($post_id, $term_ids, 'ai_recipe_tag');
-                }
-            }, 10, 1);
-        }
+        //     // Add the terms after the block is created
+        //     add_action('wp_insert_post', function($post_id) use ($recipe) {
+        //         if (!empty($recipe['dietary_tags'])) {
+        //             $term_ids = array();
+        //             foreach ($recipe['dietary_tags'] as $tag_name) {
+        //                 $term = term_exists($tag_name, 'ai_recipe_tag');
+        //                 if (!$term) {
+        //                     $term = wp_insert_term($tag_name, 'ai_recipe_tag');
+        //                 }
+        //                 if (!is_wp_error($term)) {
+        //                     $term_ids[] = (int)$term['term_id'];
+        //                 }
+        //             }
+        //             wp_set_object_terms($post_id, $term_ids, 'ai_recipe_tag');
+        //         }
+        //     }, 10, 1);
+        // }
         
         // 4. Ingredients
         if (!empty($ingredients)) {
