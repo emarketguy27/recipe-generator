@@ -328,6 +328,26 @@ add_filter('render_block', function($block_content, $block) {
     return $block_content;
 }, 10, 2);
 
+add_filter('dashboard_glance_items', function($items) {
+    $post_type = 'ai_recipe';
+    $count = wp_count_posts($post_type);
+    
+    if ($count && $count->publish) {
+        $text = sprintf(
+            _n('%d AI Recipe', '%d AI Recipes', $count->publish, 'recipe-generator'),
+            $count->publish
+        );
+        
+        $items[] = sprintf(
+            '<a href="%s" class="ai-recipe-count">%s</a>',
+            admin_url('edit.php?post_type=' . $post_type),
+            $text
+        ) . 
+        '<style>.ai-recipe-count:before { content: "\f485"!important; font-family: dashicons; vertical-align: middle; margin-right: 5px; }</style>';
+    }
+    
+    return $items;
+});
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
 
