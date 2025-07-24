@@ -5,11 +5,11 @@
 <div class="wp-block-columns alignwide recipe-columns"><!-- wp:column {"className":"recipe-main-content"} -->
 <div class="wp-block-column recipe-main-content"><!-- wp:group {"tagName":"section","className":"is-style-section-1 recipe-card","style":{"border":{"radius":"10px"},"shadow":"var:preset|shadow|natural","spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30","right":"var:preset|spacing|30"}}},"layout":{"type":"default"}} -->
 <section class="wp-block-group is-style-section-1 recipe-card" style="border-radius:10px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--30);box-shadow:var(--wp--preset--shadow--natural)"><!-- wp:group {"tagName":"header","className":"recipe-header"} -->
-<header class="wp-block-group recipe-header"><!-- wp:post-title {"level":1,"className":"recipe-title"} /-->
+<header class="wp-block-group recipe-header"><!-- wp:post-title {"level":1,"className":"wp-block-post-title recipe-title"} /-->
 
-<!-- wp:post-featured-image {"align":"wide","className":"recipe-image"} /-->
+<!-- wp:post-featured-image {"align":"wide","className":"wp-block-post-featured-image alignwide recipe-image"} /-->
 
-<!-- wp:post-excerpt {"className":"recipe-excerpt"} /-->
+<!-- wp:post-excerpt {"className":"wp-block-post-excerpt recipe-excerpt"} /-->
 
 <!-- wp:post-terms {"term":"ai_recipe_tag","separator":"","className":"is-style-post-terms-1 recipe-tags"} /--></header>
 <!-- /wp:group -->
@@ -18,12 +18,12 @@
 <hr class="wp-block-separator has-alpha-channel-opacity recipe-divider"/>
 <!-- /wp:separator -->
 
-<!-- wp:post-content {"className":"recipe-content"} /--></section>
+<!-- wp:post-content {"className":"wp-block-post-content recipe-content"} /--></section>
 <!-- /wp:group --></div>
 <!-- /wp:column -->
 
-<!-- wp:column {"tagName":"aside", "width":"33.33%","className":"recipe-sidebar"} -->
-<div class="wp-block-column recipe-sidebar" style="flex-basis:33.33%" aria-label="Recipe sidebar"><!-- wp:group {"className":"dietary-tags-section"} -->
+<!-- wp:column {"width":"33.33%","className":"recipe-sidebar"} -->
+<div class="wp-block-column recipe-sidebar" style="flex-basis:33.33%"><!-- wp:group {"className":"dietary-tags-section"} -->
 <div class="wp-block-group dietary-tags-section"><!-- wp:heading {"level":3,"className":"sidebar-heading"} -->
 <h3 class="wp-block-heading sidebar-heading">Dietary Tags</h3>
 <!-- /wp:heading -->
@@ -38,30 +38,38 @@
 <!-- /wp:columns --></article>
 <!-- /wp:group -->
 
-<!-- wp:group {"className":"recipe-navigation"} -->
-<div class="wp-block-group recipe-navigation"><!-- wp:group {"align":"wide","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
-<div class="wp-block-group alignwide"><!-- wp:post-navigation-link {"type":"previous","showTitle":true,"linkLabel":true,"style":{"layout":{"selfStretch":"fill","flexSize":null}},"fontSize":"large"} /-->
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"align":"wide","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+<div class="wp-block-group alignwide"><!-- wp:post-navigation-link {"type":"previous","showTitle":true,"linkLabel":true,"arrow":"arrow","style":{"elements":{"link":{"color":{"text":"var:preset|color|accent-3"},":hover":{"color":{"text":"var:preset|color|accent-1"}}}},"layout":{"selfStretch":"fill","flexSize":null}}} /-->
 
-<!-- wp:post-navigation-link {"textAlign":"right","showTitle":true,"linkLabel":true,"style":{"layout":{"selfStretch":"fill","flexSize":null}},"fontSize":"large"} /--></div>
+<!-- wp:post-navigation-link {"textAlign":"right","showTitle":true,"linkLabel":true,"arrow":"arrow","style":{"elements":{"link":{"color":{"text":"var:preset|color|accent-3"},":hover":{"color":{"text":"var:preset|color|accent-1"}}}},"layout":{"selfStretch":"fill","flexSize":null}}} /--></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 
-<!-- wp:group {"tagName":"section","className":"recipe-comments","style":{"spacing":{"padding":{"right":"0","left":"0"}}},"layout":{"type":"constrained"}} -->
-<section class="wp-block-group recipe-comments" style="padding-right:0;padding-left:0"><!-- wp:comments {"align":"wide","className":"recipe-comments-container"} -->
-<div class="wp-block-comments alignwide recipe-comments-container"><!-- wp:comments-title /-->
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:comments {"align":"wide"} -->
+<div class="wp-block-comments alignwide"><!-- wp:comments-title /-->
 
 <!-- wp:comment-template -->
-<!-- wp:avatar /-->
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"40px"} -->
+<div class="wp-block-column" style="flex-basis:40px"><!-- wp:avatar {"size":40,"style":{"border":{"radius":"20px"}}} /--></div>
+<!-- /wp:column -->
 
-<!-- wp:comment-author-name /-->
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:comment-author-name {"fontSize":"small"} /-->
 
-<!-- wp:comment-date /-->
+<!-- wp:group {"style":{"spacing":{"margin":{"top":"0px","bottom":"0px"}}},"layout":{"type":"flex"}} -->
+<div class="wp-block-group" style="margin-top:0px;margin-bottom:0px"><!-- wp:comment-date {"fontSize":"small"} /-->
+
+<!-- wp:comment-edit-link {"fontSize":"small"} /--></div>
+<!-- /wp:group -->
 
 <!-- wp:comment-content /-->
 
-<!-- wp:comment-reply-link /-->
-
-<!-- wp:comment-edit-link /-->
+<!-- wp:comment-reply-link {"fontSize":"small"} /--></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
 <!-- /wp:comment-template -->
 
 <!-- wp:comments-pagination -->
@@ -73,12 +81,7 @@
 <!-- /wp:comments-pagination -->
 
 <!-- wp:post-comments-form /--></div>
-<!-- /wp:comments --></section>
+<!-- /wp:comments --></div>
 <!-- /wp:group -->
-
-
-<!-- wp:separator {"className":"footer-separator"} -->
-<hr class="wp-block-separator has-alpha-channel-opacity footer-separator"/>
-<!-- /wp:separator -->
 
 <!-- wp:template-part {"slug":"footer","tagName":"footer","area":"footer"} /-->

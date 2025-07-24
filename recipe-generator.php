@@ -34,6 +34,8 @@ class Recipe_Generator {
 
         // Register Custom Taxonomies
         add_action('init', [$this, 'init_recipe_taxonomies'], 20);
+
+        add_action('wp_head', [$this, 'output_recipe_schema']);
     }
 
     private function includes() {
@@ -46,8 +48,15 @@ class Recipe_Generator {
         require_once RECIPE_GENERATOR_PATH . 'includes/class-frontend.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-template-loader.php';
+        require_once RECIPE_GENERATOR_PATH . 'includes/class-schema-generator.php';
     }
 
+    public function output_recipe_schema() {
+        if (is_singular('ai_recipe')) {
+            Recipe_Generator_Schema::output_recipe_schema(get_the_ID());
+        }
+    }
+    
     public function init() {
     }
 
@@ -295,24 +304,29 @@ add_filter('archive_template_hierarchy', function($templates) {
     return $templates;
 });
 
-// Temp Debug to check registration of all templates
-add_action('init', function() {
-    if (current_user_can('edit_theme_options')) {
-        $template = get_block_template('recipe-generator//archive-recipe', 'wp_template');
-        error_log(print_r($template, true));
+add_filter('render_block', function($block_content, $block) {
+    if (is_singular('ai_recipe')) {
+        // Add schema markup to core/paragraph blocks with specific classes
+        if ($block['blockName'] === 'core/paragraph') {
+            if (strpos($block['attrs']['className'] ?? '', 'recipe-servings') !== false) {
+                $block_content = str_replace(
+                    '<p class="',
+                    '<p itemprop="recipeYield" class="',
+                    $block_content
+                );
+            }
+            // Repeat for other meta items
+            elseif (strpos($block['attrs']['className'] ?? '', 'recipe-prep-time') !== false) {
+                $block_content = str_replace(
+                    '<p class="',
+                    '<p itemprop="prepTime" class="',
+                    $block_content
+                );
+            }
+        }
     }
-}, 99);
-
-add_action('admin_init', function() {
-    if (current_user_can('edit_theme_options')) {
-        $template = get_block_template('recipe-generator//archive-recipes', 'wp_template');
-        error_log(print_r([
-            'template_exists' => !!$template,
-            'template_details' => $template ? $template->slug : 'Not found',
-            'taxonomy_object' => get_taxonomy('ai_recipe_tag')
-        ], true));
-    }
-});
+    return $block_content;
+}, 10, 2);
 
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';

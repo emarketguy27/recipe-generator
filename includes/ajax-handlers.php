@@ -160,7 +160,6 @@ add_action('wp_ajax_recipe_generator_test_connection', function() {
 
 add_action('wp_ajax_recipe_generator_test_prompt', function() {
     check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
-    error_log('[Recipe Generator] Test prompt initiated'); //DEBUG
     
     if (!current_user_can('manage_options')) {
         wp_send_json_error(__('Permission denied.', 'recipe-generator'));
@@ -172,12 +171,10 @@ add_action('wp_ajax_recipe_generator_test_prompt', function() {
         'exclude_ingredients' => !empty($_POST['exclude']) ? sanitize_text_field($_POST['exclude']) : '',
         'dietary' => !empty($_POST['dietary']) ? array_map('sanitize_text_field', $_POST['dietary']) : []
     ];
-    error_log('[Recipe Generator] Test args: ' . print_r($args, true)); //DEBUG
     
     $api_handler = Recipe_Generator_API_Handler::get_instance();
     $result = $api_handler->handle_prompt_request($args, true);
 
-    error_log('[Recipe Generator] Handler result: ' . print_r($result, true)); //DEBUG
     
     if (is_wp_error($result)) {
         wp_send_json_error($result->get_error_message());
@@ -281,26 +278,74 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         $xpath = new DOMXPath($dom);
         
         // Extract all elements
+
         $servings = $xpath->query("//p[contains(., 'Servings:')]")->item(0)->nodeValue ?? '';
         $prep_time = $xpath->query("//p[contains(., 'Prep Time:')]")->item(0)->nodeValue ?? '';
         $cook_time = $xpath->query("//p[contains(., 'Cook Time:')]")->item(0)->nodeValue ?? '';
+        $prep_mins = (int)preg_replace('/[^0-9]/', '', $prep_time);
+        $cook_mins = (int)preg_replace('/[^0-9]/', '', $cook_time);
+        $total_time = $prep_mins + $cook_mins;
         
         $ingredients = [];
         $ingredient_nodes = $xpath->query("//ul[@class='recipe-ingredients']/li");
         foreach ($ingredient_nodes as $node) {
-            $ingredients[] = trim($node->nodeValue);
+            $text = trim($node->nodeValue);
+            $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if (function_exists('mb_convert_encoding')) {
+                $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+            }
+            $text = str_replace(['Â°', 'â„¢'], ['°', '™'], $text);
+            $ingredients[] = $text;
         }
         
         $instructions = [];
         $instruction_nodes = $xpath->query("//ol[@class='recipe-instructions']/li");
         foreach ($instruction_nodes as $node) {
-            $instructions[] = trim($node->nodeValue);
+            $text = trim($node->nodeValue);
+            // Fix double-encoded UTF-8 characters
+            $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            // Convert to proper UTF-8 if needed
+            if (function_exists('mb_convert_encoding')) {
+                $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+            }
+            // Clean any remaining encoding artifacts
+            $text = str_replace(['Â°', 'â„¢'], ['°', '™'], $text);
+            $instructions[] = $text;
         }
         
         $nutrition = [];
         $nutrition_nodes = $xpath->query("//ul[@class='recipe-nutrition']/li");
         foreach ($nutrition_nodes as $node) {
             $nutrition[] = trim($node->nodeValue);
+        }
+
+        // Parse nutrition information
+        $nutrition_meta = [
+            '_recipe_calories' => '',
+            '_recipe_fat' => '',               // fatContent
+            '_recipe_carbohydrates' => '',     // carbohydrateContent
+            '_recipe_fiber' => '',             // fiberContent
+            '_recipe_protein' => '',           // proteinContent
+            '_recipe_sugar' => '',             // sugarContent
+            '_recipe_sodium' => '',            // sodiumContent
+            '_recipe_cholesterol' => ''        // cholesterolContent
+        ];
+
+        foreach ($nutrition as $nutrition_item) {
+            if (preg_match('/(calories|fat|carbs|carbohydrates|protein|sugar|fiber|sodium|cholesterol):?\s*([0-9\.]+)\s*(kcal|g|mg)?/i', 
+                strtolower($nutrition_item), $matches)) {
+                
+                $nutri_type = $matches[1];
+                // Standardize field names
+                if ($nutri_type === 'carbs') $nutri_type = 'carbohydrates';
+                
+                $value = $matches[2] . ($matches[3] ?? '');
+                $meta_key = '_recipe_' . $nutri_type;
+                
+                if (array_key_exists($meta_key, $nutrition_meta)) {
+                    $nutrition_meta[$meta_key] = $value;
+                }
+            }
         }
 
         // Generate block content
@@ -397,7 +442,8 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         if (!empty($instructions)) {
             $blocks[] = '<!-- wp:heading {"level":3} --><h3>Instructions</h3><!-- /wp:heading -->';
             $instruction_blocks = array_map(function($item) {
-                return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
+                $clean = htmlspecialchars($item, ENT_HTML5 | ENT_QUOTES, 'UTF-8');
+                return '<!-- wp:list-item --><li>' . $clean . '</li><!-- /wp:list-item -->';
             }, $instructions);
             $blocks[] = '<!-- wp:list {"ordered":true} --><ol>' . implode('', $instruction_blocks) . '</ol><!-- /wp:list -->';
         }
@@ -412,14 +458,22 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         }
         $blocks[] = '</div>';
         $blocks[] = '<!-- /wp:group -->';
-        
+
         // Create the post
         $post_id = wp_insert_post([
             'post_title'   => $recipe['name'],
             'post_content' => implode("\n\n", $blocks),
             'post_status'  => 'draft',
             'post_author'  => $user_id,
-            'post_type'    => 'ai_recipe'
+            'post_type'    => 'ai_recipe',
+            'meta_input'   => array_merge([
+                '_recipe_servings' => $servings,
+                '_recipe_prep_time' => $prep_mins,
+                '_recipe_cook_time' => $cook_mins,
+                '_recipe_total_time' => $total_time,
+                '_recipe_generator_id' => $recipe_id,
+                '_recipe_original_user' => $user_id
+            ], $nutrition_meta)
         ]);
         
         if (is_wp_error($post_id)) {
@@ -451,7 +505,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         // Add custom meta
         update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
         update_post_meta($post_id, '_recipe_original_user', $user_id);
-        
+
         $created++;
         $created_posts[] = [
             'recipe_id' => $recipe_id,
@@ -518,23 +572,31 @@ function recipe_generator_format_recipe_for_display($recipe_data) {
     if (!isset($recipe['recipe_name'])) {
         return '<div class="error">Invalid recipe format received</div>';
     }
+
+    // Custom sanitizer that preserves existing encoded chars
+    $safe_output = function($string) {
+        // First decode any existing entities to prevent double encoding
+        $decoded = html_entity_decode($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // Then properly escape only what needs escaping
+        return htmlspecialchars($decoded, ENT_QUOTES | ENT_HTML5, 'UTF-8', false);
+    };
     
     ob_start(); ?>
     <div class="recipe-container">
-        <h2><?php echo esc_html($recipe['recipe_name']); ?></h2>
+        <h2><?php echo $safe_output($recipe['recipe_name']); ?></h2>
         <?php if (!empty($recipe['description'])) : ?>
-            <p class="description"><?php echo esc_html($recipe['description']); ?></p>
+            <p class="description"><?php echo $safe_output($recipe['description']); ?></p>
         <?php endif; ?>
         
         <div class="recipe-meta">
             <?php if (!empty($recipe['servings'])) : ?>
-                <span>Servings: <?php echo esc_html($recipe['servings']); ?></span>
+                <span>Servings: <?php echo $safe_output($recipe['servings']); ?></span>
             <?php endif; ?>
             <?php if (!empty($recipe['preparation_time'])) : ?>
-                <span>Prep: <?php echo esc_html($recipe['preparation_time']); ?></span>
+                <span>Prep: <?php echo $safe_output($recipe['preparation_time']); ?></span>
             <?php endif; ?>
             <?php if (!empty($recipe['cooking_time'])) : ?>
-                <span>Cook: <?php echo esc_html($recipe['cooking_time']); ?></span>
+                <span>Cook: <?php echo $safe_output($recipe['cooking_time']); ?></span>
             <?php endif; ?>
         </div>
         
@@ -542,7 +604,7 @@ function recipe_generator_format_recipe_for_display($recipe_data) {
             <h3>Ingredients</h3>
             <ul>
                 <?php foreach ((array)$recipe['ingredients'] as $ingredient) : ?>
-                    <li><?php echo esc_html($ingredient); ?></li>
+                    <li><?php echo $safe_output($ingredient); ?></li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>

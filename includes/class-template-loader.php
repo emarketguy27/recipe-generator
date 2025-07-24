@@ -14,14 +14,21 @@ class Recipe_Generator_Template_Loader {
     public static function register_templates() {
         // Register single recipe template
         register_block_template('recipe-generator//single-recipe', [
-            'title'       => __('Recipe Template', 'recipe-generator'),
+            'title'       => __('Recipe Template - Basic', 'recipe-generator'),
             'description' => __('Pre-designed template for AI-recipe posts', 'recipe-generator'),
             'content'     => self::get_template_content('single-recipe'),
         ]);
 
-        // Register single recipe with sidebar template
+        // Register single recipe no sidebar template
+        register_block_template('recipe-generator//single-recipe-no-sidebar', [
+            'title'       => __('Recipe Template - Hero Top - no Sidebar', 'recipe-generator'),
+            'description' => __('Pre-designed template for AI-recipe posts', 'recipe-generator'),
+            'content'     => self::get_template_content('single-recipe-no-sidebar'),
+        ]);
+
+        // Register single recipe no sidebar template
         register_block_template('recipe-generator//single-recipe-with-sidebar', [
-            'title'       => __('Recipe Template with Sidebar', 'recipe-generator'),
+            'title'       => __('Recipe Template - Hero Top - with Sidebar', 'recipe-generator'),
             'description' => __('Pre-designed template for AI-recipe posts', 'recipe-generator'),
             'content'     => self::get_template_content('single-recipe-with-sidebar'),
         ]);
