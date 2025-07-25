@@ -166,19 +166,42 @@
 }
 
 /* BUTTONS & INTERACTIONS */
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+/* Dashicon in buttons */
+.rg-submit .dashicons,
+#reset-form-btn .dashicons {
+    font-size: 1.5rem;
+    width: auto;
+    height: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+    line-height: inherit;
+    color: var(--rg-accent-3);
+}
+
+/* Loading state adjustment */
+/* .rg-submit[disabled] .dashicons {
+    display: none; 
+} */
 .rg-submit,
 #save-recipe-btn,
+#reset-form-btn,
 .view-recipe-btn,
 .modal-action:not(.platform-share-btn) {
   position: relative;
-  overflow: hidden; /* For ripple effect */
+  overflow: hidden;
   border-radius: 8px;
   padding: 10px 20px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   transform: scale(1);
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   border: none;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -188,19 +211,21 @@
 }
 
 /* Primary button (Generate Recipe) */
-.rg-submit {
-  background: var(--wp--preset--color--accent-1); /* Your blue */
+.rg-submit, #reset-form-btn {
+  background: var(--wp--preset--color--accent-1);
   color: white;
+  padding: 4px 12px;
 }
 
 /* Save to favorites button */
 #save-recipe-btn {
-  background: var(--wp--preset--color--accent-3); /* Your purple */
+  background: var(--wp--preset--color--accent-3);
   color: white;
 }
 
 /* Hover states */
 .rg-submit:hover,
+#reset-form-btn:hover,
 #save-recipe-btn:hover,
 .view-recipe-btn:hover,
 .modal-action:not(.platform-share-btn):hover {
@@ -226,6 +251,15 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp--preset--color--accent-1) 40%, transparent);
 }
 
+.rg-submit:disabled, 
+#save-recipe-btn:disabled {
+    opacity: 0.7;
+    transform: none !important;
+    cursor: not-allowed;
+    background: var(--wp--preset--color--accent-3);
+    /* Reuses your existing accent-3 variable */
+}
+
 /* Success state for save button */
 #save-recipe-btn.saved {
   background: var(--wp--preset--color--success, #4CAF50);
@@ -249,7 +283,7 @@
 }
 
 /* Add these animations to your existing button classes */
-.rg-submit.clicked {
+.rg-submit.clicked, #reset-form-btn.clicked {
   animation: clickFeedback 0.4s ease-out;
 }
 
@@ -408,26 +442,38 @@
   overflow-y:auto;
 }
 
-/* SCROLLBARS (consolidated) */
+/* CUSTOM SCROLLBARS */
 .saved-recipes-shortcode-container::-webkit-scrollbar,
 .modal-content::-webkit-scrollbar {
-  width:0.35rem;
+  width:0.5rem;
 }
 .saved-recipes-shortcode-container::-webkit-scrollbar-thumb,
 .modal-content::-webkit-scrollbar-thumb {
   background-color:var(--rg-accent-1);
   border-radius:0.7rem;
+  box-shadow: inset 2px 0 3px rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
 .saved-recipes-shortcode-container::-webkit-scrollbar-track,
 .modal-content::-webkit-scrollbar-track {
   background-color:var(--rg-primary);
   border-radius:0.7rem;
+  box-shadow: inset 1px 0 2px rgba(0, 0, 0, 0.1);
+}
+.saved-recipes-shortcode-container:hover::-webkit-scrollbar-thumb,
+.modal-content:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--wp--preset--color--accent-1) 90%, black);
+  box-shadow: inset 3px 0 4px rgba(0, 0, 0, 0.3);
 }
 @supports not selector(::-webkit-scrollbar) {
   .saved-recipes-shortcode-container,
   .modal-content {
     scrollbar-width:thin;
-    scrollbar-color:var(--rg-accent-1) var(--rg-primary);
+    scrollbar-color: 
+      /* Thumb with left shadow effect */
+      color-mix(in srgb, var(--wp--preset--color--accent-1) 90%, rgba(0, 0, 0, 0.2))
+      /* Track */
+      color-mix(in srgb, var(--wp--preset--color--accent-1) 20%, transparent);
   }
 }
 
@@ -459,6 +505,7 @@
   position:relative;
   opacity:0;
   transform:translateY(-20px);
+  border-radius: 6px;
   transition:all 0.3s ease 0.15s;
 }
 .modal-content h3,

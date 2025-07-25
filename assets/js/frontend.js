@@ -1,4 +1,36 @@
 jQuery(document).ready(function($) {
+    let initialFormState = '';
+
+    // Store initial form state on load
+    function storeFormState() {
+        initialFormState = $('#recipe-generator-form').serialize();
+    }
+    storeFormState();
+
+    // Form change detection
+    $('#recipe-generator-form').on('input change', function() {
+        const currentState = $(this).serialize();
+        $('.rg-submit').prop('disabled', currentState === initialFormState);
+    });
+
+    // Reset form handler
+    $('#reset-form-btn').on('click', function() {
+        $('#recipe-generator-form')[0].reset();
+        $('.dietary-option').removeClass('checked');
+        
+        storeFormState();
+        
+        $('#recipe-generator-form .rg-submit').prop('disabled', false);
+        
+        $(this).addClass('clicked');
+        setTimeout(() => {
+            $(this).removeClass('clicked');
+        }, 300);
+        
+        $(this).html('<span class="dashicons dashicons-update"></span> Reset Form');
+    });
+
+    // Recipe Generation Form Submit Handler
     $('#recipe-generator-form').on('submit', function(e) {
         e.preventDefault();
         
@@ -15,10 +47,8 @@ jQuery(document).ready(function($) {
         // Show loading state
         $submitBtn.prop('disabled', true);
         $submitBtn.addClass('clicked');
-        $submitBtn.text('Working...');
         $loading.show();
-        // $results.hide().empty().removeClass('show');
-        // Loading message sequence
+
         const messages = [
             "Analyzing your ingredients...",
             "Checking your Dietary Requirements...",
@@ -54,6 +84,10 @@ jQuery(document).ready(function($) {
         $.post(recipeGeneratorFrontendVars.ajaxurl, formData, function(response) {
             if (response.success) {
                 handleGenerateSuccess();
+
+                storeFormState();
+                $('.rg-submit').prop('disabled', true).text('Generate Another');
+
                 clearInterval(messageInterval);
                 $results.html(response.data.html).addClass('show').show();
                 $('#recipe-actions').show();
@@ -62,7 +96,7 @@ jQuery(document).ready(function($) {
                 setTimeout(() => {
                     $('html, body').stop().animate({
                     scrollTop: $results.offset().top - 140
-                }, 1200);
+                }, 800);
                 }, 500);
                 
             } else {
@@ -80,10 +114,8 @@ jQuery(document).ready(function($) {
             $loading.hide();
             $submitBtn.prop('disabled', false);
             setTimeout(() => {
-               $submitBtn.removeClass('success');
-               $submitBtn.text('Generate another...'); 
-            }, "5000");
-            
+               $submitBtn.removeClass('clicked');
+            }, "1000");
         });
     });
 
@@ -128,42 +160,35 @@ jQuery(document).ready(function($) {
         }
     }
 
-    // Button Interactions
-        const buttons = [
-        ...document.querySelectorAll('.rg-submit'),
-        ...document.querySelectorAll('#save-recipe-btn'),
-        ...document.querySelectorAll('.view-recipe-btn'),
-        ...document.querySelectorAll('.modal-action:not(.platform-share-btn)')
-    ];
-    
-    buttons.forEach(button => {
+    // Button Interactions (applied to all buttons)
+    document.querySelectorAll('.rg-submit, #save-recipe-btn, .view-recipe-btn, .modal-action:not(.platform-share-btn)').forEach(button => {
         // Add ripple effect on click
         button.addEventListener('click', function(e) {
-        // Create ripple
-        const ripple = document.createElement('span');
-        ripple.classList.add('button-ripple');
-        
-        // Position ripple at click location
-        const rect = button.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        ripple.style.width = ripple.style.height = `${size}px`;
-        ripple.style.left = `${e.clientX - rect.left - size/2}px`;
-        ripple.style.top = `${e.clientY - rect.top - size/2}px`;
-        
-        button.appendChild(ripple);
-        
-        // Remove ripple after animation
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
+            // Create ripple
+            const ripple = document.createElement('span');
+            ripple.classList.add('button-ripple');
+            
+            // Position ripple at click location
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${e.clientX - rect.left - size/2}px`;
+            ripple.style.top = `${e.clientY - rect.top - size/2}px`;
+            
+            button.appendChild(ripple);
+            
+            // Remove ripple after animation
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
         });
         
         // Keyboard support
         button.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            this.click();
-        }
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
         });
     });
 
@@ -182,7 +207,6 @@ jQuery(document).ready(function($) {
         });
 
         $btn.prop('disabled', true);
-        $btn.addClass('clicked');
         $status.text('Saving...').hide().fadeIn(400);
         
         $.post(recipeGeneratorFrontendVars.ajaxurl, {
@@ -193,12 +217,10 @@ jQuery(document).ready(function($) {
             _wpnonce: recipeGeneratorFrontendVars.nonce
         }, function(response) {
             if (response.success) {
-                $btn.text('Saved!').prop('disabled', true);
-                handleSaveSuccess();
+                $btn.addClass('saved');
                 setTimeout(() => {
-                   $status.text('Recipe saved to your favorites!').hide().fadeIn(700); 
+                $status.text('Recipe saved to your favorites!').hide().fadeIn(700); 
                 }, 500);
-                
                 
                 // Update the count if on saved recipes page
                 const $countDisplay = $('.recipe-count');
@@ -213,20 +235,8 @@ jQuery(document).ready(function($) {
         }).fail(function() {
             $status.text('Connection error. Please try again.');
             $btn.prop('disabled', false);
-        }).always(function() {
-            $btn.removeClass('clicked');
         });
-        console.log('Collected dietary tags:', dietaryTags);
     });
-
-    function handleSaveSuccess() {
-        const saveBtn = document.querySelector('#save-recipe-btn');
-        if (saveBtn) {
-        saveBtn.classList.add('saved');
-        // Remove after 3 seconds if needed
-        setTimeout(() => saveBtn.classList.remove('saved'), 3000);
-        }
-    }
 
     // Unique ID creations for recipes being saved to user meta
     function generateRecipeId(html) {
