@@ -379,20 +379,19 @@
 }
 .saved-recipes-list {
   list-style:none;
-  padding:0 .6rem;
+  padding:0 .8rem;
 }
 .saved-recipe-item {
   border:1px solid color-mix(in srgb, var(--rg-primary) 16%, transparent);
   padding:4px;
   margin-top:10px;
   border-radius:4px;
-  background:var(--rg-accent-3);
+  background:var(--rg-primary-light);
   color:var(--rg-base);
 }
 .recipe-summary h4 {
   font-weight:600;
   margin-block:0;
-  text-wrap:balance;
   margin-bottom:0.5em;
 }
 .dietary-tags {
@@ -484,6 +483,7 @@
   top:0;
   backdrop-filter:blur(8px);
   align-items:center;
+  box-shadow: 0px 3px 6px -6px black;
 }
 .modal-action {
   display:flex;
