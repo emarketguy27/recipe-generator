@@ -125,7 +125,7 @@ class Recipe_Generator_Frontend {
         <!-- Modal Structure -->
         <div id="recipe-modal" class="recipe-modal" style="display:none;">
             <div class="modal-content">
-                <span class="close-modal">&times;</span>
+                
                 <div class="modal-actions">
                     <button class="modal-action share-recipe" title="Share Recipe">
                         <span class="dashicons dashicons-share"></span> Share
@@ -139,6 +139,7 @@ class Recipe_Generator_Frontend {
                     <button class="modal-action delete-recipe" title="Delete Recipe">
                         <span class="dashicons dashicons-trash"></span> Delete
                     </button>
+                    <span class="close-modal">&times;</span>
                 </div>
                 <div id="modal-recipe-content"></div>
             </div>

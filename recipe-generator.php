@@ -246,29 +246,6 @@ register_deactivation_hook(__FILE__, function() {
 
     flush_rewrite_rules();
 
-    // 2. Optional: Remove test posts (use only during development)
-    if (defined('WP_DEBUG') && WP_DEBUG) {
-        $posts = get_posts([
-            'post_type' => 'ai_recipe',
-            'posts_per_page' => -1,
-            'post_status' => 'any'
-        ]);
-        
-        foreach ($posts as $post) {
-            wp_delete_post($post->ID, true);
-        }
-        
-        // Clean up terms if needed
-        $terms = get_terms([
-            'taxonomy' => ['ai_recipe_category', 'ai_recipe_tag'],
-            'hide_empty' => false
-        ]);
-        
-        foreach ($terms as $term) {
-            wp_delete_term($term->term_id, $term->taxonomy);
-        }
-    }
-
     wp_cache_flush();
 });
 

@@ -1,399 +1,651 @@
-* {
-    /* font-size: var(--wp--preset--font-size--medium); */
+/* =============================================
+   RECIPE GENERATOR PLUGIN - OPTIMIZED CSS
+   Uses WordPress theme variables for consistency
+   Structured for easy minification
+============================================= */
+
+/* CSS Variables using WP Theme defaults */
+:root {
+  --rg-primary: var(--wp--preset--color--primary, #0073aa);
+  --rg-primary-light: color-mix(in srgb, var(--rg-primary) 70%, transparent);
+  --rg-primary-lighter: color-mix(in srgb, var(--rg-primary) 8%, transparent);
+  --rg-accent-1: var(--wp--preset--color--accent-1, #3858e9);
+  --rg-accent-2: var(--wp--preset--color--accent-2, #4fb8d9);
+  --rg-accent-3: var(--wp--preset--color--accent-3, #7e57c2);
+  --rg-base: var(--wp--preset--color--base, #ffffff);
+  --rg-contrast: var(--wp--preset--color--contrast, #000000);
+  --rg-success: #4caf50;
+  --rg-danger: #ff000052;
+  --rg-transition: all 0.3s ease;
+  --rg-spacing: var(--wp--preset--spacing--30, 1rem);
+  --rg-border-radius: 8px;
+  --rg-box-shadow: 0 0 16px 6px rgba(0,0,0,0.05);
 }
+
+/* BASE STYLES */
 .recipe-generator-frontend {
-    /* max-width: 600px; */
-    margin: 0 auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin:0 auto;
+  padding:var(--rg-spacing);
+  border-radius:var(--rg-border-radius);
+  box-shadow:var(--rg-box-shadow);
+}
+.recipe-generator-frontend li {
+  text-wrap:pretty;
+  margin-bottom:0.3em;
+}
+
+/* FORM STRUCTURE */
+#recipe-generator-form {
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--rg-spacing);
+  transition:var(--rg-transition);
 }
 .form-group {
-    width: 100%;
-    margin-bottom: 20px;
+  flex-grow:1;
+  display:flex;
+  flex-direction:column;
+  margin-bottom:20px;
 }
-.form-group label, .form-group h3{
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
+.form-group label,
+.form-group h3 {
+  /* display:block; */
+  margin-bottom:8px;
+  font-weight:600;
 }
 .form-group input[type="text"],
 .form-group input[type="number"] {
-    font-size: 1.2rem;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+  font-size:1rem;
+  font-weight:600;
+  padding:10px;
+  background:var(--rg-primary-lighter);
+  border:1px solid #ddd;
+  border-radius:4px;
+  flex-grow:1;
 }
-.form-group input[type="text"] {
-    width: 60%;
-    max-width: 500px;
-}
+
+/* DIETARY OPTIONS */
 .dietary-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
 }
+
+.dietary-options input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
 .dietary-option {
-    display: flex;
-    align-items: center;
-    padding: 4px 12px;
-    margin-bottom: 0;
-    /* background: #0073aa70; */
-    border: 1px solid #0073aa70;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all .3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: var(--wp--preset--color--base);
+  border: 1px solid var(--wp--preset--color--accent-1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+  color: var(--wp--preset--color--contrast);
+  flex-grow: 1;
+  min-width: 100px;
+  text-align: center;
+  text-transform: capitalize;
 }
+
+/* Checked state - matches your accent colors */
+.dietary-option.checked {
+  background: var(--wp--preset--color--accent-1); /* Your blue accent */
+  border-color: var(--wp--preset--color--accent-1);
+  color: white;
+  box-shadow: 0 4px 8px color-mix(in srgb, var(--wp--preset--color--accent-1) 20%, transparent);
+  transform: translateY(-1px);
+}
+
+/* Checkmark indicator - matches your success states */
+.dietary-option::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--wp--preset--color--accent-1); /* Blue border */
+  border-radius: 3px;
+  background: var(--wp--preset--color--base); /* White background */
+  transition: all 0.2s ease;
+}
+
+/* Checked checkmark - matches your success button */
+.dietary-option.checked::after {
+  content: "✓";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  background: var(--wp--preset--color--accent-1); /* Blue background */
+  border-color: var(--wp--preset--color--accent-1);
+}
+
+/* Hover state - matches your button hover */
 .dietary-option:hover {
-    background: #0073aa;
+  border-color: var(--wp--preset--color--accent-3); /* Purple accent */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
+/* Focus state for accessibility */
+.dietary-option:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp--preset--color--accent-1) 40%, transparent);
+}
+
+.dietary-option.checked {
+  animation: dietary-pulse 0.3s ease;
+}
+
+/* Ripple effect for click feedback */
+.dietary-option .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, white 30%, transparent);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+.dietary-option:hover {
+  background:var(--rg-primary);
+}
+
+/* BUTTONS & INTERACTIONS */
+.rg-submit,
+#save-recipe-btn,
+.view-recipe-btn,
+.modal-action:not(.platform-share-btn) {
+  position: relative;
+  overflow: hidden; /* For ripple effect */
+  border-radius: 8px;
+  padding: 10px 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform: scale(1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+/* Primary button (Generate Recipe) */
 .rg-submit {
-    border-radius: 8px;
-    transition: all .3s ease;
+  background: var(--wp--preset--color--accent-1); /* Your blue */
+  color: white;
 }
-.rg-submit:hover {
-    opacity: .8;
-    scale: 1.05;
+
+/* Save to favorites button */
+#save-recipe-btn {
+  background: var(--wp--preset--color--accent-3); /* Your purple */
+  color: white;
 }
+
+/* Hover states */
+.rg-submit:hover,
+#save-recipe-btn:hover,
+.view-recipe-btn:hover,
+.modal-action:not(.platform-share-btn):hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  opacity: 0.9;
+}
+
+/* Click/pressed effect */
+.rg-submit:active,
+#save-recipe-btn:active,
+.view-recipe-btn:active,
+.modal-action:not(.platform-share-btn):active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Focus states */
+.rg-submit:focus-visible,
+#save-recipe-btn:focus-visible,
+.view-recipe-btn:focus-visible,
+.modal-action:not(.platform-share-btn):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp--preset--color--accent-1) 40%, transparent);
+}
+
+/* Success state for save button */
+#save-recipe-btn.saved {
+  background: var(--wp--preset--color--success, #4CAF50);
+  padding-left: 15px; /* Make room for checkmark */
+}
+
+#save-recipe-btn.saved::before {
+  content: "✓";
+  margin-right: 5px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Ripple effect - matches dietary options */
+.button-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, white 30%, transparent);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+/* Add these animations to your existing button classes */
 .rg-submit.clicked {
-    animation: clicked 1.5s;
-    animation-delay: .5s;
-    animation-iteration-count: 2;
+  animation: clickFeedback 0.4s ease-out;
 }
+
+#save-recipe-btn.saved {
+  animation: success-pulse 0.6s ease;
+}
+
+/* LOADING STATES */
 .rg-loading {
-    display: none;
-    margin: 20px 0;
-    text-align: center;
+  display:none;
+  width:100%;
+  text-align:center;
 }
 .rg-spinner {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(0,0,0,.1);
-    border-radius: 50%;
-    border-top-color: #0073aa;
-    animation: rg-spin 1s ease-in-out infinite;
+  display:inline-block;
+  width:40px;
+  height:40px;
+  border:4px solid rgba(0,0,0,0.1);
+  border-radius:50%;
+  border-top-color:var(--rg-primary);
+  animation:rg-spin 1s ease-in-out infinite;
 }
 
-/* Form and results transition */
-#recipe-generator-form {
-    transition: all 0.3s ease;
-}
+/* RESULTS DISPLAY */
 #recipe-results {
-    margin-top: 30px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
-    h2, h4 {
-        font-size: 120%;
-        font-weight: 700;
-    }
-    h4 {
-        display: flex;
-        align-items: center;
-        text-indent: .6em;
-        &::before {
-            content: "";
-            position: absolute;
-            width: 6px;
-            height: 2rem;
-            border-radius: 6px;
-            background: linear-gradient(0deg,var(--wp--preset--color--accent-3) 0%, var(--wp--preset--color--accent-1) 100%);
-        }
-    }
+  margin-top:30px;
+  opacity:0;
+  transform:translateY(20px);
+  transition:var(--rg-transition);
 }
 #recipe-results.show {
-    opacity: 1;
-    transform: translateY(0px);
-    border-top: 1px solid #0073aa2e;
+  opacity:1;
+  transform:translateY(0);
+  border-top:1px solid color-mix(in srgb, var(--rg-primary) 18%, transparent);
+  padding:1em 3em;
 }
-.dietary-tag{
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    /* width: 5em; */
-    gap: .3em;
-    background-color: var(--wp--preset--color--accent-3);
-    padding: 0px 8px;
-    border-radius: 20px;
-    color: whitesmoke;
-    text-transform: capitalize;
-    transition: all .3s ease;
-    &:hover {
-        background-color: var(--wp--preset--color--accent-3);
-        color: var(--wp--preset--color--accent-2);
-        text-decoration: none;
-    }
+#recipe-results h2,
+#recipe-results h4 {
+  font-size:120%;
+  font-weight:700;
+}
+#recipe-results h4 {
+  display:flex;
+  align-items:center;
+  text-indent:0.6em;
+}
+#recipe-results h4::before {
+  content:"";
+  position:absolute;
+  width:6px;
+  height:2rem;
+  border-radius:6px;
+  background:linear-gradient(0deg,var(--rg-accent-3) 0%,var(--rg-accent-1) 100%);
+}
+
+/* TAGS & META */
+.dietary-tag {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:0.3em;
+  background-color:var(--rg-accent-3);
+  padding:0 8px;
+  border-radius:20px;
+  color:whitesmoke;
+  text-transform:capitalize;
+  transition:var(--rg-transition);
+}
+.dietary-tag:hover {
+  background-color:var(--rg-accent-3);
+  color:var(--rg-accent-2);
+  text-decoration:none;
 }
 .recipe-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 1em;
+  display:flex;
+  justify-content:space-between;
+  gap:1em;
 }
 .meta-group {
-    display: flex;
-    align-items: center;
-    gap: .3em;
-    .dashicons {
-        width: 2rem;
-        height: 2rem;
-        font-size: 2rem;
-        color: var(--wp--preset--color--accent-1);
-        text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.6);
-
-    }
+  display:flex;
+  align-items:center;
+  gap:0.3em;
 }
+.meta-group .dashicons {
+  width:2rem;
+  height:2rem;
+  font-size:2rem;
+  color:var(--rg-accent-1);
+  text-shadow:1px 2px 3px rgba(0,0,0,0.6);
+}
+
+/* ACTIONS & SAVED STATES */
 #recipe-actions {
-    margin-top: 20px;
-    text-align: center;
+  margin-top:20px;
+  text-align:center;
 }
 #save-status {
-    display: block;
-    margin-top: 10px;
-    color: #0073aa;
-    font-weight: bold;
+  display:block;
+  margin-top:10px;
+  color:var(--rg-primary);
+  font-weight:700;
 }
 #save-recipe-btn.saved {
-    background: mediumseagreen;
+  background:mediumseagreen;
 }
-#save-recipe-btn.saved:before {
-    content: "✓ ";
+#save-recipe-btn.saved::before {
+  content:"✓ ";
 }
 
-/* SAVED RECIPES LIST DISPLAY STYLES */
+/* SAVED RECIPES LIST */
 .user-saved-recipes {
-    margin: 20px 0;
-    h3 {
-        margin-block-start: 0;
-        font-weight: 700;
-        span {
-            font-weight: 300;
-            font-size: .9rem;
-        }
-    }
+  margin:20px 0;
+}
+.user-saved-recipes h3 {
+  margin-block-start:0;
+  position:sticky;
+  top:0;
+  background:var(--rg-base);
+  padding-bottom:6px;
+  font-weight:700;
+}
+.user-saved-recipes h3 span {
+  font-weight:300;
+  font-size:0.9rem;
 }
 .saved-recipes-list {
-    list-style: none;
-    padding: 0;
+  list-style:none;
+  padding:0;
 }
 .saved-recipe-item {
-    border: 1px solid #0073aa29;
-    padding: 4px;
-    margin-top: 10px;
-    border-radius: 4px;
-    .recipe-summary {
-        h4 {
-            font-weight: 600;
-            margin-block: 0;
-            text-wrap: balance;
-            margin-bottom: .5em;
-        }
-    }
+  border:1px solid color-mix(in srgb, var(--rg-primary) 16%, transparent);
+  padding:4px;
+  margin-top:10px;
+  border-radius:4px;
+  background:var(--rg-accent-3);
+  color:var(--rg-base);
+}
+.recipe-summary h4 {
+  font-weight:600;
+  margin-block:0;
+  text-wrap:balance;
+  margin-bottom:0.5em;
 }
 .dietary-tags {
-    margin: 8px 0;
+  margin:8px 0;
 }
 .view-recipe-btn {
-    padding: 5px 10px;
-    border-radius: 8px;
-    transition: all .3s ease;
+  padding:5px 10px;
+  border-radius:var(--rg-border-radius);
+  transition:var(--rg-transition);
+}
+.saved-recipes-shortcode-container {
+  max-height:100vh;
+  padding-inline:0.5em;
+  overflow-y:auto;
 }
 
-/* Modal Styles */
+/* SCROLLBARS (consolidated) */
+.saved-recipes-shortcode-container::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width:0.35rem;
+}
+.saved-recipes-shortcode-container::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb {
+  background-color:var(--rg-accent-1);
+  border-radius:0.7rem;
+}
+.saved-recipes-shortcode-container::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track {
+  background-color:var(--rg-primary);
+  border-radius:0.7rem;
+}
+@supports not selector(::-webkit-scrollbar) {
+  .saved-recipes-shortcode-container,
+  .modal-content {
+    scrollbar-width:thin;
+    scrollbar-color:var(--rg-accent-1) var(--rg-primary);
+  }
+}
+
+/* MODAL SYSTEM */
 .recipe-modal {
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: none;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+  position:fixed;
+  z-index:100;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background-color:rgba(0,0,0,0.7);
+  display:none;
+  opacity:0;
+  transition:opacity 0.2s ease;
 }
 .recipe-modal.show {
-    display: block;
-    opacity: 1;
+  display:block;
+  opacity:1;
 }
 .modal-content {
-    background-color: ghostwhite;
-    color: var(--wp--preset--color--contrast);
-    margin: 5% auto;
-    padding: 20px;
-    width: 80%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.3s ease 0.15s;
-    h3, h4 {
-        color: var(--wp--preset--color--accent-3);
-        font-size: 120%;
-        text-decoration: underline;
-        text-underline-offset: 4px;
-        font-weight: 800;
-    }
+  background:linear-gradient(0deg,#000,var(--rg-accent-1));
+  color:var(--rg-contrast);
+  margin:5% auto;
+  width:80%;
+  max-width:800px;
+  max-height:80vh;
+  overflow-y:auto;
+  position:relative;
+  opacity:0;
+  transform:translateY(-20px);
+  transition:all 0.3s ease 0.15s;
+}
+.modal-content h3,
+.modal-content h4 {
+  color:var(--rg-accent-3);
+  font-size:120%;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  font-weight:800;
 }
 .recipe-modal.show .modal-content {
-    opacity: 1;
-    transform: translateY(0);
+  opacity:1;
+  transform:translateY(0);
 }
-.close-modal {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 28px;
-    cursor: pointer;
-}
+
+/* MODAL ACTIONS */
 .modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 2em;
-    padding-bottom: 1em;
-    border-bottom: 1px solid #0073aa60;
+  display:flex;
+  gap:10px;
+  padding:1em;
+  position:sticky;
+  top:0;
+  backdrop-filter:blur(8px);
+  align-items:center;
 }
 .modal-action {
-    display: flex;
-    align-items: center;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-    gap: 1em;
-    transition: all 0.3s ease;
+  display:flex;
+  align-items:center;
+  border:none;
+  padding:4px 12px;
+  border-radius:4px;
+  color:var(--rg-base);
+  font-size:1rem !important;
+  line-height:1 !important;
+  cursor:pointer;
+  gap:1em;
+  transition:var(--rg-transition);
 }
 .modal-action:hover {
-    opacity: .8;
-    box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.3);
+  opacity:0.8;
+  box-shadow:0 0 10px 1px rgba(0,0,0,0.3);
 }
 .modal-action .dashicons {
-    font-size: 1.5rem;
-    width: 1.2rem;
-    height: 1.2rem;
-    color: var(--wp--preset--color--accent-3);
-    line-height: 1.2rem;
+  font-size:1.5rem;
+  width:1.2rem;
+  height:1.2rem;
+  color:var(--rg-accent-3);
+  line-height:1.2rem;
 }
 .modal-action.copied {
-    background-color: #4CAF50;
-    color: white;
+  background-color:var(--rg-success);
+  color:var(--rg-base);
 }
-.modal-action .dashicons-yes {
-    margin-right: 5px;
-    vertical-align: middle;
+#modal-recipe-content {
+  background:var(--wp--preset--color--accent-5);
+  padding:1em 3em;
 }
-/* Share Modal */
+
+/* SHARE MODAL */
 .share-modal {
-    position: fixed;
-    z-index: 101;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: none;
+  position:fixed;
+  z-index:101;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background-color:rgba(0,0,0,0.7);
+  display:none;
 }
 .share-modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    border-radius: 5px;
-    position: relative;
+  background-color:var(--rg-base);
+  margin:10% auto;
+  padding:20px;
+  width:90%;
+  max-width:400px;
+  border-radius:5px;
+  position:relative;
 }
-.close-share-modal, .close-modal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    cursor: pointer;
-    border: 1px solid #c3c4c76b;
-    border-radius: 4px;
-    width: 1.5rem;
-    height: 1.5rem;
-    transition: all .3s ease;
-    &:hover {
-        border: 1px solid rgba(0, 0, 255, 0.336);
-        background: #135e96;
-    }
+
+/* CLOSE BUTTONS (consolidated) */
+.close-share-modal,
+.close-modal {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:2rem;
+  cursor:pointer;
+  border:1px solid color-mix(in srgb, var(--rg-contrast) 42%, transparent);
+  border-radius:4px;
+  width:1.5rem;
+  height:1.5rem;
+  transition:var(--rg-transition);
+  position:sticky;
+  top:0.2em;
+  right:0.2em;
+  float:right;
+  z-index:1;
 }
+.close-share-modal:hover,
+.close-modal:hover {
+  border:1px solid rgba(0,0,255,0.336);
+  background:#135e96;
+}
+
+/* SHARE BUTTONS */
 .share-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 15px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:15px;
 }
-.share-recipe, .print-recipe, .view-post-btn {
-    background: #0073aa60;
-    width: 6em;
-    column-gap: 10px;
+.share-buttons a {
+  line-height:1.5 !important;
+}
+.share-recipe,
+.print-recipe,
+.view-post-btn {
+  background:color-mix(in srgb, var(--rg-primary) 38%, transparent);
+  column-gap:10px;
 }
 .delete-recipe {
-    background: #ff000052;
-    width: 6em;
-    margin-left: auto;
-    column-gap: 10px;
+  background:var(--rg-danger);
+  margin-left:auto;
+  column-gap:10px;
 }
-.facebook { background: #3b5998; }
-.twitter { background: #1da1f2; }
-.pinterest { background: #e60023; }
-.reddit { background: #ff4500; }
-.email-recipe { background: black; }
-.copy-recipe { background: black; }
+.facebook { background:#3b5998; }
+.twitter { background:#1da1f2; }
+.pinterest { background:#e60023; }
+.reddit { background:#ff4500; }
+.email-recipe,
+.copy-recipe { background:var(--rg-contrast); }
 
-/* Disabled state for platform buttons */
+/* BUTTON STATES */
 .modal-action.platform-share-btn.disabled {
-    opacity: 0.25;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-/* Email/copy buttons stay fully visible */
-.email-recipe, .copy-recipe {
-    opacity: 1 !important;
+  opacity:0.25;
+  cursor:not-allowed;
+  pointer-events:none;
 }
 
-
+/* PRINT STYLES */
 @media print {
-    .modal-actions {
-        display: none;
-    }
-    
-    .recipe-modal {
-        position: static;
-        background: white;
-        display: block !important;
-    }
-    
-    .modal-content {
-        box-shadow: none;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        max-width: 100%;
-    }
-    
-    .close-modal {
-        display: none;
-    }
+  .modal-actions {
+    display:none;
+  }
+  .recipe-modal {
+    position:static;
+    background:var(--rg-base);
+    display:block !important;
+  }
+  .modal-content {
+    box-shadow:none;
+    margin:0;
+    padding:0;
+    width:100%;
+    max-width:100%;
+  }
+  .close-modal {
+    display:none;
+  }
 }
 
+/* ANIMATIONS (consolidated) */
 @keyframes rg-spin {
-    to { transform: rotate(360deg); }
+  to { transform:rotate(360deg); }
 }
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Pulse animation when action completes */
+@keyframes success-pulse {
+  0% { transform: translateY(-1px) scale(1); }
+  50% { transform: translateY(-1px) scale(1.05); }
+  100% { transform: translateY(-1px) scale(1); }
 }
-
-@keyframes clicked {
-    0% { scale: 1;}
-    50% { scale: 1.02;}
-    100% { scale: 1.;}
+/* Click feedback animation */
+@keyframes clickFeedback {
+  0% { transform: translateY(-1px) scale(1); }
+  50% { 
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--wp--preset--color--accent-1) 40%, transparent);
+  }
+  100% { transform: translateY(-1px) scale(1); }
+}
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+@keyframes dietary-pulse {
+  0% { transform: translateY(-1px) scale(1); }
+  50% { transform: translateY(-1px) scale(1.05); }
+  100% { transform: translateY(-1px) scale(1); }
 }

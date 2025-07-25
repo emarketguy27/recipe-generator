@@ -67,7 +67,6 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
         if ($this->current_action() !== 'delete' || !current_user_can('manage_options')) {
             return;
         }
-        // error_log('Bulk delete request received: ' . print_r($_REQUEST, true)); // Debug
 
         $recipe_ids = isset($_REQUEST['recipe']) ? (array)$_REQUEST['recipe'] : [];
         $user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
