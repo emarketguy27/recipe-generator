@@ -370,6 +370,8 @@
   background:var(--rg-base);
   padding-bottom:6px;
   font-weight:700;
+  z-index: +1;
+  box-shadow: 0px 3px 6px -6px black;
 }
 .user-saved-recipes h3 span {
   font-weight:300;
@@ -377,7 +379,7 @@
 }
 .saved-recipes-list {
   list-style:none;
-  padding:0;
+  padding:0 .6rem;
 }
 .saved-recipe-item {
   border:1px solid color-mix(in srgb, var(--rg-primary) 16%, transparent);
