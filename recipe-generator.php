@@ -49,6 +49,7 @@ class Recipe_Generator {
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-template-loader.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-schema-generator.php';
+        require_once RECIPE_GENERATOR_PATH . 'includes/class-patterns-handler.php';
     }
 
     public function output_recipe_schema() {
@@ -259,6 +260,8 @@ add_action('plugins_loaded', function() {
         new Recipe_Generator_Admin_AI_Settings();
         new Recipe_Generator_Admin_Saved_Recipes();
     }
+
+    Recipe_Generator_Patterns_Handler::init();
     // Future: Initialize frontend components here if needed
 });
 
