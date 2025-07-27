@@ -60,7 +60,7 @@ class Recipe_Generator_Frontend {
                 <?php endif; ?>
                 
                 <div class="form-buttons">
-                   <button type="submit" class="rg-submit wp-element-button">
+                   <button type="submit" id="generate-btn" class="rg-submit wp-element-button">
                     <span class="dashicons dashicons-food"></span>
                     <?php esc_html_e('Generate Recipe', 'recipe-generator'); ?>
                     </button>

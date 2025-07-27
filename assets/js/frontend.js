@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
         var $form = $(this);
         var $results = $('#recipe-results');
         var $loading = $('.rg-loading');
-        var $submitBtn = $form.find('.rg-submit');
+        var $submitBtn = $form.find('#generate-btn');
         var $saveBtn = $('#save-recipe-btn');
 
         $saveBtn.removeClass('saved');
@@ -86,7 +86,7 @@ jQuery(document).ready(function($) {
                 handleGenerateSuccess();
 
                 storeFormState();
-                $('.rg-submit').prop('disabled', true).text('Generate Another');
+                $('#generate-btn').prop('disabled', true);
 
                 clearInterval(messageInterval);
                 $results.html(response.data.html).addClass('show').show();
@@ -216,10 +216,10 @@ jQuery(document).ready(function($) {
             dietary_tags: dietaryTags, // Add the tags to the AJAX request
             _wpnonce: recipeGeneratorFrontendVars.nonce
         }, function(response) {
-            if (response.success) {
-                $btn.addClass('saved');
+            if (response.success) {                
                 setTimeout(() => {
-                $status.text('Recipe saved to your favorites!').hide().fadeIn(700); 
+                    $btn.addClass('saved');
+                    $status.text('Recipe saved to your favorites!').hide().fadeIn(700); 
                 }, 500);
                 
                 // Update the count if on saved recipes page

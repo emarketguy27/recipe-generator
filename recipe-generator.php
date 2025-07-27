@@ -14,6 +14,7 @@ define('RECIPE_GENERATOR_VERSION', '1.0.0');
 define('RECIPE_GENERATOR_PATH', plugin_dir_path(__FILE__));
 define('RECIPE_GENERATOR_URL', plugin_dir_url(__FILE__));
 define('RECIPE_GENERATOR_TEMPLATES_PATH', RECIPE_GENERATOR_PATH . 'templates/');
+define('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL', true);
 
 class Recipe_Generator {
     private static $instance;
@@ -49,7 +50,7 @@ class Recipe_Generator {
         require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-template-loader.php';
         require_once RECIPE_GENERATOR_PATH . 'includes/class-schema-generator.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-patterns-handler.php';
+        // require_once RECIPE_GENERATOR_PATH . 'includes/class-patterns-handler.php';
     }
 
     public function output_recipe_schema() {
@@ -85,6 +86,8 @@ class Recipe_Generator {
                 ],
                 'public' => true,
                 'publicly_queryable' => true,
+                'exclude_from_search' => false,
+                'hierarchical' => true,
                 'show_ui' => true,
                 'show_in_menu' => true,
                 'show_in_nav_menus' => true,
@@ -97,14 +100,13 @@ class Recipe_Generator {
                 ],
                 'supports' => [
                     'title', 'editor', 'author', 'thumbnail',
-                    'excerpt', 'comments', 'custom-fields'
+                    'excerpt', 'comments', 'custom-fields', 'page-attributes'
                 ],
                 // 'taxonomies' => ['category', 'post_tag'],
                 'capability_type' => 'post',
                 'map_meta_cap' => true,
                 'menu_icon' => 'dashicons-food',
                 'menu_position' => 5,
-                'hierarchical' => false,
                 'can_export' => true
             ];
 
@@ -241,9 +243,6 @@ register_activation_hook(__FILE__, function() {
 });
 
 register_deactivation_hook(__FILE__, function() {
-    // 1. Remove taxonomy connections
-    unregister_taxonomy_for_object_type('category', 'ai_recipe');
-    unregister_taxonomy_for_object_type('post_tag', 'ai_recipe');
 
     flush_rewrite_rules();
 
@@ -261,7 +260,7 @@ add_action('plugins_loaded', function() {
         new Recipe_Generator_Admin_Saved_Recipes();
     }
 
-    Recipe_Generator_Patterns_Handler::init();
+    // Recipe_Generator_Patterns_Handler::init();
     // Future: Initialize frontend components here if needed
 });
 
@@ -328,6 +327,16 @@ add_filter('dashboard_glance_items', function($items) {
     
     return $items;
 });
+
+// Admin Notice for complete uninstall
+add_action('admin_notices', function() {
+    if (isset($_GET['plugin']) && $_GET['plugin'] === 'recipe-generator/recipe-generator.php') {
+        echo '<div class="notice notice-info"><p>';
+        _e('Recipe Generator: All plugin data will be preserved. Enable cleanup by defining RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL as true.', 'recipe-generator');
+        echo '</p></div>';
+    }
+});
+
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
 
