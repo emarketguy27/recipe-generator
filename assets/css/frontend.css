@@ -93,7 +93,7 @@
   font-size: 0.95rem;
   color: var(--wp--preset--color--contrast);
   flex-grow: 1;
-  min-width: 100px;
+  min-width: 110px;
   text-align: center;
   text-transform: capitalize;
 }
@@ -437,9 +437,7 @@
   padding-inline:0.5em;
   overflow-y:auto;
 }
-.saved-recipes-shortcode-container p {
-  padding-inline: .5em;
-}
+
 /* CUSTOM SCROLLBARS */
 .saved-recipes-shortcode-container::-webkit-scrollbar,
 .modal-content::-webkit-scrollbar {
@@ -493,11 +491,11 @@
   opacity:1;
 }
 .modal-content {
-  background:linear-gradient(0deg,#000,var(--rg-accent-1));
+  background:linear-gradient(0deg,var(--rg-accent-1),#000,var(--rg-accent-1));
   color:var(--rg-contrast);
   margin:5% auto;
-  width:80%;
-  max-width:800px;
+  width:70%;
+  max-width:850px;
   max-height:80vh;
   overflow-y:auto;
   position:relative;
@@ -523,7 +521,8 @@
 .modal-actions {
   display:flex;
   gap:10px;
-  padding:1em;
+  padding:.3em;
+  margin-bottom: .3em;
   position:sticky;
   top:0;
   backdrop-filter:blur(8px);
@@ -560,7 +559,10 @@
 }
 #modal-recipe-content {
   background:var(--wp--preset--color--accent-5);
-  padding:1em 3em;
+  padding:1em 1.5em;
+  width: 86%;
+  justify-self: center;
+  border-radius: 10px;
 }
 
 /* SHARE MODAL */

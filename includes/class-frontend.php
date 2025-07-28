@@ -106,19 +106,11 @@ class Recipe_Generator_Frontend {
             
             <?php if ($recipe_count > 0) : ?>
                 <ul class="saved-recipes-list">
-                    <?php foreach ($saved_recipes as $recipe_id => $recipe) : 
-                        $dietary_tags = !empty($recipe['data']['dietary_tags']) ? $recipe['data']['dietary_tags'] : [];
-                        ?>
+                    <?php foreach ($saved_recipes as $recipe_id => $recipe) : ?>
                         <li class="saved-recipe-item" data-recipe-id="<?php echo esc_attr($recipe_id); ?>">
                             <div class="recipe-summary">
                                 <h4><?php echo esc_html($recipe['name']); ?></h4>
-                                <?php if (!empty($dietary_tags)) : ?>
-                                    <div class="dietary-tags">
-                                        <?php foreach ($dietary_tags as $tag) : ?>
-                                            <span class="dietary-tag"><?php echo esc_html($tag); ?></span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
+                                
                                 <button class="view-recipe-btn wp-element-button">View Recipe</button>
                             </div>
                         </li>
