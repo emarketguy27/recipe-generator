@@ -349,7 +349,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         // Generate block content
         $blocks = [];
 
-        $blocks[] = '<!-- wp:group {"layout":{"type":"constrained","wideSize":"800px"},"style":{"spacing":{"padding":{"top":"20px","bottom":"20px"}}}} -->';
+        $blocks[] = '<!-- wp:group {"layout":{"type":"constrained","wideSize":"1000px},"style":{"spacing":{"padding":{"top":"20px","bottom":"20px"}}}} -->';
         $blocks[] = '<div class="wp-block-group">';
         
         // 1. Description

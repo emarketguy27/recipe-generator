@@ -110,8 +110,7 @@ class Recipe_Generator_Frontend {
                         <li class="saved-recipe-item" data-recipe-id="<?php echo esc_attr($recipe_id); ?>">
                             <div class="recipe-summary">
                                 <h4><?php echo esc_html($recipe['name']); ?></h4>
-                                
-                                <button class="view-recipe-btn wp-element-button">View Recipe</button>
+                                <a class="view-recipe-btn wp-element-button">View Recipe</a>
                             </div>
                         </li>
                     <?php endforeach; ?>
