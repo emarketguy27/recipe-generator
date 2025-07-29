@@ -60,6 +60,40 @@
     }
 }
 
+.recipe-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.meta-group {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.meta-icon .dashicons {
+    font-size: 1.4em;
+    color: var(--wp--preset--color--primary);
+}
+
+.meta-icon p,
+.meta-value p {
+    margin: 0;
+}
+
+/* Editor-specific fixes */
+.block-editor .meta-group {
+    white-space: nowrap;
+    background: rgba(0,0,0,0.03);
+    padding: 0.5em;
+    border-radius: 4px;
+}
+
+/* Fix for editor compatibility */
+.block-editor .recipe-meta-item {
+    white-space: nowrap;
+}
 /* .recipe-meta .dashicons-before::before {
     font-family: dashicons;
     display: inline-block;

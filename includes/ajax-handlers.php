@@ -276,10 +276,15 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         $xpath = new DOMXPath($dom);
         
         // Extract all elements
+        $servings_node = $xpath->query("//p[contains(., 'Servings:')]")->item(0);
+        $servings = $servings_node ? trim(str_replace('Servings:', '', $servings_node->nodeValue)) : '';
 
-        $servings = $xpath->query("//p[contains(., 'Servings:')]")->item(0)->nodeValue ?? '';
-        $prep_time = $xpath->query("//p[contains(., 'Prep Time:')]")->item(0)->nodeValue ?? '';
-        $cook_time = $xpath->query("//p[contains(., 'Cook Time:')]")->item(0)->nodeValue ?? '';
+        $prep_time_node = $xpath->query("//p[contains(., 'Prep Time:')]")->item(0);
+        $prep_time = $prep_time_node ? trim(str_replace('Prep Time:', '', $prep_time_node->nodeValue)) : '';
+
+        $cook_time_node = $xpath->query("//p[contains(., 'Cook Time:')]")->item(0);
+        $cook_time = $cook_time_node ? trim(str_replace('Cook Time:', '', $cook_time_node->nodeValue)) : '';
+
         $prep_mins = (int)preg_replace('/[^0-9]/', '', $prep_time);
         $cook_mins = (int)preg_replace('/[^0-9]/', '', $cook_time);
         $total_time = $prep_mins + $cook_mins;
@@ -358,36 +363,41 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         }
 
         // 2. Meta Group 1 (Times/Servings)
+        $blocks[] = '<!-- wp:group {"style":{"spacing":{"blockGap":"0.5em"}},"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between"}} -->';
+        $blocks[] = '<div class="wp-block-group recipe-meta-container">';
+
         $meta_items = [
             'servings' => [
                 'icon' => 'groups',
-                'label' => '',
+                'label' => 'Servings',
                 'value' => $servings
             ],
             'prep_time' => [
                 'icon' => 'clock',
-                'label' => '',
+                'label' => 'Prep Time',
                 'value' => $prep_time
             ],
             'cook_time' => [
                 'icon' => 'food',
-                'label' => '',
+                'label' => 'Cook Time',
                 'value' => $cook_time
             ]
         ];
 
-        $blocks[] = '<!-- wp:group {"style":{"spacing":{"blockGap":"0.5em"}},"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between"}} -->';
-        $blocks[] = '<div class="wp-block-group">';
-
-        foreach ($meta_items as $item) {
+        foreach ($meta_items as $key => $item) {
             if (!empty($item['value'])) {
                 $blocks[] = sprintf(
-                    '<!-- wp:paragraph {"style":{"layout":{"selfStretch":"fixed","flexSize":"auto"}},"className":"recipe-meta-item"} -->
-                    <p class="recipe-meta-item" style="display:inline-flex;align-items:center;gap:0.3em;margin:0 !important;">
-                        <span class="dashicons dashicons-%s" style="font-size:1.4em;width:auto;height:auto;color:var(--wp--preset--color--accent-1)"></span>
-                        <span>%s: %s</span>
-                    </p>
-                    <!-- /wp:paragraph -->',
+                    '<!-- wp:group {"className":"meta-group","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+                    <div class="wp-block-group meta-group">
+                        <!-- wp:paragraph {"className":"meta-icon"} -->
+                        <p class="meta-icon"><span class="dashicons dashicons-%s"></span></p>
+                        <!-- /wp:paragraph -->
+                        
+                        <!-- wp:paragraph {"className":"meta-value"} -->
+                        <p class="meta-value">%s: %s</p>
+                        <!-- /wp:paragraph -->
+                    </div>
+                    <!-- /wp:group -->',
                     esc_attr($item['icon']),
                     esc_html($item['label']),
                     esc_html($item['value'])

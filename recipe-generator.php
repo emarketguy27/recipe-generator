@@ -231,6 +231,7 @@ class Recipe_Generator {
                 'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator')
             )
         );
+
     }
 }
 
@@ -337,6 +338,18 @@ add_action('admin_notices', function() {
     }
 });
 
+add_action('enqueue_block_editor_assets', function() {
+    wp_enqueue_style('dashicons');
+});
+// add_action('admin_head', function() {
+//     echo '<style>
+//         .dashicons-test:before {
+//             content: "\f155";
+//             font-family: dashicons;
+//         }
+//     </style>
+//     <div class="dashicons-test" style="position:absolute;top:0;left:0;z-index:99999;"></div>';
+// });
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
 
