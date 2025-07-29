@@ -158,6 +158,7 @@ class Recipe_Generator_Admin_AI_Settings {
             <form method="post" action="options.php">
                 <?php 
                 settings_fields('recipe_generator_ai_settings');
+                wp_nonce_field('recipe_generator_ai_settings-options');
                 ?>                
                 <div class="settings-section">
                     <h2 class="title"><?php esc_html_e('API Configuration', 'recipe-generator'); ?></h2>
@@ -558,9 +559,60 @@ class Recipe_Generator_Admin_AI_Settings {
         return empty($key) ? '' : '••••••••••••••••';
     }
 
+    // public function handle_submissions() {
+    //     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'recipe_generator_ai_settings')) {
+    //         return;
+    //     }
+
+    //     // Handle API key
+    //     if (isset($_POST[$this->api_key_option])) {
+    //         update_option($this->api_key_option, sanitize_text_field($_POST[$this->api_key_option]));
+    //     }
+
+    //     // Handle provider selection
+    //     if (isset($_POST['api_provider'])) {
+    //         update_option('recipe_generator_selected_provider', sanitize_text_field($_POST['api_provider']));
+    //     }
+
+    //     // Handle new provider addition
+    //     if (!empty($_POST['new_provider'])) {
+    //         $provider_name = sanitize_text_field($_POST['new_provider']);
+    //         $endpoint = !empty($_POST['new_provider_endpoint']) ? esc_url_raw($_POST['new_provider_endpoint']) : '';
+            
+    //         if (empty($endpoint)) {
+    //             add_settings_error(
+    //                 'recipe_generator_messages',
+    //                 'recipe_generator_message',
+    //                 __('API endpoint URL is required when adding a new provider', 'recipe-generator'),
+    //                 'error'
+    //             );
+    //             return;
+    //         }
+
+    //         $result = $this->providers->add_provider($provider_name, $endpoint);
+            
+    //         if (is_wp_error($result)) {
+    //             add_settings_error('recipe_generator_messages', 'recipe_generator_message', $result->get_error_message(), 'error');
+    //         } else {
+    //             add_settings_error(
+    //                 'recipe_generator_messages',
+    //                 'recipe_generator_message',
+    //                 __('Provider added successfully!', 'recipe-generator'),
+    //                 'success'
+    //             );
+    //         }
+    //     }
+    // }
     public function handle_submissions() {
-        if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'recipe_generator_ai_settings')) {
+        error_log('Handling submissions...'); // Debug
+        error_log(print_r($_POST, true)); // Debug
+        
+        if (!isset($_POST['option_page']) || $_POST['option_page'] !== 'recipe_generator_ai_settings') {
             return;
+        }
+
+        if (!wp_verify_nonce($_POST['_wpnonce'], 'recipe_generator_ai_settings-options')) {
+            wp_die(__('Security check failed', 'recipe-generator'));
         }
 
         // Handle API key
@@ -571,6 +623,14 @@ class Recipe_Generator_Admin_AI_Settings {
         // Handle provider selection
         if (isset($_POST['api_provider'])) {
             update_option('recipe_generator_selected_provider', sanitize_text_field($_POST['api_provider']));
+        }
+
+        // Handle technical parameters
+        foreach ($this->technical_params as $param => $attributes) {
+            $option_name = "recipe_generator_{$param}";
+            if (isset($_POST[$option_name])) {
+                update_option($option_name, $this->sanitize_technical_param_single($_POST[$option_name], $param));
+            }
         }
 
         // Handle new provider addition

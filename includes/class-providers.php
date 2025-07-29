@@ -63,24 +63,63 @@ class Recipe_Generator_Providers {
         return $this->providers;
     }
 
+    // public function get_endpoint($provider_name) {
+    //     if (isset($this->endpoints[$provider_name])) {
+    //         return $this->endpoints[$provider_name];
+    //     }
+    //     return false;
+    // }
     public function get_endpoint($provider_name) {
+        // Check built-in endpoints first
         if (isset($this->endpoints[$provider_name])) {
             return $this->endpoints[$provider_name];
         }
+        
+        // Check custom endpoints
+        $custom_endpoints = get_option('recipe_generator_custom_endpoints', array());
+        if (isset($custom_endpoints[$provider_name])) {
+            return $custom_endpoints[$provider_name];
+        }
+        
         return false;
     }
 
+    // public function add_provider($provider_name, $endpoint = '') {
+    //     if (empty(trim($provider_name))) {
+    //         return new WP_Error('empty', __('Provider name cannot be empty', 'recipe-generator'));
+    //     }
+
+    //     $custom_providers = get_option($this->option_name, array());
+    //     $sanitized = sanitize_text_field($provider_name);
+    //     $custom_providers[$sanitized] = $sanitized;
+        
+    //     if (!empty($endpoint)) {
+    //         $this->endpoints[$sanitized] = esc_url_raw($endpoint);
+    //     }
+        
+    //     if (!update_option($this->option_name, $custom_providers)) {
+    //         return new WP_Error('db_error', __('Failed to save provider', 'recipe-generator'));
+    //     }
+        
+    //     $this->providers[$sanitized] = $sanitized;
+    //     return true;
+    // }
     public function add_provider($provider_name, $endpoint = '') {
+        error_log("Adding provider: $provider_name with endpoint: $endpoint"); // Debug
+        
         if (empty(trim($provider_name))) {
             return new WP_Error('empty', __('Provider name cannot be empty', 'recipe-generator'));
         }
 
         $custom_providers = get_option($this->option_name, array());
+        $custom_endpoints = get_option('recipe_generator_custom_endpoints', array());
+        
         $sanitized = sanitize_text_field($provider_name);
         $custom_providers[$sanitized] = $sanitized;
         
         if (!empty($endpoint)) {
-            $this->endpoints[$sanitized] = esc_url_raw($endpoint);
+            $custom_endpoints[$sanitized] = esc_url_raw($endpoint);
+            update_option('recipe_generator_custom_endpoints', $custom_endpoints);
         }
         
         if (!update_option($this->option_name, $custom_providers)) {
