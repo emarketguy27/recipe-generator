@@ -341,15 +341,19 @@ add_action('admin_notices', function() {
 add_action('enqueue_block_editor_assets', function() {
     wp_enqueue_style('dashicons');
 });
-// add_action('admin_head', function() {
-//     echo '<style>
-//         .dashicons-test:before {
-//             content: "\f155";
-//             font-family: dashicons;
-//         }
-//     </style>
-//     <div class="dashicons-test" style="position:absolute;top:0;left:0;z-index:99999;"></div>';
-// });
+
+add_action('wp_enqueue_scripts', function() {
+    // Always load Dashicons - they're part of WordPress core
+    wp_enqueue_style('dashicons');
+    
+    // Load minimal base styles for all recipe content
+    wp_enqueue_style(
+        'recipe-generator-base',
+        RECIPE_GENERATOR_URL . 'assets/css/base.css',
+        [],
+        RECIPE_GENERATOR_VERSION
+    );
+});
 // Include AJAX handlers
 require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
 

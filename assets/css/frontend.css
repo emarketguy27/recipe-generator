@@ -364,7 +364,7 @@
   align-items:center;
   gap:0.3em;
 }
-.meta-group .dashicons {
+.meta-group .dashicons, .meta-icon .dashicons, .dashicons {
   width:2rem;
   height:2rem;
   font-size:2rem;

@@ -359,12 +359,12 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         
         // 1. Description
         if (!empty($recipe['description'])) {
-            $blocks[] = '<!-- wp:paragraph --><p>' . esc_html($recipe['description']) . '</p><!-- /wp:paragraph -->';
+            $blocks[] = '<!-- wp:paragraph --><p class="recipe-description">' . esc_html($recipe['description']) . '</p><!-- /wp:paragraph -->';
         }
 
         // 2. Meta Group 1 (Times/Servings)
-        $blocks[] = '<!-- wp:group {"style":{"spacing":{"blockGap":"0.5em"}},"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between"}} -->';
-        $blocks[] = '<div class="wp-block-group recipe-meta-container">';
+        $blocks[] = '<!-- wp:group {"className":"recipe-meta-container","style":{"spacing":{"padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20"},"margin":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50"}}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->';
+        $blocks[] = '<div class="wp-block-group recipe-meta-container" style="margin-top:var(--wp--preset--spacing--50);margin-bottom:var(--wp--preset--spacing--50);padding-top:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20)">';
 
         $meta_items = [
             'servings' => [
@@ -410,30 +410,46 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         
         // 4. Ingredients
         if (!empty($ingredients)) {
-            $blocks[] = '<!-- wp:heading {"level":3} --><h3>Ingredients</h3><!-- /wp:heading -->';
+            $blocks[] = '<!-- wp:group {"className":"is-style-section-1","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30","right":"var:preset|spacing|30"},"margin":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50"}},"border":{"radius":"8px"}},"layout":{"type":"default"}} -->';
+            $blocks[] = '<div class="wp-block-group is-style-section-1 ingredients-wrapper" style="border-radius:8px;margin-top:var(--wp--preset--spacing--50);margin-bottom:var(--wp--preset--spacing--50);padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--30)">';
+            $blocks[] = '<!-- wp:heading {"level":3,"className":"is-style-text-subtitle","style":{"border":{"bottom":{"color":"var:preset|color|accent-6","style":"solid","width":"1px"}},"spacing":{"padding":{"bottom":"var:preset|spacing|20"}}}} -->
+            <h3 class="wp-block-heading is-style-text-subtitle" style="border-bottom-color:var(--wp--preset--color--accent-6);border-bottom-style:solid;border-bottom-width:1px;padding-bottom:var(--wp--preset--spacing--20)">Ingredients</h3><!-- /wp:heading -->';
             $ingredient_blocks = array_map(function($item) {
                 return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
             }, $ingredients);
             $blocks[] = '<!-- wp:list --><ul>' . implode('', $ingredient_blocks) . '</ul><!-- /wp:list -->';
+            $blocks[] = '</div>';
+            $blocks[] = '<!-- /wp:group -->';
         }
         
         // 5. Instructions
         if (!empty($instructions)) {
-            $blocks[] = '<!-- wp:heading {"level":3} --><h3>Instructions</h3><!-- /wp:heading -->';
+            $blocks[] = '<!-- wp:group {"className":"is-style-section-1","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30","right":"var:preset|spacing|30"},"margin":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50"}},"border":{"radius":"8px"}},"layout":{"type":"default"}} -->';
+            $blocks[] = '<div class="wp-block-group is-style-section-1 instructions-wrapper" style="border-radius:8px;margin-top:var(--wp--preset--spacing--50);margin-bottom:var(--wp--preset--spacing--50);padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--30)">';
+            $blocks[] = '<!-- wp:heading {"level":3,"className":"is-style-text-subtitle","style":{"spacing":{"padding":{"bottom":"var:preset|spacing|20"}},"border":{"bottom":{"color":"var:preset|color|accent-6","style":"solid","width":"1px"},"top":{},"right":{},"left":{}}}} -->
+            <h3 class="wp-block-heading is-style-text-subtitle" style="border-bottom-color:var(--wp--preset--color--accent-6);border-bottom-style:solid;border-bottom-width:1px;padding-bottom:var(--wp--preset--spacing--20)">Instructions</h3><!-- /wp:heading -->';
             $instruction_blocks = array_map(function($item) {
                 $clean = htmlspecialchars($item, ENT_HTML5 | ENT_QUOTES, 'UTF-8');
                 return '<!-- wp:list-item --><li>' . $clean . '</li><!-- /wp:list-item -->';
             }, $instructions);
             $blocks[] = '<!-- wp:list {"ordered":true} --><ol>' . implode('', $instruction_blocks) . '</ol><!-- /wp:list -->';
+            $blocks[] = '</div>';
+            $blocks[] = '<!-- /wp:group -->';
         }
         
         // 6. Nutrition
         if (!empty($nutrition)) {
-            $blocks[] = '<!-- wp:heading {"level":3} --><h3>Nutritional Information</h3><!-- /wp:heading -->';
+            $blocks[] = '<!-- wp:group {"className":"is-style-section-2","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30","right":"var:preset|spacing|30"},"margin":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30"}},"border":{"radius":"8px"},"shadow":"var:preset|shadow|deep"},"layout":{"type":"default"}} -->';
+            $blocks[] = '<div class="wp-block-group is-style-section-2 nutrition-wrapper" style="border-radius:8px;margin-top:var(--wp--preset--spacing--30);margin-bottom:var(--wp--preset--spacing--30);padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--30);box-shadow:var(--wp--preset--shadow--deep)">';
+            $blocks[] = '<!-- wp:heading {"textAlign":"left","level":3,"className":"is-style-text-subtitle","style":{"border":{"bottom":{"color":"var:preset|color|accent-6","style":"solid","width":"1px"}},"spacing":{"padding":{"bottom":"var:preset|spacing|20"}}}} -->
+            <h3 class="wp-block-heading has-text-align-left is-style-text-subtitle" style="border-bottom-color:var(--wp--preset--color--accent-6);border-bottom-style:solid;border-bottom-width:1px;padding-bottom:var(--wp--preset--spacing--20)">Nutritional Information</h3>
+            <!-- /wp:heading -->';
             $nutrition_blocks = array_map(function($item) {
                 return '<!-- wp:list-item --><li>' . esc_html($item) . '</li><!-- /wp:list-item -->';
             }, $nutrition);
             $blocks[] = '<!-- wp:list --><ul>' . implode('', $nutrition_blocks) . '</ul><!-- /wp:list -->';
+            $blocks[] = '</div>';
+            $blocks[] = '<!-- /wp:group -->';
         }
         $blocks[] = '</div>';
         $blocks[] = '<!-- /wp:group -->';
