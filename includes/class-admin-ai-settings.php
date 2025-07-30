@@ -309,6 +309,7 @@ class Recipe_Generator_Admin_AI_Settings {
                 
                 <div class="submit-section">
                     <?php submit_button(__('Save All Settings', 'recipe-generator')); ?>
+                    <p><strong>ANY</strong> changes made <strong>MUST</strong> be saved using this <strong>"Save All Settings"</strong> button.</p>
                 </div>
             </form>
         </div>
@@ -407,63 +408,6 @@ class Recipe_Generator_Admin_AI_Settings {
         <?php
     }
 
-    // private function render_test_interface() {
-    //     echo '<h2 class="title">' . esc_html__('Test Prompt', 'recipe-generator') . '</h2>';
-    //     echo '<div id="prompt-test-interface">';
-        
-    //     // Test form fields
-    //     echo '<table class="form-table">';
-    //     echo '<tbody>';
-        
-    //     // Servings
-    //     echo '<tr>';
-    //     echo '<th scope="row"><label for="test_servings">' . esc_html__('Servings', 'recipe-generator') . '</label></th>';
-    //     echo '<td>';
-    //     echo '<input type="number" id="test_servings" name="test_servings" min="1" max="20" value="4">';
-    //     echo '</td>';
-    //     echo '</tr>';
-        
-    //     // Include ingredients
-    //     echo '<tr>';
-    //     echo '<th scope="row"><label for="test_include">' . esc_html__('Must Include', 'recipe-generator') . '</label></th>';
-    //     echo '<td>';
-    //     echo '<input type="text" id="test_include" name="test_include" class="regular-text" placeholder="' . esc_attr__('Comma separated list', 'recipe-generator') . '">';
-    //     echo '</td>';
-    //     echo '</tr>';
-        
-    //     // Exclude ingredients
-    //     echo '<tr>';
-    //     echo '<th scope="row"><label for="test_exclude">' . esc_html__('Must Exclude', 'recipe-generator') . '</label></th>';
-    //     echo '<td>';
-    //     echo '<input type="text" id="test_exclude" name="test_exclude" class="regular-text" placeholder="' . esc_attr__('Comma separated list', 'recipe-generator') . '">';
-    //     echo '</td>';
-    //     echo '</tr>';
-        
-    //     // Dietary options
-    //     echo '<tr>';
-    //     echo '<th scope="row"><label>' . esc_html__('Dietary Requirements', 'recipe-generator') . '</label></th>';
-    //     echo '<td>';
-    //     $dietary_options = Recipe_Generator_Prompt_Manager::get_instance()->get_dietary_options();
-    //     foreach ($dietary_options as $key => $label) {
-    //         echo '<label><input type="checkbox" name="test_dietary[]" value="' . esc_attr($key) . '"> ' . esc_html($label) . '</label><br>';
-    //     }
-    //     echo '</td>';
-    //     echo '</tr>';
-        
-    //     echo '</tbody>';
-    //     echo '</table>';
-        
-    //     // Test button and results
-    //     echo '<button type="button" id="test-prompt" class="button button-primary">' . esc_html__('Test Prompt', 'recipe-generator') . '</button>';
-    //     echo '<div id="test-results" style="margin-top:20px; display:none;">';
-    //     echo '<h3>' . esc_html__('Generated Prompt:', 'recipe-generator') . '</h3>';
-    //     echo '<div id="generated-prompt" class="code" style="background:#f5f5f5; padding:10px; border:1px solid #ddd;"></div>';
-    //     echo '<h3 style="margin-top:15px;">' . esc_html__('API Response:', 'recipe-generator') . '</h3>';
-    //     echo '<div id="api-response" style="background:#f5f5f5; padding:10px; border:1px solid #ddd;"></div>';
-    //     echo '</div>';
-        
-    //     echo '</div>';
-    // }
     private function render_test_interface() {
         $dietary_options = Recipe_Generator_Prompt_Manager::get_instance()->get_dietary_options();
         ?>
@@ -559,50 +503,6 @@ class Recipe_Generator_Admin_AI_Settings {
         return empty($key) ? '' : '••••••••••••••••';
     }
 
-    // public function handle_submissions() {
-    //     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'recipe_generator_ai_settings')) {
-    //         return;
-    //     }
-
-    //     // Handle API key
-    //     if (isset($_POST[$this->api_key_option])) {
-    //         update_option($this->api_key_option, sanitize_text_field($_POST[$this->api_key_option]));
-    //     }
-
-    //     // Handle provider selection
-    //     if (isset($_POST['api_provider'])) {
-    //         update_option('recipe_generator_selected_provider', sanitize_text_field($_POST['api_provider']));
-    //     }
-
-    //     // Handle new provider addition
-    //     if (!empty($_POST['new_provider'])) {
-    //         $provider_name = sanitize_text_field($_POST['new_provider']);
-    //         $endpoint = !empty($_POST['new_provider_endpoint']) ? esc_url_raw($_POST['new_provider_endpoint']) : '';
-            
-    //         if (empty($endpoint)) {
-    //             add_settings_error(
-    //                 'recipe_generator_messages',
-    //                 'recipe_generator_message',
-    //                 __('API endpoint URL is required when adding a new provider', 'recipe-generator'),
-    //                 'error'
-    //             );
-    //             return;
-    //         }
-
-    //         $result = $this->providers->add_provider($provider_name, $endpoint);
-            
-    //         if (is_wp_error($result)) {
-    //             add_settings_error('recipe_generator_messages', 'recipe_generator_message', $result->get_error_message(), 'error');
-    //         } else {
-    //             add_settings_error(
-    //                 'recipe_generator_messages',
-    //                 'recipe_generator_message',
-    //                 __('Provider added successfully!', 'recipe-generator'),
-    //                 'success'
-    //             );
-    //         }
-    //     }
-    // }
     public function handle_submissions() {
         error_log('Handling submissions...'); // Debug
         error_log(print_r($_POST, true)); // Debug

@@ -210,9 +210,6 @@ class Recipe_Generator {
             RECIPE_GENERATOR_VERSION,
             true
         );
-
-        // Enqueue Dashicons for the editor
-        wp_enqueue_style('dashicons');
         
         // Localize script with AJAX URL and nonce
         wp_localize_script(
@@ -338,10 +335,6 @@ add_action('admin_notices', function() {
     }
 });
 
-add_action('enqueue_block_editor_assets', function() {
-    wp_enqueue_style('dashicons');
-});
-
 add_action('wp_enqueue_scripts', function() {
     // Always load Dashicons - they're part of WordPress core
     wp_enqueue_style('dashicons');
@@ -354,6 +347,3 @@ add_action('wp_enqueue_scripts', function() {
         RECIPE_GENERATOR_VERSION
     );
 });
-// Include AJAX handlers
-require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
-
