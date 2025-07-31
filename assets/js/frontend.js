@@ -233,7 +233,7 @@ jQuery(document).ready(function($) {
                 $btn.prop('disabled', false);
             }
         }).fail(function() {
-            $status.text('Connection error. Please try again.');
+            $status.text('You must be a logged-in member to save recipes');
             $btn.prop('disabled', false);
         });
     });

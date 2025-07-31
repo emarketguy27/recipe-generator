@@ -13,6 +13,7 @@ class Recipe_Generator_Frontend {
     private function __construct() {
         add_shortcode('recipe_generator', [$this, 'recipe_shortcode_handler']);
         add_shortcode('user_saved_recipes', [$this, 'saved_recipes_shortcode_handler']);
+        add_shortcode('recipe_user_profile', [$this, 'user_profile_shortcode']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
     }
 
@@ -170,6 +171,53 @@ class Recipe_Generator_Frontend {
             </div>
         </div>
         <?php
+        return ob_get_clean();
+    }
+
+    public function user_profile_shortcode($atts) {
+        $this->set_assets_flag();
+        
+        $atts = shortcode_atts([
+            'show_avatar' => true,
+            'show_name'   => true,
+            'show_login'  => true,
+            'avatar_size' => 50
+        ], $atts, 'recipe_user_profile');
+
+        ob_start();
+        
+        if (is_user_logged_in()) {
+            $current_user = wp_get_current_user();
+            ?>
+            <div class="recipe-generator-user-profile">
+                <?php if ($atts['show_avatar']) : ?>
+                    <div class="user-avatar">
+                        <?php echo get_avatar($current_user->ID, (int)$atts['avatar_size']); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($atts['show_name']) : ?>
+                    <div class="user-info">
+                        <span class="user-display-name">Welcome <?php echo esc_html($current_user->display_name); ?></span>
+                        <?php if ($atts['show_login']) : ?>
+                            <a href="<?php echo esc_url(wp_logout_url()); ?>" class="logout-link">
+                                <?php esc_html_e('Log Out', 'recipe-generator'); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <?php
+        } elseif ($atts['show_login']) {
+            ?>
+            <div class="recipe-generator-user-profile">
+                <a href="<?php echo esc_url(wp_login_url()); ?>" class="login-link">
+                    <?php esc_html_e('Log In', 'recipe-generator'); ?>
+                </a>
+            </div>
+            <?php
+        }
+        
         return ob_get_clean();
     }
 

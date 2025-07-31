@@ -14,7 +14,6 @@ define('RECIPE_GENERATOR_VERSION', '1.0.0');
 define('RECIPE_GENERATOR_PATH', plugin_dir_path(__FILE__));
 define('RECIPE_GENERATOR_URL', plugin_dir_url(__FILE__));
 define('RECIPE_GENERATOR_TEMPLATES_PATH', RECIPE_GENERATOR_PATH . 'templates/');
-define('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL', true);
 
 class Recipe_Generator {
     private static $instance;
