@@ -36,6 +36,7 @@ class Recipe_Generator_Admin_Main {
                                     $settings_url = admin_url('admin.php?page=recipe-generator-ai-settings');
                                     printf(
                                         wp_kses(
+                                            /* translators: %s: URL to the API settings page */
                                             __('Select an API provider and add your API key in the <a href="%s">API Settings</a>', 'recipe-generator'),
                                             array('a' => array('href' => array()))
                                         ),
@@ -51,6 +52,7 @@ class Recipe_Generator_Admin_Main {
                                 <?php
                                 printf(
                                     wp_kses(
+                                        /* translators: %s: URL to the API settings page */
                                         __('<a href="%s" class="button button-primary">Go to API Settings</a>', 'recipe-generator'),
                                         array(
                                             'a' => array(
@@ -75,7 +77,7 @@ class Recipe_Generator_Admin_Main {
                                 <li><?php echo esc_html__('High-quality recipe generation', 'recipe-generator'); ?></li>
                                 <li><?php echo esc_html__('Adherence to all selectable parameters', 'recipe-generator'); ?></li>
                             </ul>
-                            <p><?php echo esc_html__('Changes should be made with caution. Use the "Test Prompt" section to verify changes before saving.', 'recipe-generator'); ?></p>
+                            <p class="warning"><?php echo esc_html__('Changes should be made with caution. Use the "Test Prompt" section to verify changes before going "live".', 'recipe-generator'); ?></p>
                             <p><?php echo esc_html__('A master reset option is available if you need to restore default prompts.', 'recipe-generator'); ?></p>
                         </div>
                     </div>
@@ -224,6 +226,15 @@ class Recipe_Generator_Admin_Main {
                                     <p class="video-caption" style="text-wrap: pretty;"><?php echo esc_html__('PLease note: Taxonomy archives will display automatically in a pre-built, customizable template. Best practice is to simply edit this template.', 'recipe-generator'); ?></p>
                                 </div>
                             </pre>
+                            <div class="important-info">
+                               <h3><span class="dashicons dashicons-info"></span> Notes On Custom Post Types & Custom Taxonomies</h3>
+                                <ul>
+                                    <li style="text-wrap: balance; font-size: 1.4rem; line-height: 1.2;"><strong><?php echo esc_html__('The creation of Custom Post Types & associated Templates/Patterns and Taxonomies requires your "Permalinks" to be flushed...', 'recipe-generator'); ?></strong></li>
+                                    <hr/>
+                                    <li class="warning"><?php echo esc_html__('Go to the main WordPress dashboard > Settings > Permalinks', 'recipe-generator'); ?></li>
+                                    <li class="warning"><?php echo esc_html__('Click "Save Changes" to flush and reset. All Custom Templates & Taxonomies will now be seen by WordPress.', 'recipe-generator'); ?></li>
+                                </ul> 
+                            </div>
                         </div>
                     </div>
                 </div>

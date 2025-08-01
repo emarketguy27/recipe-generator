@@ -50,9 +50,6 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
 
         foreach ($terms as $term_id) {
             $result = wp_delete_term($term_id, $taxonomy);
-            if (is_wp_error($result)) {
-                error_log("Failed to delete term $term_id: " . $result->get_error_message());
-            }
         }
         
         // Clean taxonomy cache
