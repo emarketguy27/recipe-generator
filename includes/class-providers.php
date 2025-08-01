@@ -84,28 +84,7 @@ class Recipe_Generator_Providers {
         return false;
     }
 
-    // public function add_provider($provider_name, $endpoint = '') {
-    //     if (empty(trim($provider_name))) {
-    //         return new WP_Error('empty', __('Provider name cannot be empty', 'recipe-generator'));
-    //     }
-
-    //     $custom_providers = get_option($this->option_name, array());
-    //     $sanitized = sanitize_text_field($provider_name);
-    //     $custom_providers[$sanitized] = $sanitized;
-        
-    //     if (!empty($endpoint)) {
-    //         $this->endpoints[$sanitized] = esc_url_raw($endpoint);
-    //     }
-        
-    //     if (!update_option($this->option_name, $custom_providers)) {
-    //         return new WP_Error('db_error', __('Failed to save provider', 'recipe-generator'));
-    //     }
-        
-    //     $this->providers[$sanitized] = $sanitized;
-    //     return true;
-    // }
     public function add_provider($provider_name, $endpoint = '') {
-        error_log("Adding provider: $provider_name with endpoint: $endpoint"); // Debug
         
         if (empty(trim($provider_name))) {
             return new WP_Error('empty', __('Provider name cannot be empty', 'recipe-generator'));

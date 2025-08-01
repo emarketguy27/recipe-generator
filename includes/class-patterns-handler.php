@@ -66,19 +66,11 @@ class Recipe_Generator_Patterns_Handler {
         $pattern_path = RECIPE_GENERATOR_PATH . "patterns/{$pattern_name}.html";
         
         if (!file_exists($pattern_path) || !is_readable($pattern_path)) {
-            error_log(sprintf(
-                __('Pattern file %s does not exist or is not readable', 'recipe-generator'),
-                $pattern_path
-            ));
             return '';
         }
 
         $content = @file_get_contents($pattern_path);
         if (false === $content) {
-            error_log(sprintf(
-                __('Failed to read pattern file: %s', 'recipe-generator'),
-                $pattern_path
-            ));
             return '';
         }
 

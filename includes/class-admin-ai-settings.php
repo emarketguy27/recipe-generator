@@ -141,7 +141,7 @@ class Recipe_Generator_Admin_AI_Settings {
 
     public function render_page() {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions.', 'recipe-generator'));
+            wp_die(esc_html__('You do not have sufficient permissions.', 'recipe-generator'));
         }
         
         $selected_provider = get_option('recipe_generator_selected_provider', '');
@@ -504,39 +504,48 @@ class Recipe_Generator_Admin_AI_Settings {
     }
 
     public function handle_submissions() {
-        error_log('Handling submissions...'); // Debug
-        error_log(print_r($_POST, true)); // Debug
         
-        if (!isset($_POST['option_page']) || $_POST['option_page'] !== 'recipe_generator_ai_settings') {
+        if (!isset($_POST['option_page']) || sanitize_text_field(wp_unslash($_POST['option_page'])) !== 'recipe_generator_ai_settings') {
             return;
         }
 
-        if (!wp_verify_nonce($_POST['_wpnonce'], 'recipe_generator_ai_settings-options')) {
-            wp_die(__('Security check failed', 'recipe-generator'));
+        if (!isset($_POST['_wpnonce'])) {
+            wp_die(esc_html__('Security check failed', 'recipe-generator'));
+        }
+        
+        $nonce = sanitize_text_field(wp_unslash($_POST['_wpnonce']));
+        if (!wp_verify_nonce($nonce, 'recipe_generator_ai_settings-options')) {
+            wp_die(esc_html__('Security check failed', 'recipe-generator'));
         }
 
         // Handle API key
         if (isset($_POST[$this->api_key_option])) {
-            update_option($this->api_key_option, sanitize_text_field($_POST[$this->api_key_option]));
+            $api_key = isset($_POST[$this->api_key_option]) ? sanitize_text_field(wp_unslash($_POST[$this->api_key_option])) : '';
+            update_option($this->api_key_option, $api_key);
         }
 
         // Handle provider selection
         if (isset($_POST['api_provider'])) {
-            update_option('recipe_generator_selected_provider', sanitize_text_field($_POST['api_provider']));
+            $provider = isset($_POST['api_provider']) ? sanitize_text_field(wp_unslash($_POST['api_provider'])) : '';
+            update_option('recipe_generator_selected_provider', $provider);
         }
 
         // Handle technical parameters
         foreach ($this->technical_params as $param => $attributes) {
             $option_name = "recipe_generator_{$param}";
             if (isset($_POST[$option_name])) {
-                update_option($option_name, $this->sanitize_technical_param_single($_POST[$option_name], $param));
+                // First sanitize as text input, then unslash, then custom sanitize
+                $raw_value = sanitize_text_field(wp_unslash($_POST[$option_name]));
+                $unsanitized_value = wp_unslash($raw_value);
+                $value = $this->sanitize_technical_param_single($unsanitized_value, $param);
+                update_option($option_name, $value);
             }
         }
 
         // Handle new provider addition
-        if (!empty($_POST['new_provider'])) {
-            $provider_name = sanitize_text_field($_POST['new_provider']);
-            $endpoint = !empty($_POST['new_provider_endpoint']) ? esc_url_raw($_POST['new_provider_endpoint']) : '';
+        $new_provider = isset($_POST['new_provider']) ? sanitize_text_field(wp_unslash($_POST['new_provider'])) : '';
+        if (!empty($new_provider)) {
+            $endpoint = isset($_POST['new_provider_endpoint']) ? esc_url_raw(wp_unslash($_POST['new_provider_endpoint'])) : '';
             
             if (empty($endpoint)) {
                 add_settings_error(
@@ -548,10 +557,15 @@ class Recipe_Generator_Admin_AI_Settings {
                 return;
             }
 
-            $result = $this->providers->add_provider($provider_name, $endpoint);
+            $result = $this->providers->add_provider($new_provider, $endpoint);
             
             if (is_wp_error($result)) {
-                add_settings_error('recipe_generator_messages', 'recipe_generator_message', $result->get_error_message(), 'error');
+                add_settings_error(
+                    'recipe_generator_messages', 
+                    'recipe_generator_message', 
+                    esc_html($result->get_error_message()), 
+                    'error'
+                );
             } else {
                 add_settings_error(
                     'recipe_generator_messages',

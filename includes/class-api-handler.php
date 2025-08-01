@@ -73,15 +73,12 @@ class Recipe_Generator_API_Handler {
      * Formats the API response for display
      */
     private function format_response($provider, $response) {
-        error_log('[Recipe Generator] Formatting response for: ' . $provider);
         
         try {
             if ($provider === 'Deepseek') {
-                error_log('[Recipe Generator] Deepseek response structure: ' . print_r($response, true));
                 
                 if (isset($response['choices'][0]['message']['content'])) {
                     $content = $response['choices'][0]['message']['content'];
-                    error_log('[Recipe Generator] Deepseek content: ' . $content);
                     
                     // Try to parse JSON
                     $decoded = json_decode($content, true);
@@ -95,7 +92,6 @@ class Recipe_Generator_API_Handler {
             // ... other provider handling
             
         } catch (Exception $e) {
-            error_log('[Recipe Generator] Formatting error: ' . $e->getMessage());
             return __('Error formatting response', 'recipe-generator');
         }
     }

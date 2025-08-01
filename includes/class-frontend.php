@@ -103,7 +103,7 @@ class Recipe_Generator_Frontend {
 
         ob_start(); ?>
         <div class="user-saved-recipes">
-            <h3>Your Saved Recipes <span class="recipe-count">(<?php echo $recipe_count; ?>)</span></h3>
+            <h3>Your Saved Recipes <span class="recipe-count">(<?php echo esc_html( $recipe_count ); ?>)</span></h3>
             
             <?php if ($recipe_count > 0) : ?>
                 <ul class="saved-recipes-list">

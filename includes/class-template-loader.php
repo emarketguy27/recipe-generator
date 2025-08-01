@@ -60,10 +60,6 @@ class Recipe_Generator_Template_Loader {
 
         // Validate template file exists and is readable
         if (!file_exists($template_path) || !is_readable($template_path)) {
-            error_log(sprintf(
-                __('Template file %s does not exist or is not readable', 'recipe-generator'),
-                $template_path
-            ));
             return '';
         }
 
@@ -72,10 +68,6 @@ class Recipe_Generator_Template_Loader {
         $content = @file_get_contents($template_path);
 
         if (false === $content) {
-            error_log(sprintf(
-                __('Failed to read template file: %s', 'recipe-generator'),
-                $template_path
-            ));
             return '';
         }
 

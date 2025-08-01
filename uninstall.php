@@ -7,36 +7,30 @@ if (!defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL')) {
     define('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL', true);
 }
 
-global $wpdb;
-
 if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL) {
-    
-    // ======================
-    // WARNING MESSAGE SYSTEM
-    // ======================
-
-    error_log('Recipe Generator Uninstall: Starting cleanup');
-
     // ======================
     // POSTS & ATTACHMENTS
     // ======================
-    $posts = $wpdb->get_col("SELECT ID FROM {$wpdb->posts} WHERE post_type = 'ai_recipe'");
+    $posts = get_posts([
+        'post_type'      => 'ai_recipe',
+        'post_status'    => 'any',
+        'posts_per_page' => -1,
+        'fields'         => 'ids'
+    ]);
+
     foreach ($posts as $post_id) {
         // Delete attachments first if any
-        $attachments = $wpdb->get_col($wpdb->prepare(
-            "SELECT ID FROM {$wpdb->posts} 
-            WHERE post_parent = %d 
-            AND post_type = 'attachment'",
-            $post_id
-        ));
-        
+        $attachments = get_children([
+            'post_parent' => $post_id,
+            'post_type'   => 'attachment',
+            'fields'      => 'ids'
+        ]);
+
         foreach ($attachments as $attachment_id) {
             wp_delete_attachment($attachment_id, true);
         }
-        
-        wp_delete_post($post_id, true);
 
-        error_log('Recipe Generator Uninstall: Deleted ' . count($posts) . ' recipes');
+        wp_delete_post($post_id, true);
     }
 
     // ======================
@@ -44,82 +38,71 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
     // ======================
     $taxonomies = ['ai_recipe_category', 'ai_recipe_tag'];
     foreach ($taxonomies as $taxonomy) {
-        // Get all terms
-        $terms = $wpdb->get_results($wpdb->prepare(
-            "SELECT t.term_id, tt.term_taxonomy_id 
-            FROM {$wpdb->terms} t 
-            JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id 
-            WHERE tt.taxonomy = %s",
-            $taxonomy
-        ));
-        
-        foreach ($terms as $term) {
-            // Delete term relationships
-            $wpdb->delete(
-                $wpdb->term_relationships,
-                ['term_taxonomy_id' => $term->term_taxonomy_id]
-            );
-            
-            // Delete term meta
-            $wpdb->delete(
-                $wpdb->termmeta,
-                ['term_id' => $term->term_id]
-            );
-            
-            // Delete term taxonomy
-            $wpdb->delete(
-                $wpdb->term_taxonomy,
-                ['term_taxonomy_id' => $term->term_taxonomy_id]
-            );
-            
-            // Delete term
-            $wpdb->delete(
-                $wpdb->terms,
-                ['term_id' => $term->term_id]
-            );
+        $terms = get_terms([
+            'taxonomy'   => $taxonomy,
+            'hide_empty' => false,
+            'fields'     => 'ids'
+        ]);
+
+        foreach ($terms as $term_id) {
+            wp_delete_term($term_id, $taxonomy);
         }
-        error_log('Recipe Generator Uninstall: Deleted ' . count($taxonomies) . ' recipes');
     }
 
     // ======================
     // USER SAVED RECIPES
     // ======================
-    $wpdb->query(
-        "DELETE FROM {$wpdb->usermeta} 
-        WHERE meta_key = 'ai_saved_recipes' 
-        OR meta_key LIKE '%recipe_generator%'"
-    );
+    $users = get_users([
+        'meta_key' => 'ai_saved_recipes',
+        'fields'   => 'ids'
+    ]);
+
+    foreach ($users as $user_id) {
+        delete_user_meta($user_id, 'ai_saved_recipes');
+        
+        // Get all user meta keys starting with 'recipe_generator'
+        $meta_keys = array_keys(get_user_meta($user_id));
+        foreach ($meta_keys as $meta_key) {
+            if (strpos($meta_key, 'recipe_generator') === 0) {
+                delete_user_meta($user_id, $meta_key);
+            }
+        }
+    }
 
     // ======================
     // PLUGIN OPTIONS
     // ======================
-    $wpdb->query(
-        "DELETE FROM {$wpdb->options} 
-        WHERE option_name LIKE 'recipe_generator%'"
-    );
+    $all_options = wp_load_alloptions();
+    foreach ($all_options as $name => $value) {
+        if (strpos($name, 'recipe_generator') === 0) {
+            delete_option($name);
+        }
+    }
 
     // ======================
     // TRANSIENTS & CACHE
     // ======================
-    $wpdb->query(
-        "DELETE FROM {$wpdb->options} 
-        WHERE option_name LIKE '_transient%recipe%' 
-        OR option_name LIKE '_transient_timeout%recipe%'"
-    );
+    // Get all transients from cache
+    $transient_keys = [];
+    $alloptions = wp_load_alloptions();
+    foreach ($alloptions as $name => $value) {
+        if (strpos($name, '_transient_') === 0 && stripos($name, 'recipe') !== false) {
+            $transient_keys[] = str_replace('_transient_', '', $name);
+        }
+        if (strpos($name, '_transient_timeout_') === 0 && stripos($name, 'recipe') !== false) {
+            $transient_keys[] = str_replace('_transient_timeout_', '', $name);
+        }
+    }
+
+    // Delete unique transients
+    $transient_keys = array_unique($transient_keys);
+    foreach ($transient_keys as $transient) {
+        delete_transient($transient);
+    }
 
     // ======================
     // CLEANUP
     // ======================
-    if (function_exists('flush_rewrite_rules')) {
-        flush_rewrite_rules();
-    }
-    
-    $remaining = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'ai_recipe'");
-    if ($remaining > 0) {
-        error_log('Recipe Generator Uninstall: Failed to delete all recipes - ' . $remaining . ' remain');
-    }
-
-    if (function_exists('wp_cache_flush')) {
-        wp_cache_flush();
-    }
+    flush_rewrite_rules();
+    wp_cache_flush();
 }

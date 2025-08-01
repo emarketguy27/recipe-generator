@@ -32,7 +32,7 @@ class Recipe_Generator_Admin_Saved_Recipes {
 
     public function render_page() {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions.', 'recipe-generator'));
+            wp_die(esc_html__('You do not have sufficient permissions.', 'recipe-generator'));
         }
 
         $saved_recipes_table = new Recipe_Generator_Saved_Recipes_List_Table();
@@ -42,6 +42,7 @@ class Recipe_Generator_Admin_Saved_Recipes {
             <h1><?php esc_html_e('Saved Recipes', 'recipe-generator'); ?></h1>
             
             <form method="post">
+                <?php wp_nonce_field('bulk-' . $saved_recipes_table->_args['plural']); ?>
                 <?php $saved_recipes_table->display(); ?>
             </form>
         </div>
@@ -64,11 +65,19 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
 
     // Handle bulk actions
     public function process_bulk_action() {
+        $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])) : '';
+        if (!wp_verify_nonce($nonce, 'bulk-' . $this->_args['plural'])) {
+            wp_die(esc_html__('Invalid request.', 'recipe-generator'));
+        }
+
         if ($this->current_action() !== 'delete' || !current_user_can('manage_options')) {
             return;
         }
 
-        $recipe_ids = isset($_REQUEST['recipe']) ? (array)$_REQUEST['recipe'] : [];
+        // Sanitize the recipe IDs
+        $recipe_ids = isset($_REQUEST['recipe']) ? array_map('sanitize_text_field', (array) wp_unslash($_REQUEST['recipe'])) : [];
+        
+        // Sanitize the user ID
         $user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
 
         if (empty($recipe_ids) || empty($user_id)) {
@@ -157,8 +166,15 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
         }
         
         // Sorting
-        $orderby = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'saved_date';
-        $order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : 'desc';
+        if (!empty($_GET['orderby']) || !empty($_GET['order'])) {
+            $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+            if (!wp_verify_nonce($nonce, 'recipe-list-nonce')) {
+                wp_die(esc_html__('Invalid request.', 'recipe-generator'));
+            }
+        }
+
+        $orderby = isset($_GET['orderby']) ? sanitize_text_field(wp_unslash($_GET['orderby'])) : 'saved_date';
+        $order = isset($_GET['order']) ? sanitize_text_field(wp_unslash($_GET['order'])) : 'desc';
         
         usort($data, function($a, $b) use ($orderby, $order) {
             $result = strcmp($a[$orderby], $b[$orderby]);
@@ -189,7 +205,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
             'view' => sprintf(
                 '<a href="#" class="view-recipe" data-recipe-html="%s">%s</a>',
                 esc_attr(wp_json_encode($item['html'])),
-                __('View', 'recipe-generator')
+                esc_html__('View', 'recipe-generator')
             ),
             'delete' => sprintf(
                 '<a href="%s" class="submitdelete">%s</a>',
@@ -221,7 +237,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     }
 
     public function no_items() {
-        _e('No saved recipes found.', 'recipe-generator');
+        esc_html_e('No saved recipes found.', 'recipe-generator');
     }
 
     public function column_post_status($item) {
@@ -229,12 +245,12 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
         $post_id = $this->find_recipe_post($item['id']);
         
         if (!$post_id) {
-            return '<span class="recipe-status"><span class="dashicons dashicons-no-alt"></span> '.__('No Post', 'recipe-generator').'</span>';
+            return '<span class="recipe-status"><span class="dashicons dashicons-no-alt"></span> '.esc_html__('No Post', 'recipe-generator').'</span>';
         }
         
         $post = get_post($post_id);
         if (!$post) {
-            return '<span class="recipe-status"><span class="dashicons dashicons-warning"></span> '.__('Invalid Post', 'recipe-generator').'</span>';
+            return '<span class="recipe-status"><span class="dashicons dashicons-warning"></span> '.esc_html__('Invalid Post', 'recipe-generator').'</span>';
         }
         
         $status_map = [
@@ -252,8 +268,8 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
             '<span class="recipe-status"><span class="%s"></span> %s <a href="%s" target="_blank">%s</a></span>',
             $status_info[0],
             $status_info[1],
-            get_edit_post_link($post_id),
-            __('(Edit)', 'recipe-generator')
+            esc_url(get_edit_post_link($post_id)),
+            esc_html__('(Edit)', 'recipe-generator')
         );
     }
 

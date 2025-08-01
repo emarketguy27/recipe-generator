@@ -3,14 +3,14 @@ Contributors: jdennisuk
 Donate link: https://jamesdennis.org
 Tags: AI, AI Recipes, Recipes
 Requires at least: 6.7
-Tested up to: 6.8.2
-Stable tag: 1.0
+Tested up to: 6.8
+Stable tag: 1.0.0
 License: GPL v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-✨ AI-Powered Recipe Generation at Your Fingertips   
-Transform your food blog with Recipe Generator — the ultimate tool for creating stunning, SEO-optimized recipes in seconds!
-Harnessing AI technology, this plugin generates unique recipes based on dietary preferences, ingredients, and serving sizes—perfect for recipe bloggers, chefs, and content creators.
+✨ AI-Powered Recipe Generation  
+Transform your food blog — SEO-optimized recipes in seconds!
+Perfect for bloggers, chefs, and content creators.
 
 == Description ==
 

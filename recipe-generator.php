@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: Recipe Generator
- * Description: A simple recipe generator plugin
+ * Description: ✨ AI-Powered Recipe Generation - Transform your food blog — SEO-optimized recipes in seconds! Perfect for bloggers, chefs, and content creators.
  * Version: 1.0.0
  * Author: Your Name
- * License: GPL2
+ * License: GPL3.0
  */
 
 defined('ABSPATH') || exit;
@@ -310,6 +310,7 @@ add_filter('dashboard_glance_items', function($items) {
     
     if ($count && $count->publish) {
         $text = sprintf(
+            /* translators: 1: Number of recipes. %d will be replaced with the actual count. */
             _n('%d AI Recipe', '%d AI Recipes', $count->publish, 'recipe-generator'),
             $count->publish
         );
@@ -323,15 +324,6 @@ add_filter('dashboard_glance_items', function($items) {
     }
     
     return $items;
-});
-
-// Admin Notice for complete uninstall
-add_action('admin_notices', function() {
-    if (isset($_GET['plugin']) && $_GET['plugin'] === 'recipe-generator/recipe-generator.php') {
-        echo '<div class="notice notice-info"><p>';
-        _e('Recipe Generator: All plugin data will be preserved. Enable cleanup by defining RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL as true.', 'recipe-generator');
-        echo '</p></div>';
-    }
 });
 
 add_action('wp_enqueue_scripts', function() {
