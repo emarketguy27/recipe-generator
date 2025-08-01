@@ -8,7 +8,7 @@
  * Author URI: https://jamesdennis.org
  * License: GPL v3.0
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain: keto-macro-calculator
+ * Text Domain: recipe-generator
  */
 
 defined('ABSPATH') || exit;
