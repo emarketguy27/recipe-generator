@@ -1,10 +1,14 @@
 <?php
 /**
  * Plugin Name: Recipe Generator
+ * Plugin URI: https://jamesdennis.org/recipe-generator.html
  * Description: ✨ AI-Powered Recipe Generation - Transform your food blog — SEO-optimized recipes in seconds! Perfect for bloggers, chefs, and content creators.
  * Version: 1.0.0
- * Author: Your Name
- * License: GPL3.0
+ * Author: James Dennis
+ * Author URI: https://jamesdennis.org
+ * License: GPL v3.0
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain: keto-macro-calculator
  */
 
 defined('ABSPATH') || exit;
