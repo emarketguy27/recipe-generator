@@ -394,10 +394,11 @@
 .recipe-generator-user-profile {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 1em;
   align-items: center;
   border-radius: 8px;
-  padding: var(--rg-spacing-20);
+  padding: 0 6px;
   box-shadow: var(--wp--preset--shadow--deep);
 }
 .recipe-generator-user-profile .user-avatar {
@@ -406,13 +407,9 @@
 .recipe-generator-user-profile .user-avatar img{
   border-radius: 15px;
 }
-.recipe-generator-user-profile .user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding-inline: var(--rg-spacing);
-}
 .recipe-generator-user-profile .user-info .user-display-name {
+  display: flex;
+  width: 100%;
   font-size: 1.3rem;
   text-transform: capitalize;
 }
@@ -422,7 +419,9 @@
 .recipe-generator-user-profile .login-link {
   font-size: 1rem;
 }
-
+.user-info br {
+  display: none;
+}
 /* SAVED RECIPES LIST */
 .user-saved-recipes {
   margin:20px 0;

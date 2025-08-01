@@ -36,6 +36,10 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
     // ======================
     // TAXONOMIES & TERMS
     // ======================
+    // First register the taxonomies - Required to ensure explicit registration during clean environment of Uninstall.
+    register_taxonomy('ai_recipe_category', 'ai_recipe');
+    register_taxonomy('ai_recipe_tag', 'ai_recipe');
+
     $taxonomies = ['ai_recipe_category', 'ai_recipe_tag'];
     foreach ($taxonomies as $taxonomy) {
         $terms = get_terms([
@@ -45,9 +49,19 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
         ]);
 
         foreach ($terms as $term_id) {
-            wp_delete_term($term_id, $taxonomy);
+            $result = wp_delete_term($term_id, $taxonomy);
+            if (is_wp_error($result)) {
+                error_log("Failed to delete term $term_id: " . $result->get_error_message());
+            }
         }
+        
+        // Clean taxonomy cache
+        clean_taxonomy_cache($taxonomy);
     }
+
+    // Unregister taxonomies
+    unregister_taxonomy('ai_recipe_category');
+    unregister_taxonomy('ai_recipe_tag');
 
     // ======================
     // USER SAVED RECIPES
