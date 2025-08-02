@@ -255,13 +255,11 @@
     transform: none !important;
     cursor: not-allowed;
     background: var(--wp--preset--color--accent-3);
-    /* Reuses your existing accent-3 variable */
 }
 
-/* Success state for save button */
 #save-recipe-btn.saved {
   background: var(--wp--preset--color--success, #4CAF50);
-  padding-left: 15px; /* Make room for checkmark */
+  padding-left: 15px;
 }
 
 #save-recipe-btn.saved::before {
@@ -270,7 +268,6 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* Ripple effect - matches dietary options */
 .button-ripple {
   position: absolute;
   border-radius: 50%;
@@ -498,8 +495,7 @@
   .saved-recipes-shortcode-container,
   .modal-content {
     scrollbar-width:thin;
-    scrollbar-color: 
-      /* Thumb with left shadow effect */
+    scrollbar-color:
       color-mix(in srgb, var(--wp--preset--color--accent-1) 90%, rgba(0, 0, 0, 0.2))
       /* Track */
       color-mix(in srgb, var(--wp--preset--color--accent-1) 20%, transparent);
@@ -619,7 +615,7 @@
   position:relative;
 }
 
-/* CLOSE BUTTONS (consolidated) */
+/* CLOSE BUTTONS */
 .close-share-modal,
 .close-modal {
   display:flex;
@@ -701,7 +697,7 @@
   }
 }
 
-/* ANIMATIONS (consolidated) */
+/* ANIMATIONS */
 @keyframes rg-spin {
   to { transform:rotate(360deg); }
 }

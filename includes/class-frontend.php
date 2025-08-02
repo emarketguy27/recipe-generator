@@ -248,7 +248,7 @@ class Recipe_Generator_Frontend {
         
         wp_enqueue_style(
             'recipe-generator-frontend',
-            RECIPE_GENERATOR_URL . 'assets/css/frontend.css',
+            RECIPE_GENERATOR_URL . 'assets/css/frontend.min.css',
             [],
             RECIPE_GENERATOR_VERSION
         );

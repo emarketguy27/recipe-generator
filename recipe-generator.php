@@ -200,7 +200,7 @@ class Recipe_Generator {
         // Enqueue admin CSS
         wp_enqueue_style(
             'recipe-generator-admin',
-            RECIPE_GENERATOR_URL . 'assets/css/admin.css',
+            RECIPE_GENERATOR_URL . 'assets/css/admin.min.css',
             [],
             RECIPE_GENERATOR_VERSION
         );
@@ -337,7 +337,7 @@ add_action('wp_enqueue_scripts', function() {
     // Load minimal base styles for all recipe content
     wp_enqueue_style(
         'recipe-generator-base',
-        RECIPE_GENERATOR_URL . 'assets/css/base.css',
+        RECIPE_GENERATOR_URL . 'assets/css/base.min.css',
         [],
         RECIPE_GENERATOR_VERSION
     );
