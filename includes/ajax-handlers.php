@@ -711,7 +711,10 @@ function recipe_generator_find_recipe_post($recipe_id) {
     if (false === $post_id) {
         global $wpdb;
         
-        // Direct SQL query with proper indexing
+        // Direct SQL query with proper indexing and suppression of warnings
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+        // Direct query used for performance reasons - we're looking up by a specific meta key
+        // and caching results to minimize database impact
         $post_id = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT post_id 
@@ -722,6 +725,7 @@ function recipe_generator_find_recipe_post($recipe_id) {
                 $recipe_id
             )
         );
+        // phpcs:enable
         
         // Cache the result (even if null)
         wp_cache_set($cache_key, $post_id ?: 0, 'recipe_generator', DAY_IN_SECONDS);

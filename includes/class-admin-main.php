@@ -24,9 +24,9 @@ class Recipe_Generator_Admin_Main {
             <!-- New Instructional Panel -->
              <div class="notice notice-info">
                 <h2 style="margin-top: 0;"><?php echo esc_html__('Getting Started with Recipe Generator', 'recipe-generator'); ?></h2>
+                <p><strong>FIRST THINGS FIRST: </strong>Visit Dashboard > Settings > Permalinks : Click "Save Changes"</p>
+                <p class="warning">This flushes the permalinks cache and includes all AI Recipe Generator Templates, Patterns & Taxonomies.</p>
                 <div class="instructions-wrapper">
-                    
-                    
                     <div class="instruction-section">
                         <h3><span class="dashicons dashicons-admin-network"></span> <?php echo esc_html__('1. API Configuration', 'recipe-generator'); ?></h3>
                         <div class="instruction-content">
@@ -91,6 +91,24 @@ class Recipe_Generator_Admin_Main {
                                 <li><?php echo esc_html__('Admins can convert saved recipes to actual posts via bulk actions', 'recipe-generator'); ?></li>
                             </ul>
                             <p><?php echo esc_html__('Visit the "Saved Recipes" admin page to manage all user-saved recipes.', 'recipe-generator'); ?></p>
+                            <p>
+                                <?php
+                                $recipes_url = admin_url('admin.php?page=recipe-generator-saved-recipes');
+                                printf(
+                                    wp_kses(
+                                        /* translators: %s: URL to the Saved Recipes page */
+                                        __('<a href="%s" class="button button-primary">Go to Saved Recipes</a>', 'recipe-generator'),
+                                        array(
+                                            'a' => array(
+                                                'href' => array(),
+                                                'class' => array()
+                                            )
+                                        )
+                                    ),
+                                    esc_url($recipes_url)
+                                );
+                                ?>
+                            </p>
                         </div>
                     </div>
                     
@@ -234,6 +252,13 @@ class Recipe_Generator_Admin_Main {
                                     <li class="warning"><?php echo esc_html__('Go to the main WordPress dashboard > Settings > Permalinks', 'recipe-generator'); ?></li>
                                     <li class="warning"><?php echo esc_html__('Click "Save Changes" to flush and reset. All Custom Templates & Taxonomies will now be seen by WordPress.', 'recipe-generator'); ?></li>
                                 </ul> 
+                            </div>
+                            <div class="warning-notice">
+                                <h3>✨ IMPORTANT NOTICE</h3>
+                                <ul>
+                                    <li><?php echo esc_html__('Deactivation of Recipe Generator will NOT remove user saved recipes, created AI Recipes, taxonomies or templates from the database. Re-activation will restore everything.', 'recipe-generator'); ?></li>
+                                    <li class="warning"><strong><?php echo esc_html__('Deletion of Recipe Generator WILL remove ALL user saved recipes, created AI Recipes, taxonomies and templates from the database. This action is permanent and NOT reversible.', 'recipe-generator'); ?></strong></li>
+                                </ul>
                             </div>
                         </div>
                     </div>

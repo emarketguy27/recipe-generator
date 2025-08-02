@@ -3,7 +3,7 @@
  * Plugin Name: Recipe Generator
  * Plugin URI: https://jamesdennis.org/recipe-generator.html
  * Description: ✨ AI-Powered Recipe Generation - Transform your food blog — SEO-optimized recipes in seconds! Perfect for bloggers, chefs, and content creators.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: James Dennis
  * Author URI: https://jamesdennis.org
  * License: GPL v3.0

@@ -4,7 +4,7 @@ Donate link: https://jamesdennis.org
 Tags: AI, AI Recipes, Recipes
 Requires at least: 6.7
 Tested up to: 6.8
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPL v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
