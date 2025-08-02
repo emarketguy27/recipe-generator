@@ -129,51 +129,41 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     public function prepare_items() {
         $this->_column_headers = [$this->get_columns(), [], $this->get_sortable_columns()];
         
-        // Get users in batches to avoid memory issues
+        // Get all users with saved recipes
+        $users = get_users([
+            'meta_key' => 'ai_saved_recipes',
+            'meta_compare' => 'EXISTS'
+        ]);
+        
         $data = [];
-        $batch_size = 100;
-        $offset = 0;
-
-        do {
-            $users = get_users([
-                'number' => $batch_size,
-                'offset' => $offset,
-                'fields' => 'all_with_meta' // Get users with their meta
-            ]);
-
-            foreach ($users as $user) {
-                // Check if user has our meta key without separate query
-                if (isset($user->ai_saved_recipes)) {
-                    $saved_recipes = maybe_unserialize($user->ai_saved_recipes) ?: [];
-                    
-                    foreach ($saved_recipes as $recipe_id => $recipe) {
-                        $description = $recipe['description'] ?? '';
-                        
-                        $dietary_tags = '';
-                        if (!empty($recipe['dietary_tags'])) {
-                            $dietary_tags = is_array($recipe['dietary_tags']) 
-                                ? implode(', ', $recipe['dietary_tags'])
-                                : $recipe['dietary_tags'];
-                        }
-                        
-                        $data[] = [
-                            'id'            => $recipe_id,
-                            'user_id'       => $user->ID,
-                            'user_name'     => $user->display_name,
-                            'recipe_name'   => $recipe['name'] ?? __('Untitled Recipe', 'recipe-generator'),
-                            'description'   => $description,
-                            'dietary_tags'  => $dietary_tags,
-                            'saved_date'    => $recipe['saved_at'] ?? '',
-                            'html'          => $recipe['html'] ?? ''
-                        ];
-                    }
+        
+        foreach ($users as $user) {
+            $saved_recipes = get_user_meta($user->ID, 'ai_saved_recipes', true) ?: [];
+            
+            foreach ($saved_recipes as $recipe_id => $recipe) {
+                // Use stored description if available
+                $description = $recipe['description'] ?? '';
+                
+                // Get dietary tags - now properly stored in the data
+                $dietary_tags = '';
+                if (!empty($recipe['dietary_tags'])) {
+                    $dietary_tags = is_array($recipe['dietary_tags']) 
+                        ? implode(', ', $recipe['dietary_tags'])
+                        : $recipe['dietary_tags'];
                 }
+                
+                $data[] = [
+                    'id'            => $recipe_id,
+                    'user_id'       => $user->ID,
+                    'user_name'     => $user->display_name,
+                    'recipe_name'   => $recipe['name'] ?? __('Untitled Recipe', 'recipe-generator'),
+                    'description'   => $description,
+                    'dietary_tags'  => $dietary_tags,
+                    'saved_date'    => $recipe['saved_at'] ?? '',
+                    'html'          => $recipe['html'] ?? ''
+                ];
             }
-
-            $offset += $batch_size;
-        } while (!empty($users));
-
-        return $data;
+        }
         
         // Sorting
         if (!empty($_GET['orderby']) || !empty($_GET['order'])) {
