@@ -703,40 +703,29 @@ function handle_save_ai_recipe_to_favorites() {
     ]);
 }
 
-// function recipe_generator_find_recipe_post($recipe_id) {
-//     global $wpdb;
-//     return $wpdb->get_var($wpdb->prepare(
-//         "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_recipe_generator_id' AND meta_value = %s LIMIT 1",
-//         $recipe_id
-//     ));
-// }
 function recipe_generator_find_recipe_post($recipe_id) {
     // First try to get from cache
     $cache_key = 'recipe_post_' . md5($recipe_id);
     $post_id = wp_cache_get($cache_key, 'recipe_generator');
     
     if (false === $post_id) {
-        // Not in cache, query with WP_Query
-        $query = new WP_Query([
-            'post_type'      => 'ai_recipe',
-            'posts_per_page' => 1,
-            'fields'         => 'ids',
-            'meta_query'     => [
-                [
-                    'key'   => '_recipe_generator_id',
-                    'value' => $recipe_id
-                ]
-            ]
-        ]);
+        global $wpdb;
         
-        if ($query->have_posts()) {
-            $post_id = $query->posts[0];
-            // Cache the result for future use
-            wp_cache_set($cache_key, $post_id, 'recipe_generator', DAY_IN_SECONDS);
-        } else {
-            $post_id = 0; // Return 0 if not found
-        }
+        // Direct SQL query with proper indexing
+        $post_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT post_id 
+                 FROM {$wpdb->postmeta} 
+                 WHERE meta_key = '_recipe_generator_id' 
+                 AND meta_value = %s 
+                 LIMIT 1",
+                $recipe_id
+            )
+        );
+        
+        // Cache the result (even if null)
+        wp_cache_set($cache_key, $post_id ?: 0, 'recipe_generator', DAY_IN_SECONDS);
     }
     
-    return $post_id;
+    return $post_id ?: 0;
 }

@@ -63,22 +63,30 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
     // ======================
     // USER SAVED RECIPES
     // ======================
-    $users = get_users([
-        'meta_key' => 'ai_saved_recipes',
-        'fields'   => 'ids'
-    ]);
+    delete_metadata('user', 0, 'ai_saved_recipes', '', true);
 
-    foreach ($users as $user_id) {
-        delete_user_meta($user_id, 'ai_saved_recipes');
-        
-        // Get all user meta keys starting with 'recipe_generator'
-        $meta_keys = array_keys(get_user_meta($user_id));
-        foreach ($meta_keys as $meta_key) {
-            if (strpos($meta_key, 'recipe_generator') === 0) {
-                delete_user_meta($user_id, $meta_key);
+    $batch_size = 100;
+    $offset = 0;
+
+    do {
+        $users = get_users([
+            'fields' => 'ids',
+            'number' => $batch_size,
+            'offset' => $offset
+        ]);
+
+        foreach ($users as $user_id) {
+            // Get only the meta keys we care about
+            $all_meta = get_user_meta($user_id);
+            foreach ($all_meta as $meta_key => $value) {
+                if (strpos($meta_key, 'recipe_generator') === 0) {
+                    delete_user_meta($user_id, $meta_key);
+                }
             }
         }
-    }
+
+        $offset += $batch_size;
+    } while (!empty($users));
 
     // ======================
     // PLUGIN OPTIONS
