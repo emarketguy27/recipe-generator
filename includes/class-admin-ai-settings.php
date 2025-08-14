@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Ai_Powered_Recipe_Generator_Admin_AI_Settings {
     private $providers;
     private $api_key_option;

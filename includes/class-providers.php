@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Ai_Powered_Recipe_Generator_Providers {
     private static $instance;
     private $option_name = 'ai_powered_recipe_generator_custom_providers';

@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // AJAX Handlers
 add_action('wp_ajax_ai_powered_recipe_generator_reset_prompt', function() {
     check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');

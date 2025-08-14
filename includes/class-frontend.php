@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Ai_Powered_Recipe_Generator_Frontend {
     private static $instance;
     private $assets_enqueued = false;

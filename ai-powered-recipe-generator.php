@@ -11,7 +11,7 @@
  * Text Domain: ai-powered-recipe-generator
  */
 
-defined('ABSPATH') || exit;
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 require_once __DIR__ . '/wordpress-stubs.php';
 
 // Define plugin constants

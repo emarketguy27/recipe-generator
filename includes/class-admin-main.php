@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Ai_Powered_Recipe_Generator_Admin_Main {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_menu_pages'));

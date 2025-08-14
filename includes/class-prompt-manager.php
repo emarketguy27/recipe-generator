@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Ai_Powered_Recipe_Generator_Prompt_Manager {
     private static $instance;
     private $default_prompt;
