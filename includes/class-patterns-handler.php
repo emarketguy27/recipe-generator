@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Recipe_Generator_Patterns_Handler {
+class Ai_Powered_Recipe_Generator_Patterns_Handler {
     /**
      * Initialize pattern registration
      */
@@ -22,7 +22,7 @@ class Recipe_Generator_Patterns_Handler {
     public static function register_patterns_category() {
         register_block_pattern_category(
             'ai-recipes',
-            ['label' => __('AI Recipes', 'recipe-generator')]
+            ['label' => __('AI Recipes', 'ai-powered-recipe-generator')]
         );
     }
 
@@ -32,20 +32,20 @@ class Recipe_Generator_Patterns_Handler {
     public static function register_patterns() {
         $patterns = [
             'user-recipes-sidebar' => [
-                'title' => __('User Recipes Sidebar', 'recipe-generator'),
-                'description' => __('A sidebar section for displaying user-generated recipes', 'recipe-generator'),
+                'title' => __('User Recipes Sidebar', 'ai-powered-recipe-generator'),
+                'description' => __('A sidebar section for displaying user-generated recipes', 'ai-powered-recipe-generator'),
                 'categories' => ['ai-recipes'],
                 'content' => self::get_pattern_content('user-recipes-sidebar'),
             ],
             'ai-recipe-form-with-sidebar' => [
-                'title' => __('AI Recipe Form with Sidebar', 'recipe-generator'),
-                'description' => __('A complete recipe generation form with accompanying sidebar', 'recipe-generator'),
+                'title' => __('AI Recipe Form with Sidebar', 'ai-powered-recipe-generator'),
+                'description' => __('A complete recipe generation form with accompanying sidebar', 'ai-powered-recipe-generator'),
                 'categories' => ['ai-recipes'],
                 'content' => self::get_pattern_content('ai-recipe-form-with-sidebar'),
             ],
             'ai-recipe-hero-header' => [
-                'title' => __('AI Recipe Hero Header with Sidebar', 'recipe-generator'),
-                'description' => __('A hero header section for single recipe posts with sidebar integration', 'recipe-generator'),
+                'title' => __('AI Recipe Hero Header with Sidebar', 'ai-powered-recipe-generator'),
+                'description' => __('A hero header section for single recipe posts with sidebar integration', 'ai-powered-recipe-generator'),
                 'categories' => ['ai-recipes'],
                 'content' => self::get_pattern_content('ai-recipe-hero-header'),
             ],
@@ -53,7 +53,7 @@ class Recipe_Generator_Patterns_Handler {
 
         foreach ($patterns as $slug => $pattern) {
             register_block_pattern(
-                "recipe-generator/{$slug}",
+                "ai-powered-recipe-generator/{$slug}",
                 $pattern
             );
         }
@@ -63,7 +63,7 @@ class Recipe_Generator_Patterns_Handler {
      * Get pattern content from file
      */
     private static function get_pattern_content($pattern_name) {
-        $pattern_path = RECIPE_GENERATOR_PATH . "patterns/{$pattern_name}.html";
+        $pattern_path = AI_POWERED_RECIPE_GENERATOR_PATH . "patterns/{$pattern_name}.html";
         
         if (!file_exists($pattern_path) || !is_readable($pattern_path)) {
             return '';

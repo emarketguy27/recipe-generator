@@ -3,11 +3,11 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-if (!defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL')) {
-    define('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL', true);
+if (!defined('AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL')) {
+    define('AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL', true);
 }
 
-if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL) {
+if (defined('AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL) {
     // ======================
     // POSTS & ATTACHMENTS
     // ======================
@@ -79,7 +79,7 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
             // Get only the meta keys we care about
             $all_meta = get_user_meta($user_id);
             foreach ($all_meta as $meta_key => $value) {
-                if (strpos($meta_key, 'recipe_generator') === 0) {
+                if (strpos($meta_key, 'ai_powered_recipe_generator') === 0) {
                     delete_user_meta($user_id, $meta_key);
                 }
             }
@@ -93,7 +93,7 @@ if (defined('RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && RECIPE_GENERATOR_REM
     // ======================
     $all_options = wp_load_alloptions();
     foreach ($all_options as $name => $value) {
-        if (strpos($name, 'recipe_generator') === 0) {
+        if (strpos($name, 'ai_powered_recipe_generator') === 0) {
             delete_option($name);
         }
     }

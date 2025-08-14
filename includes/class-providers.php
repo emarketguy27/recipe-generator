@@ -1,7 +1,7 @@
 <?php
-class Recipe_Generator_Providers {
+class Ai_Powered_Recipe_Generator_Providers {
     private static $instance;
-    private $option_name = 'recipe_generator_custom_providers';
+    private $option_name = 'ai_powered_recipe_generator_custom_providers';
     private $providers;
     private $endpoints;
 
@@ -76,7 +76,7 @@ class Recipe_Generator_Providers {
         }
         
         // Check custom endpoints
-        $custom_endpoints = get_option('recipe_generator_custom_endpoints', array());
+        $custom_endpoints = get_option('ai_powered_recipe_generator_custom_endpoints', array());
         if (isset($custom_endpoints[$provider_name])) {
             return $custom_endpoints[$provider_name];
         }
@@ -87,22 +87,22 @@ class Recipe_Generator_Providers {
     public function add_provider($provider_name, $endpoint = '') {
         
         if (empty(trim($provider_name))) {
-            return new WP_Error('empty', __('Provider name cannot be empty', 'recipe-generator'));
+            return new WP_Error('empty', __('Provider name cannot be empty', 'ai-powered-recipe-generator'));
         }
 
         $custom_providers = get_option($this->option_name, array());
-        $custom_endpoints = get_option('recipe_generator_custom_endpoints', array());
+        $custom_endpoints = get_option('ai_powered_recipe_generator_custom_endpoints', array());
         
         $sanitized = sanitize_text_field($provider_name);
         $custom_providers[$sanitized] = $sanitized;
         
         if (!empty($endpoint)) {
             $custom_endpoints[$sanitized] = esc_url_raw($endpoint);
-            update_option('recipe_generator_custom_endpoints', $custom_endpoints);
+            update_option('ai_powered_recipe_generator_custom_endpoints', $custom_endpoints);
         }
         
         if (!update_option($this->option_name, $custom_providers)) {
-            return new WP_Error('db_error', __('Failed to save provider', 'recipe-generator'));
+            return new WP_Error('db_error', __('Failed to save provider', 'ai-powered-recipe-generator'));
         }
         
         $this->providers[$sanitized] = $sanitized;

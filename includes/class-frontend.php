@@ -1,5 +1,5 @@
 <?php
-class Recipe_Generator_Frontend {
+class Ai_Powered_Recipe_Generator_Frontend {
     private static $instance;
     private $assets_enqueued = false;
 
@@ -11,7 +11,7 @@ class Recipe_Generator_Frontend {
     }
 
     private function __construct() {
-        add_shortcode('recipe_generator', [$this, 'recipe_shortcode_handler']);
+        add_shortcode('ai_powered_recipe_generator', [$this, 'recipe_shortcode_handler']);
         add_shortcode('user_saved_recipes', [$this, 'saved_recipes_shortcode_handler']);
         add_shortcode('recipe_user_profile', [$this, 'user_profile_shortcode']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
@@ -21,34 +21,34 @@ class Recipe_Generator_Frontend {
         $this->set_assets_flag();
         
         // Your existing shortcode content remains exactly the same
-        $prompt_manager = Recipe_Generator_Prompt_Manager::get_instance();
+        $prompt_manager = Ai_Powered_Recipe_Generator_Prompt_Manager::get_instance();
         $dietary_options = $prompt_manager->get_dietary_options();
         
         ob_start(); ?>
-        <div class="recipe-generator-frontend">
-            <form id="recipe-generator-form">
-                <?php wp_nonce_field('recipe_generator_ajax_nonce', '_wpnonce'); ?>
+        <div class="ai-powered-recipe-generator-frontend">
+            <form id="ai-powered-recipe-generator-form">
+                <?php wp_nonce_field('ai_powered_recipe_generator_ajax_nonce', '_wpnonce'); ?>
                 
                 <div class="form-group">
-                    <label for="rg-servings"><?php esc_html_e('Servings', 'recipe-generator'); ?></label>
+                    <label for="rg-servings"><?php esc_html_e('Servings', 'ai-powered-recipe-generator'); ?></label>
                     <input type="number" id="rg-servings" name="servings" min="1" max="20" value="2">
                 </div>
                 
                 <div class="form-group">
-                    <label for="rg-include"><?php esc_html_e('Must Include Ingredients', 'recipe-generator'); ?></label>
+                    <label for="rg-include"><?php esc_html_e('Must Include Ingredients', 'ai-powered-recipe-generator'); ?></label>
                     <input type="text" id="rg-include" name="include" 
-                        placeholder="<?php esc_attr_e('e.g., chicken, potatoes', 'recipe-generator'); ?>">
+                        placeholder="<?php esc_attr_e('e.g., chicken, potatoes', 'ai-powered-recipe-generator'); ?>">
                 </div>
                 
                 <div class="form-group">
-                    <label for="rg-exclude"><?php esc_html_e('Must Exclude Ingredients', 'recipe-generator'); ?></label>
+                    <label for="rg-exclude"><?php esc_html_e('Must Exclude Ingredients', 'ai-powered-recipe-generator'); ?></label>
                     <input type="text" id="rg-exclude" name="exclude" 
-                        placeholder="<?php esc_attr_e('e.g., nuts, dairy', 'recipe-generator'); ?>">
+                        placeholder="<?php esc_attr_e('e.g., nuts, dairy', 'ai-powered-recipe-generator'); ?>">
                 </div>
                 
                 <?php if (!empty($dietary_options)) : ?>
                     <div class="form-group">
-                        <h3><?php esc_html_e('Dietary Requirements', 'recipe-generator'); ?></h3>
+                        <h3><?php esc_html_e('Dietary Requirements', 'ai-powered-recipe-generator'); ?></h3>
                         <div class="dietary-options">
                             <?php foreach ($dietary_options as $key => $label) : ?>
                                 <label class="dietary-option">
@@ -63,7 +63,7 @@ class Recipe_Generator_Frontend {
                 <div class="form-buttons">
                    <button type="submit" id="generate-btn" class="rg-submit wp-element-button">
                     <span class="dashicons dashicons-food"></span>
-                    <?php esc_html_e('Generate Recipe', 'recipe-generator'); ?>
+                    <?php esc_html_e('Generate Recipe', 'ai-powered-recipe-generator'); ?>
                     </button>
                     <button type="button" id="reset-form-btn" class="rg-submit secondary">
                         <span class="dashicons dashicons-update"></span> Reset Form
@@ -189,7 +189,7 @@ class Recipe_Generator_Frontend {
         if (is_user_logged_in()) {
             $current_user = wp_get_current_user();
             ?>
-            <div class="recipe-generator-user-profile">
+            <div class="ai-powered-recipe-generator-user-profile">
                 <?php if ($atts['show_avatar']) : ?>
                     <div class="user-avatar">
                         <?php echo get_avatar($current_user->ID, (int)$atts['avatar_size']); ?>
@@ -201,7 +201,7 @@ class Recipe_Generator_Frontend {
                         <span class="user-display-name">Welcome <?php echo esc_html($current_user->display_name); ?></span>
                         <?php if ($atts['show_login']) : ?>
                             <a href="<?php echo esc_url(wp_logout_url()); ?>" class="logout-link">
-                                <?php esc_html_e('Log Out', 'recipe-generator'); ?>
+                                <?php esc_html_e('Log Out', 'ai-powered-recipe-generator'); ?>
                             </a>
                         <?php endif; ?>
                     </div>
@@ -210,9 +210,9 @@ class Recipe_Generator_Frontend {
             <?php
         } elseif ($atts['show_login']) {
             ?>
-            <div class="recipe-generator-user-profile">
+            <div class="ai-powered-recipe-generator-user-profile">
                 <a href="<?php echo esc_url(wp_login_url()); ?>" class="login-link">
-                    <?php esc_html_e('Log In', 'recipe-generator'); ?>
+                    <?php esc_html_e('Log In', 'ai-powered-recipe-generator'); ?>
                 </a>
             </div>
             <?php
@@ -236,7 +236,7 @@ class Recipe_Generator_Frontend {
         
         // Fallback check for posts/pages
         if (is_a($post, 'WP_Post')) {
-            if (has_shortcode($post->post_content, 'recipe_generator') || 
+            if (has_shortcode($post->post_content, 'ai_powered_recipe_generator') || 
                has_shortcode($post->post_content, 'user_saved_recipes')) {
                 $this->do_enqueue_assets();
             }
@@ -247,26 +247,26 @@ class Recipe_Generator_Frontend {
         if (did_action('wp_enqueue_scripts') !== 1) return;
         
         wp_enqueue_style(
-            'recipe-generator-frontend',
-            RECIPE_GENERATOR_URL . 'assets/css/frontend.min.css',
+            'ai-powered-recipe-generator-frontend',
+            AI_POWERED_RECIPE_GENERATOR_URL . 'assets/css/frontend.min.css',
             [],
-            RECIPE_GENERATOR_VERSION
+            AI_POWERED_RECIPE_GENERATOR_VERSION
         );
         
         wp_enqueue_script(
-            'recipe-generator-frontend',
-            RECIPE_GENERATOR_URL . 'assets/js/frontend.js',
+            'ai-powered-recipe-generator-frontend',
+            AI_POWERED_RECIPE_GENERATOR_URL . 'assets/js/frontend.js',
             ['jquery'],
-            RECIPE_GENERATOR_VERSION,
+            AI_POWERED_RECIPE_GENERATOR_VERSION,
             true
         );
         
         wp_localize_script(
-            'recipe-generator-frontend',
+            'ai-powered-recipe-generator-frontend',
             'recipeGeneratorFrontendVars',
             [
                 'ajaxurl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('recipe_generator_frontend_nonce'),
+                'nonce' => wp_create_nonce('ai_powered_recipe_generator_frontend_nonce'),
                 'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
             ]
         );
@@ -274,4 +274,4 @@ class Recipe_Generator_Frontend {
 }
 
 // Initialize
-Recipe_Generator_Frontend::get_instance();
+Ai_Powered_Recipe_Generator_Frontend::get_instance();

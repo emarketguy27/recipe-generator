@@ -1,25 +1,26 @@
 <?php
 /**
- * Plugin Name: Recipe Generator
+ * Plugin Name: AI Powered Recipe Generator
  * Plugin URI: https://jamesdennis.org/recipe-generator.html
  * Description: ✨ AI-Powered Recipe Generation - Transform your food blog — SEO-optimized recipes in seconds! Perfect for bloggers, chefs, and content creators.
- * Version: 1.0.3
+ * Version: 1.0.1
  * Author: James Dennis
  * Author URI: https://jamesdennis.org
  * License: GPL v3.0
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain: recipe-generator
+ * Text Domain: ai-powered-recipe-generator
  */
 
 defined('ABSPATH') || exit;
+require_once __DIR__ . '/wordpress-stubs.php';
 
 // Define plugin constants
-define('RECIPE_GENERATOR_VERSION', '1.0.0');
-define('RECIPE_GENERATOR_PATH', plugin_dir_path(__FILE__));
-define('RECIPE_GENERATOR_URL', plugin_dir_url(__FILE__));
-define('RECIPE_GENERATOR_TEMPLATES_PATH', RECIPE_GENERATOR_PATH . 'templates/');
+define('AI_POWERED_RECIPE_GENERATOR_VERSION', '1.0.0');
+define('AI_POWERED_RECIPE_GENERATOR_PATH', plugin_dir_path(__FILE__));
+define('AI_POWERED_RECIPE_GENERATOR_URL', plugin_dir_url(__FILE__));
+define('AI_POWERED_RECIPE_GENERATOR_TEMPLATES_PATH', AI_POWERED_RECIPE_GENERATOR_PATH . 'templates/');
 
-class Recipe_Generator {
+class Ai_Powered_Recipe_Generator {
     private static $instance;
 
     public static function get_instance() {
@@ -43,22 +44,22 @@ class Recipe_Generator {
     }
 
     private function includes() {
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-prompt-manager.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-providers.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-api-handler.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-ai-settings.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-main.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-frontend.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-patterns-handler.php'; // Patterns Handler
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-template-loader.php';
-        require_once RECIPE_GENERATOR_PATH . 'includes/class-schema-generator.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-prompt-manager.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-providers.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-api-handler.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/ajax-handlers.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-admin-ai-settings.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-admin-main.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-frontend.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-admin-saved-recipes.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-patterns-handler.php'; // Patterns Handler
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-template-loader.php';
+        require_once AI_POWERED_RECIPE_GENERATOR_PATH . 'includes/class-schema-generator.php';
     }
 
     public function output_recipe_schema() {
         if (is_singular('ai_recipe')) {
-            Recipe_Generator_Schema::output_recipe_schema(get_the_ID());
+            Ai_Powered_Recipe_Generator_Schema::output_recipe_schema(get_the_ID());
         }
     }
     
@@ -70,22 +71,22 @@ class Recipe_Generator {
         if (!post_type_exists('ai_recipe')) {
             $args = [
                 'labels' => [
-                    'name' => __('AI Recipes', 'recipe-generator'),
-                    'singular_name' => __('AI Recipe', 'recipe-generator'),
-                    'add_new' => __('Add New', 'recipe-generator'),
-                    'add_new_item' => __('Add New Recipe', 'recipe-generator'),
-                    'edit_item' => __('Edit Recipe', 'recipe-generator'),
-                    'new_item' => __('New Recipe', 'recipe-generator'),
-                    'view_item' => __('View Recipe', 'recipe-generator'),
-                    'view_items' => __('View Recipes', 'recipe-generator'),
+                    'name' => __('AI Recipes', 'ai-powered-recipe-generator'),
+                    'singular_name' => __('AI Recipe', 'ai-powered-recipe-generator'),
+                    'add_new' => __('Add New', 'ai-powered-recipe-generator'),
+                    'add_new_item' => __('Add New Recipe', 'ai-powered-recipe-generator'),
+                    'edit_item' => __('Edit Recipe', 'ai-powered-recipe-generator'),
+                    'new_item' => __('New Recipe', 'ai-powered-recipe-generator'),
+                    'view_item' => __('View Recipe', 'ai-powered-recipe-generator'),
+                    'view_items' => __('View Recipes', 'ai-powered-recipe-generator'),
                     'taxonomies' => [],
-                    'search_items' => __('Search Recipes', 'recipe-generator'),
-                    'not_found' => __('No recipes found', 'recipe-generator'),
-                    'not_found_in_trash' => __('No recipes found in Trash', 'recipe-generator'),
-                    'all_items' => __('All Recipes', 'recipe-generator'),
-                    'archives' => __('Recipe Archives', 'recipe-generator'),
-                    'attributes' => __('Recipe Attributes', 'recipe-generator'),
-                    'insert_into_item' => __('Insert into recipe', 'recipe-generator')
+                    'search_items' => __('Search Recipes', 'ai-powered-recipe-generator'),
+                    'not_found' => __('No recipes found', 'ai-powered-recipe-generator'),
+                    'not_found_in_trash' => __('No recipes found in Trash', 'ai-powered-recipe-generator'),
+                    'all_items' => __('All Recipes', 'ai-powered-recipe-generator'),
+                    'archives' => __('Recipe Archives', 'ai-powered-recipe-generator'),
+                    'attributes' => __('Recipe Attributes', 'ai-powered-recipe-generator'),
+                    'insert_into_item' => __('Insert into recipe', 'ai-powered-recipe-generator')
                 ],
                 'public' => true,
                 'publicly_queryable' => true,
@@ -123,17 +124,17 @@ class Recipe_Generator {
         register_taxonomy('ai_recipe_category', 'ai_recipe', [
             'hierarchical' => true,
             'labels' => [
-                'name' => __('Recipe Categories', 'recipe-generator'),
-                'singular_name' => __('Recipe Category', 'recipe-generator'),
-                'search_items' => __('Search Recipe Categories', 'recipe-generator'),
-                'all_items' => __('All Recipe Categories', 'recipe-generator'),
-                'parent_item' => __('Parent Category', 'recipe-generator'),
-                'parent_item_colon' => __('Parent Category:', 'recipe-generator'),
-                'edit_item' => __('Edit Category', 'recipe-generator'),
-                'update_item' => __('Update Category', 'recipe-generator'),
-                'add_new_item' => __('Add New Category', 'recipe-generator'),
-                'new_item_name' => __('New Category Name', 'recipe-generator'),
-                'menu_name' => __('Categories', 'recipe-generator'),
+                'name' => __('Recipe Categories', 'ai-powered-recipe-generator'),
+                'singular_name' => __('Recipe Category', 'ai-powered-recipe-generator'),
+                'search_items' => __('Search Recipe Categories', 'ai-powered-recipe-generator'),
+                'all_items' => __('All Recipe Categories', 'ai-powered-recipe-generator'),
+                'parent_item' => __('Parent Category', 'ai-powered-recipe-generator'),
+                'parent_item_colon' => __('Parent Category:', 'ai-powered-recipe-generator'),
+                'edit_item' => __('Edit Category', 'ai-powered-recipe-generator'),
+                'update_item' => __('Update Category', 'ai-powered-recipe-generator'),
+                'add_new_item' => __('Add New Category', 'ai-powered-recipe-generator'),
+                'new_item_name' => __('New Category Name', 'ai-powered-recipe-generator'),
+                'menu_name' => __('Categories', 'ai-powered-recipe-generator'),
             ],
             'show_ui' => true,
             'show_admin_column' => true,
@@ -156,19 +157,19 @@ class Recipe_Generator {
         register_taxonomy('ai_recipe_tag', 'ai_recipe', [
             'hierarchical' => false,
             'labels' => [
-                'name' => __('Dietary Tags', 'recipe-generator'),
-                'singular_name' => __('Dietary Tag', 'recipe-generator'),
-                'search_items' => __('Search Tags', 'recipe-generator'),
-                'popular_items' => __('Popular Tags', 'recipe-generator'),
-                'all_items' => __('All Tags', 'recipe-generator'),
-                'edit_item' => __('Edit Tag', 'recipe-generator'),
-                'update_item' => __('Update Tag', 'recipe-generator'),
-                'add_new_item' => __('Add New Tag', 'recipe-generator'),
-                'new_item_name' => __('New Tag Name', 'recipe-generator'),
-                'separate_items_with_commas' => __('Separate tags with commas', 'recipe-generator'),
-                'add_or_remove_items' => __('Add or remove tags', 'recipe-generator'),
-                'choose_from_most_used' => __('Choose from most used tags', 'recipe-generator'),
-                'menu_name' => __('Dietary Tags', 'recipe-generator'),
+                'name' => __('Dietary Tags', 'ai-powered-recipe-generator'),
+                'singular_name' => __('Dietary Tag', 'ai-powered-recipe-generator'),
+                'search_items' => __('Search Tags', 'ai-powered-recipe-generator'),
+                'popular_items' => __('Popular Tags', 'ai-powered-recipe-generator'),
+                'all_items' => __('All Tags', 'ai-powered-recipe-generator'),
+                'edit_item' => __('Edit Tag', 'ai-powered-recipe-generator'),
+                'update_item' => __('Update Tag', 'ai-powered-recipe-generator'),
+                'add_new_item' => __('Add New Tag', 'ai-powered-recipe-generator'),
+                'new_item_name' => __('New Tag Name', 'ai-powered-recipe-generator'),
+                'separate_items_with_commas' => __('Separate tags with commas', 'ai-powered-recipe-generator'),
+                'add_or_remove_items' => __('Add or remove tags', 'ai-powered-recipe-generator'),
+                'choose_from_most_used' => __('Choose from most used tags', 'ai-powered-recipe-generator'),
+                'menu_name' => __('Dietary Tags', 'ai-powered-recipe-generator'),
             ],
             'show_ui' => true,
             'show_admin_column' => true,
@@ -194,41 +195,41 @@ class Recipe_Generator {
     /*** Enqueue Admin assets ***/
     public function enqueue_admin_assets($hook) {
         // Only load on our plugin pages
-        if (strpos($hook, 'recipe-generator') === false) {
+        if (strpos($hook, 'ai-powered-recipe-generator') === false) {
             return;
         }
         // Enqueue admin CSS
         wp_enqueue_style(
-            'recipe-generator-admin',
-            RECIPE_GENERATOR_URL . 'assets/css/admin.min.css',
+            'ai-powered-recipe-generator-admin',
+            AI_POWERED_RECIPE_GENERATOR_URL . 'assets/css/admin.min.css',
             [],
-            RECIPE_GENERATOR_VERSION
+            AI_POWERED_RECIPE_GENERATOR_VERSION
         );
         
         // Enqueue admin JS
         wp_enqueue_script(
-            'recipe-generator-admin',
-            RECIPE_GENERATOR_URL . 'assets/js/admin.js',
+            'ai-powered-recipe-generator-admin',
+            AI_POWERED_RECIPE_GENERATOR_URL . 'assets/js/admin.js',
             array('jquery'),
-            RECIPE_GENERATOR_VERSION,
+            AI_POWERED_RECIPE_GENERATOR_VERSION,
             true
         );
         
         // Localize script with AJAX URL and nonce
         wp_localize_script(
-            'recipe-generator-admin',
+            'ai-powered-recipe-generator-admin',
             'recipeGeneratorVars',
             array(
                 'ajaxurl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('recipe_generator_ajax_nonce'),
-                'confirmResetPrompt' => __('Are you sure you want to reset the prompt to default?', 'recipe-generator'),
-                'promptResetSuccess' => __('Prompt reset to default.', 'recipe-generator'),
-                'confirmRemoveOption' => __('Are you sure you want to remove this option?', 'recipe-generator'),
-                'confirmResetOptions' => __('Are you sure you want to reset all dietary options to default?', 'recipe-generator'),
-                'remove' => __('Remove', 'recipe-generator'),
-                'testing' => __('Testing...', 'recipe-generator'),
-                'testPrompt' => __('Test Prompt', 'recipe-generator'),
-                'errorOccurred' => __('An error occurred. Please try again.', 'recipe-generator')
+                'nonce' => wp_create_nonce('ai_powered_recipe_generator_ajax_nonce'),
+                'confirmResetPrompt' => __('Are you sure you want to reset the prompt to default?', 'ai-powered-recipe-generator'),
+                'promptResetSuccess' => __('Prompt reset to default.', 'ai-powered-recipe-generator'),
+                'confirmRemoveOption' => __('Are you sure you want to remove this option?', 'ai-powered-recipe-generator'),
+                'confirmResetOptions' => __('Are you sure you want to reset all dietary options to default?', 'ai-powered-recipe-generator'),
+                'remove' => __('Remove', 'ai-powered-recipe-generator'),
+                'testing' => __('Testing...', 'ai-powered-recipe-generator'),
+                'testPrompt' => __('Test Prompt', 'ai-powered-recipe-generator'),
+                'errorOccurred' => __('An error occurred. Please try again.', 'ai-powered-recipe-generator')
             )
         );
 
@@ -236,10 +237,10 @@ class Recipe_Generator {
 }
 
 // Initialize the plugin
-Recipe_Generator::get_instance();
+Ai_Powered_Recipe_Generator::get_instance();
 
 register_activation_hook(__FILE__, function() {
-    Recipe_Generator::get_instance()->register_post_types();
+    Ai_Powered_Recipe_Generator::get_instance()->register_post_types();
     flush_rewrite_rules();
 });
 
@@ -252,26 +253,26 @@ register_deactivation_hook(__FILE__, function() {
 
 add_action('plugins_loaded', function() {
     // Initialize provider system
-    Recipe_Generator_Providers::get_instance();
+    Ai_Powered_Recipe_Generator_Providers::get_instance();
     
     // Initialize admin interfaces
     if (is_admin()) {
-        new Recipe_Generator_Admin_Main();
-        new Recipe_Generator_Admin_AI_Settings();
-        new Recipe_Generator_Admin_Saved_Recipes();
+        new Ai_Powered_Recipe_Generator_Admin_Main();
+        new Ai_Powered_Recipe_Generator_Admin_AI_Settings();
+        new Ai_Powered_Recipe_Generator_Admin_Saved_Recipes();
     }
 
-    Recipe_Generator_Patterns_Handler::init();
+    Ai_Powered_Recipe_Generator_Patterns_Handler::init();
     // Future: Initialize frontend components here if needed
 });
 
-add_action('init', [Recipe_Generator::get_instance(), 'register_post_types']);
+add_action('init', [Ai_Powered_Recipe_Generator::get_instance(), 'register_post_types']);
 
 /*** Register Custom Block Templates ***/
 add_action('init', function() {
     // Only register templates if block themes are supported
     if (function_exists('register_block_template')) {
-        Recipe_Generator_Template_Loader::register_templates();
+        Ai_Powered_Recipe_Generator_Template_Loader::register_templates();
     }
 }, 20);
 
@@ -315,7 +316,7 @@ add_filter('dashboard_glance_items', function($items) {
     if ($count && $count->publish) {
         $text = sprintf(
             /* translators: 1: Number of recipes. %d will be replaced with the actual count. */
-            _n('%d AI Recipe', '%d AI Recipes', $count->publish, 'recipe-generator'),
+            _n('%d AI Recipe', '%d AI Recipes', $count->publish, 'ai-powered-recipe-generator'),
             $count->publish
         );
         
@@ -336,9 +337,9 @@ add_action('wp_enqueue_scripts', function() {
     
     // Load minimal base styles for all recipe content
     wp_enqueue_style(
-        'recipe-generator-base',
-        RECIPE_GENERATOR_URL . 'assets/css/base.min.css',
+        'ai-powered-recipe-generator-base',
+        AI_POWERED_RECIPE_GENERATOR_URL . 'assets/css/base.min.css',
         [],
-        RECIPE_GENERATOR_VERSION
+        AI_POWERED_RECIPE_GENERATOR_VERSION
     );
 });

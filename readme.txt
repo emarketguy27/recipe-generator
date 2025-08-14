@@ -1,10 +1,10 @@
-=== Recipe Generator ===
+=== AI Powered Recipe Generator ===
 Contributors: jdennisuk
 Donate link: https://jamesdennis.org
 Tags: AI, AI Recipes, Recipes
 Requires at least: 6.7
 Tested up to: 6.8
-Stable tag: 1.0.3
+Stable tag: 1.0.1
 License: GPL v3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -37,9 +37,9 @@ Perfect for bloggers, chefs, and content creators.
 
 == Installation ==
 
-1. Upload the `recipe-generator` folder to `/wp-content/plugins/`.  
+1. Upload the `ai-powered-recipe-generator` folder to `/wp-content/plugins/`.  
 2. Activate the plugin through **Plugins > Installed Plugins**.  
-3. Navigate to **Recipe Generator > Settings** to configure your API keys and preferences.
+3. Navigate to **Ai Powered Recipe Generator > Settings** to configure your API keys and preferences.
 
 == Frequently Asked Questions ==
 

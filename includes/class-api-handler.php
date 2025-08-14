@@ -2,7 +2,7 @@
 /**
  * Handles all API communication for Recipe Generator
  */
-class Recipe_Generator_API_Handler {
+class Ai_Powered_Recipe_Generator_API_Handler {
     private static $instance;
     private $providers;
     
@@ -14,7 +14,7 @@ class Recipe_Generator_API_Handler {
     }
     
     private function __construct() {
-        $this->providers = Recipe_Generator_Providers::get_instance();
+        $this->providers = Ai_Powered_Recipe_Generator_Providers::get_instance();
     }
     
     /**
@@ -27,24 +27,24 @@ class Recipe_Generator_API_Handler {
     public function handle_prompt_request($args, $is_test = false) {
         // error_log('[Recipe Generator] Prompt request args: ' . print_r($args, true)); // DEBUG
         // Generate the prompt (shared between frontend and admin)
-        $prompt_manager = Recipe_Generator_Prompt_Manager::get_instance();
+        $prompt_manager = Ai_Powered_Recipe_Generator_Prompt_Manager::get_instance();
         $prompt = $prompt_manager->generate_prompt($args);
         // error_log('[Recipe Generator] Generated prompt: ' . $prompt); //DEBUG
         
         // Get API configuration
-        $selected_provider = get_option('recipe_generator_selected_provider', 'OpenAI');
+        $selected_provider = get_option('ai_powered_recipe_generator_selected_provider', 'OpenAI');
         $api_endpoint = $this->providers->get_endpoint($selected_provider);
-        $api_key = get_option('recipe_generator_api_key', '');
+        $api_key = get_option('ai_powered_recipe_generator_api_key', '');
 
         // error_log("[Recipe Generator] Using provider: {$selected_provider}, endpoint: {$api_endpoint}"); //DEBUG
         
         // Validate configuration
         if (empty($api_key)) {
-            return new WP_Error('missing_api_key', __('API key is not configured.', 'recipe-generator'));
+            return new WP_Error('missing_api_key', __('API key is not configured.', 'ai-powered-recipe-generator'));
         }
         
         if (!$api_endpoint) {
-            return new WP_Error('invalid_provider', __('Invalid API provider selected.', 'recipe-generator'));
+            return new WP_Error('invalid_provider', __('Invalid API provider selected.', 'ai-powered-recipe-generator'));
         }
         
         // Make the API request
@@ -92,7 +92,7 @@ class Recipe_Generator_API_Handler {
             // ... other provider handling
             
         } catch (Exception $e) {
-            return __('Error formatting response', 'recipe-generator');
+            return __('Error formatting response', 'ai-powered-recipe-generator');
         }
     }
     
@@ -134,18 +134,18 @@ class Recipe_Generator_API_Handler {
      * Gets the request body formatted for the specific provider
      */
     private function get_request_body($provider, $prompt) {
-        $providers = Recipe_Generator_Providers::get_instance();
+        $providers = Ai_Powered_Recipe_Generator_Providers::get_instance();
         $model = $providers->get_model($provider);
         $response_format = $providers->get_response_format($provider);
         
         if (!$model) {
-            return new WP_Error('invalid_model', __('Invalid provider model', 'recipe-generator'));
+            return new WP_Error('invalid_model', __('Invalid provider model', 'ai-powered-recipe-generator'));
         }
 
         $base_params = [
             'model' => $model,
-            'temperature' => (float) get_option('recipe_generator_temperature', 0.7),
-            'max_tokens' => (int) get_option('recipe_generator_max_tokens', 1000)            
+            'temperature' => (float) get_option('ai_powered_recipe_generator_temperature', 0.7),
+            'max_tokens' => (int) get_option('ai_powered_recipe_generator_max_tokens', 1000)            
         ];
 
         // Add response format if specified
@@ -189,7 +189,7 @@ class Recipe_Generator_API_Handler {
     private function format_json_recipe($recipe_data) {
         // Ensure we have an array
         if (!is_array($recipe_data)) {
-            return __('Invalid recipe format', 'recipe-generator');
+            return __('Invalid recipe format', 'ai-powered-recipe-generator');
         }
 
         ob_start(); ?>
@@ -206,14 +206,14 @@ class Recipe_Generator_API_Handler {
                 <?php if (!empty($recipe_data['servings'])) : ?>
                     <div class="meta-group">
                         <span class="dashicons dashicons-groups"></span>
-                        <p><strong><?php esc_html_e('Servings:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['servings']); ?></p>
+                        <p><strong><?php esc_html_e('Servings:', 'ai-powered-recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['servings']); ?></p>
                     </div>
                 <?php endif; ?>
                 
                 <?php if (!empty($recipe_data['preparation_time'])) : ?>
                     <div class="meta-group">
                         <span class="dashicons dashicons-clock"></span>
-                        <p><strong><?php esc_html_e('Prep Time:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['preparation_time']); ?></p>
+                        <p><strong><?php esc_html_e('Prep Time:', 'ai-powered-recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['preparation_time']); ?></p>
                     </div>
                     
                 <?php endif; ?>
@@ -221,14 +221,14 @@ class Recipe_Generator_API_Handler {
                 <?php if (!empty($recipe_data['cooking_time'])) : ?>
                     <div class="meta-group">
                         <span class="dashicons dashicons-food"></span>
-                        <p><strong><?php esc_html_e('Cook Time:', 'recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['cooking_time']); ?></p>
+                        <p><strong><?php esc_html_e('Cook Time:', 'ai-powered-recipe-generator'); ?></strong> <?php echo esc_html($recipe_data['cooking_time']); ?></p>
                     </div>
                     
                 <?php endif; ?>
             </div>
             
             <?php if (!empty($recipe_data['ingredients'])) : ?>
-                <h4><?php esc_html_e('Ingredients', 'recipe-generator'); ?></h4>
+                <h4><?php esc_html_e('Ingredients', 'ai-powered-recipe-generator'); ?></h4>
                 <ul class="recipe-ingredients">
                     <?php foreach ((array)$recipe_data['ingredients'] as $ingredient) : ?>
                         <li><?php echo esc_html($ingredient); ?></li>
@@ -237,7 +237,7 @@ class Recipe_Generator_API_Handler {
             <?php endif; ?>
             
             <?php if (!empty($recipe_data['method'])) : ?>
-                <h4><?php esc_html_e('Instructions', 'recipe-generator'); ?></h4>
+                <h4><?php esc_html_e('Instructions', 'ai-powered-recipe-generator'); ?></h4>
                 <ol class="recipe-instructions">
                     <?php foreach ((array)$recipe_data['method'] as $step) : ?>
                         <li><?php echo esc_html($step); ?></li>
@@ -246,7 +246,7 @@ class Recipe_Generator_API_Handler {
             <?php endif; ?>
             
             <?php if (!empty($recipe_data['nutritional_information'])) : ?>
-                <h4><?php esc_html_e('Nutritional Information', 'recipe-generator'); ?></h4>
+                <h4><?php esc_html_e('Nutritional Information', 'ai-powered-recipe-generator'); ?></h4>
                 <ul class="recipe-nutrition">
                     <?php foreach ((array)$recipe_data['nutritional_information'] as $key => $value) : ?>
                         <li><strong><?php echo esc_html(ucfirst(str_replace('_', ' ', $key))); ?>:</strong> <?php echo esc_html($value); ?></li>
@@ -271,24 +271,24 @@ class Recipe_Generator_API_Handler {
      */
     private function get_api_error_message($provider, $response) {
         if (!is_array($response)) {
-            return __('Unknown API error occurred', 'recipe-generator');
+            return __('Unknown API error occurred', 'ai-powered-recipe-generator');
         }
         
         switch ($provider) {
             case 'OpenAI':
-                return $response['error']['message'] ?? __('OpenAI API error', 'recipe-generator');
+                return $response['error']['message'] ?? __('OpenAI API error', 'ai-powered-recipe-generator');
                 
             case 'Anthropic':
-                return $response['error']['message'] ?? __('Anthropic API error', 'recipe-generator');
+                return $response['error']['message'] ?? __('Anthropic API error', 'ai-powered-recipe-generator');
                 
             case 'Google AI':
-                return $response['error']['message'] ?? __('Google AI API error', 'recipe-generator');
+                return $response['error']['message'] ?? __('Google AI API error', 'ai-powered-recipe-generator');
                 
             case 'Deepseek':
-                return $response['error']['message'] ?? __('Deepseek API error', 'recipe-generator');
+                return $response['error']['message'] ?? __('Deepseek API error', 'ai-powered-recipe-generator');
                 
             default:
-                return __('API request failed', 'recipe-generator');
+                return __('API request failed', 'ai-powered-recipe-generator');
         }
     }
 }

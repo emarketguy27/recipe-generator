@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Recipe_Generator_Schema {
+class Ai_Powered_Recipe_Generator_Schema {
     /**
      * Get schema for a recipe post
      */

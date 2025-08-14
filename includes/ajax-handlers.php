@@ -1,13 +1,13 @@
 <?php
 // AJAX Handlers
-add_action('wp_ajax_recipe_generator_reset_prompt', function() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+add_action('wp_ajax_ai_powered_recipe_generator_reset_prompt', function() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
     
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(esc_html__('Permission denied.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Permission denied.', 'ai-powered-recipe-generator'));
     }
     
-    $prompt_manager = Recipe_Generator_Prompt_Manager::get_instance();
+    $prompt_manager = Ai_Powered_Recipe_Generator_Prompt_Manager::get_instance();
     $prompt_manager->reset_prompt_to_default();
     
     wp_send_json_success([
@@ -15,17 +15,17 @@ add_action('wp_ajax_recipe_generator_reset_prompt', function() {
     ]);
 });
 
-add_action('wp_ajax_recipe_generator_add_dietary_option', function() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+add_action('wp_ajax_ai_powered_recipe_generator_add_dietary_option', function() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
     
     if (!current_user_can('manage_options') || empty($_POST['option'])) {
-        wp_send_json_error(esc_html__('Invalid request.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Invalid request.', 'ai-powered-recipe-generator'));
     }
     
     $option = sanitize_text_field(wp_unslash($_POST['option']));
     $key = sanitize_key($option);
     
-    $prompt_manager = Recipe_Generator_Prompt_Manager::get_instance();
+    $prompt_manager = Ai_Powered_Recipe_Generator_Prompt_Manager::get_instance();
     $prompt_manager->add_dietary_option($key, $option);
     
     wp_send_json_success([
@@ -34,60 +34,60 @@ add_action('wp_ajax_recipe_generator_add_dietary_option', function() {
     ]);
 });
 
-add_action('wp_ajax_recipe_generator_remove_dietary_option', function() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+add_action('wp_ajax_ai_powered_recipe_generator_remove_dietary_option', function() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
     
     if (!current_user_can('manage_options') || empty($_POST['key'])) {
-        wp_send_json_error(esc_html__('Invalid request.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Invalid request.', 'ai-powered-recipe-generator'));
     }
     
     $key = isset($_POST['key']) ? sanitize_key(wp_unslash($_POST['key'])) : '';
     if (empty($key)) {
-        wp_send_json_error(esc_html__('Invalid key.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Invalid key.', 'ai-powered-recipe-generator'));
     }
 
-    $prompt_manager = Recipe_Generator_Prompt_Manager::get_instance();
+    $prompt_manager = Ai_Powered_Recipe_Generator_Prompt_Manager::get_instance();
     
     // Don't allow removing default options
     $default_options = $prompt_manager->get_default_dietary_options();
     if (array_key_exists($key, $default_options)) {
-        wp_send_json_error(esc_html__('Cannot remove default options.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Cannot remove default options.', 'ai-powered-recipe-generator'));
     }
     
     $prompt_manager->remove_dietary_option($key);
     wp_send_json_success();
 });
 
-add_action('wp_ajax_recipe_generator_reset_dietary_options', function() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+add_action('wp_ajax_ai_powered_recipe_generator_reset_dietary_options', function() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
     
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(esc_html__('Permission denied.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Permission denied.', 'ai-powered-recipe-generator'));
     }
     
-    $prompt_manager = Recipe_Generator_Prompt_Manager::get_instance();
+    $prompt_manager = Ai_Powered_Recipe_Generator_Prompt_Manager::get_instance();
     $prompt_manager->reset_dietary_options_to_default();
     wp_send_json_success();
 });
 
-add_action('wp_ajax_recipe_generator_test_connection', function() {
-    check_ajax_referer('recipe_generator_test_connection', 'nonce');
+add_action('wp_ajax_ai_powered_recipe_generator_test_connection', function() {
+    check_ajax_referer('ai_powered_recipe_generator_test_connection', 'nonce');
     
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(esc_html__('Permission denied.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Permission denied.', 'ai-powered-recipe-generator'));
     }
 
-    $providers = Recipe_Generator_Providers::get_instance();
-    $selected_provider = get_option('recipe_generator_selected_provider', '');
+    $providers = Ai_Powered_Recipe_Generator_Providers::get_instance();
+    $selected_provider = get_option('ai_powered_recipe_generator_selected_provider', '');
     $api_endpoint = $providers->get_endpoint($selected_provider);
-    $api_key = get_option('recipe_generator_api_key', '');
+    $api_key = get_option('ai_powered_recipe_generator_api_key', '');
 
     if (empty($api_key)) {
-        wp_send_json_error(esc_html__('API key is not configured.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('API key is not configured.', 'ai-powered-recipe-generator'));
     }
 
     if (empty($api_endpoint)) {
-        wp_send_json_error(esc_html__('No API endpoint configured for this provider.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('No API endpoint configured for this provider.', 'ai-powered-recipe-generator'));
     }
 
     // Provider-specific test requests
@@ -151,11 +151,11 @@ add_action('wp_ajax_recipe_generator_test_connection', function() {
     $response_body = wp_remote_retrieve_body($response);
     
     if ($response_code === 200) {
-        wp_send_json_success(__('API connection successful!', 'recipe-generator'));
+        wp_send_json_success(__('API connection successful!', 'ai-powered-recipe-generator'));
     } else {
         $error_message = sprintf(
             /* translators: 1: HTTP status code, 2: API response body */
-            __('API returned status %1$d. Response: %2$s', 'recipe-generator'),
+            __('API returned status %1$d. Response: %2$s', 'ai-powered-recipe-generator'),
             absint($response_code),
             esc_html($response_body)
         );
@@ -163,11 +163,11 @@ add_action('wp_ajax_recipe_generator_test_connection', function() {
     }
 });
 
-add_action('wp_ajax_recipe_generator_test_prompt', function() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+add_action('wp_ajax_ai_powered_recipe_generator_test_prompt', function() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
     
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(esc_html__('Permission denied.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Permission denied.', 'ai-powered-recipe-generator'));
     }
     
     $args = [
@@ -177,7 +177,7 @@ add_action('wp_ajax_recipe_generator_test_prompt', function() {
         'dietary' => !empty($_POST['dietary']) ? array_map('sanitize_text_field', wp_unslash($_POST['dietary'])) : []
     ];
     
-    $api_handler = Recipe_Generator_API_Handler::get_instance();
+    $api_handler = Ai_Powered_Recipe_Generator_API_Handler::get_instance();
     $result = $api_handler->handle_prompt_request($args, true);
 
     
@@ -205,15 +205,15 @@ add_action('wp_ajax_recipe_generator_test_prompt', function() {
     ]);
 });
 
-add_action('wp_ajax_recipe_generator_generate_recipe', 'recipe_generator_handle_frontend_request');
-add_action('wp_ajax_nopriv_recipe_generator_generate_recipe', 'recipe_generator_handle_frontend_request');
+add_action('wp_ajax_ai_powered_recipe_generator_generate_recipe', 'ai_powered_recipe_generator_handle_frontend_request');
+add_action('wp_ajax_nopriv_ai_powered_recipe_generator_generate_recipe', 'ai_powered_recipe_generator_handle_frontend_request');
 add_action('wp_ajax_save_ai_recipe_to_favorites', 'handle_save_ai_recipe_to_favorites');
 
 add_action('wp_ajax_delete_saved_recipe', function() {
-    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
+    check_ajax_referer('ai_powered_recipe_generator_frontend_nonce', '_wpnonce');
     
     if (!is_user_logged_in()) {
-        wp_send_json_error(esc_html__('Authentication required', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Authentication required', 'ai-powered-recipe-generator'));
     }
     
     $user_id = get_current_user_id();
@@ -226,12 +226,12 @@ add_action('wp_ajax_delete_saved_recipe', function() {
         wp_send_json_success();
     }
     
-    wp_send_json_error(esc_html__('Recipe not found', 'recipe-generator'));
+    wp_send_json_error(esc_html__('Recipe not found', 'ai-powered-recipe-generator'));
 });
 
 add_action('admin_action_delete_recipe', function() {
     if (!current_user_can('manage_options')) {
-        wp_die(esc_html__('You do not have sufficient permissions.', 'recipe-generator'));
+        wp_die(esc_html__('You do not have sufficient permissions.', 'ai-powered-recipe-generator'));
     }
 
     $recipe_id = isset($_GET['recipe_id']) ? sanitize_text_field(wp_unslash($_GET['recipe_id'])) : '';
@@ -246,15 +246,15 @@ add_action('admin_action_delete_recipe', function() {
         update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
     }
 
-    wp_redirect(admin_url('admin.php?page=recipe-generator-saved-recipes'));
+    wp_redirect(admin_url('admin.php?page=ai-powered-recipe-generator-saved-recipes'));
     exit;
 });
 
-add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+add_action('wp_ajax_ai_powered_recipe_generator_bulk_create_posts', function() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
     
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(esc_html__('Permission denied.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Permission denied.', 'ai-powered-recipe-generator'));
     }
 
     // 1. Get the raw input safely
@@ -262,7 +262,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
     
     // 2. Validate the input
     if (!is_array($input_recipes) || empty($input_recipes)) {
-        wp_send_json_error(esc_html__('No valid recipes provided.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('No valid recipes provided.', 'ai-powered-recipe-generator'));
     }
 
     // 3. Sanitize the array in one operation
@@ -481,7 +481,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
                 '_recipe_prep_time' => $prep_mins,
                 '_recipe_cook_time' => $cook_mins,
                 '_recipe_total_time' => $total_time,
-                '_recipe_generator_id' => $recipe_id,
+                '_ai_powered_recipe_generator_id' => $recipe_id,
                 '_recipe_original_user' => $user_id
             ], $nutrition_meta)
         ]);
@@ -515,7 +515,7 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         }
 
         // Add custom meta
-        update_post_meta($post_id, '_recipe_generator_id', $recipe_id);
+        update_post_meta($post_id, '_ai_powered_recipe_generator_id', $recipe_id);
         update_post_meta($post_id, '_recipe_original_user', $user_id);
 
         $created++;
@@ -534,14 +534,14 @@ add_action('wp_ajax_recipe_generator_bulk_create_posts', function() {
         'count' => $created,
         'created_posts' => $created_posts,
         /* translators: %d: Number of posts created */
-        'message' => sprintf(_n('Created %d post', 'Created %d posts', $created, 'recipe-generator'), $created)
+        'message' => sprintf(_n('Created %d post', 'Created %d posts', $created, 'ai-powered-recipe-generator'), $created)
     ]);
 });
 
 add_action('wp_ajax_check_recipe_post', function() {
-    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
+    check_ajax_referer('ai_powered_recipe_generator_frontend_nonce', '_wpnonce');
     $recipe_id = isset($_POST['recipe_id']) ? sanitize_text_field(wp_unslash($_POST['recipe_id'])) : '';
-    $post_id = recipe_generator_find_recipe_post($recipe_id);
+    $post_id = ai_powered_recipe_generator_find_recipe_post($recipe_id);
     
     wp_send_json_success([
         'has_post' => (bool)$post_id,
@@ -550,11 +550,11 @@ add_action('wp_ajax_check_recipe_post', function() {
 });
 
 // Standalone helper functions
-function recipe_generator_handle_frontend_request() {
-    check_ajax_referer('recipe_generator_ajax_nonce', '_wpnonce');
+function ai_powered_recipe_generator_handle_frontend_request() {
+    check_ajax_referer('ai_powered_recipe_generator_ajax_nonce', '_wpnonce');
 
     if (!is_user_logged_in()) {
-        wp_send_json_error(esc_html__('Authentication required.', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Authentication required.', 'ai-powered-recipe-generator'));
     }
     
     $args = [
@@ -564,7 +564,7 @@ function recipe_generator_handle_frontend_request() {
         'dietary' => !empty($_POST['dietary']) ? array_map('sanitize_key', $_POST['dietary']) : []
     ];
     
-    $api_handler = Recipe_Generator_API_Handler::get_instance();
+    $api_handler = Ai_Powered_Recipe_Generator_API_Handler::get_instance();
     $result = $api_handler->handle_prompt_request($args);
     
     if (is_wp_error($result)) {
@@ -577,11 +577,11 @@ function recipe_generator_handle_frontend_request() {
     ]);
 }
 
-function recipe_generator_format_recipe_for_display($recipe_data) {
+function ai_powered_recipe_generator_format_recipe_for_display($recipe_data) {
     if (is_string($recipe_data)) {
         $recipe = json_decode($recipe_data, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return '<div class="error">' . esc_html__('Failed to parse recipe data', 'recipe-generator') . '</div>';
+            return '<div class="error">' . esc_html__('Failed to parse recipe data', 'ai-powered-recipe-generator') . '</div>';
         }
     } else {
         $recipe = $recipe_data;
@@ -589,7 +589,7 @@ function recipe_generator_format_recipe_for_display($recipe_data) {
     
     // Basic validation
     if (!isset($recipe['recipe_name'])) {
-        return '<div class="error">' . esc_html__('Invalid recipe format received', 'recipe-generator') . '</div>';
+        return '<div class="error">' . esc_html__('Invalid recipe format received', 'ai-powered-recipe-generator') . '</div>';
     }
     
     ob_start(); ?>
@@ -603,22 +603,22 @@ function recipe_generator_format_recipe_for_display($recipe_data) {
             <?php if (!empty($recipe['servings'])) : ?>
                 <span><?php
                     /* translators: %s: Number of servings */
-                    printf(esc_html__('Servings: %s', 'recipe-generator'), esc_html($recipe['servings'])); ?></span>
+                    printf(esc_html__('Servings: %s', 'ai-powered-recipe-generator'), esc_html($recipe['servings'])); ?></span>
             <?php endif; ?>
             <?php if (!empty($recipe['preparation_time'])) : ?>
                 <span><?php 
                     /* translators: %s: Preparation time */
-                    printf(esc_html__('Prep: %s', 'recipe-generator'), esc_html($recipe['preparation_time'])); ?></span>
+                    printf(esc_html__('Prep: %s', 'ai-powered-recipe-generator'), esc_html($recipe['preparation_time'])); ?></span>
             <?php endif; ?>
             <?php if (!empty($recipe['cooking_time'])) : ?>
                 <span><?php 
                     /* translators: %s: Cooking time */
-                    printf(esc_html__('Cook: %s', 'recipe-generator'), esc_html($recipe['cooking_time'])); ?></span>
+                    printf(esc_html__('Cook: %s', 'ai-powered-recipe-generator'), esc_html($recipe['cooking_time'])); ?></span>
             <?php endif; ?>
         </div>
         
         <?php if (!empty($recipe['ingredients'])) : ?>
-            <h3><?php esc_html_e('Ingredients', 'recipe-generator'); ?></h3>
+            <h3><?php esc_html_e('Ingredients', 'ai-powered-recipe-generator'); ?></h3>
             <ul>
                 <?php foreach ((array)$recipe['ingredients'] as $ingredient) : ?>
                     <li><?php echo esc_html($ingredient); ?></li>
@@ -627,7 +627,7 @@ function recipe_generator_format_recipe_for_display($recipe_data) {
         <?php endif; ?>
         
         <?php if (!empty($recipe['method'])) : ?>
-            <h3><?php esc_html_e('Method', 'recipe-generator'); ?></h3>
+            <h3><?php esc_html_e('Method', 'ai-powered-recipe-generator'); ?></h3>
             <ol>
                 <?php foreach ((array)$recipe['method'] as $step) : ?>
                     <li><?php echo esc_html($step); ?></li>
@@ -640,10 +640,10 @@ function recipe_generator_format_recipe_for_display($recipe_data) {
 }
 
 function handle_save_ai_recipe_to_favorites() {
-    check_ajax_referer('recipe_generator_frontend_nonce', '_wpnonce');
+    check_ajax_referer('ai_powered_recipe_generator_frontend_nonce', '_wpnonce');
     
     if (!is_user_logged_in()) {
-        wp_send_json_error(esc_html__('You must be logged in to save recipes', 'recipe-generator'));
+        wp_send_json_error(esc_html__('You must be logged in to save recipes', 'ai-powered-recipe-generator'));
     }
 
     $user_id = get_current_user_id();
@@ -651,7 +651,7 @@ function handle_save_ai_recipe_to_favorites() {
 
     // Validate ID format
     if (!preg_match('/^recipe_[a-z0-9]+_[a-z0-9]+_\d+$/', $recipe_id)) {
-        wp_send_json_error(esc_html__('Invalid recipe ID format', 'recipe-generator'));
+        wp_send_json_error(esc_html__('Invalid recipe ID format', 'ai-powered-recipe-generator'));
     }
     
     $recipe_html = isset($_POST['recipe_html']) ? wp_kses_post(wp_unslash($_POST['recipe_html'])) : '';
@@ -703,10 +703,10 @@ function handle_save_ai_recipe_to_favorites() {
     ]);
 }
 
-function recipe_generator_find_recipe_post($recipe_id) {
+function ai_powered_recipe_generator_find_recipe_post($recipe_id) {
     // First try to get from cache
     $cache_key = 'recipe_post_' . md5($recipe_id);
-    $post_id = wp_cache_get($cache_key, 'recipe_generator');
+    $post_id = wp_cache_get($cache_key, 'ai_powered_recipe_generator');
     
     if (false === $post_id) {
         global $wpdb;
@@ -719,7 +719,7 @@ function recipe_generator_find_recipe_post($recipe_id) {
             $wpdb->prepare(
                 "SELECT post_id 
                  FROM {$wpdb->postmeta} 
-                 WHERE meta_key = '_recipe_generator_id' 
+                 WHERE meta_key = '_ai_powered_recipe_generator_id' 
                  AND meta_value = %s 
                  LIMIT 1",
                 $recipe_id
@@ -728,7 +728,7 @@ function recipe_generator_find_recipe_post($recipe_id) {
         // phpcs:enable
         
         // Cache the result (even if null)
-        wp_cache_set($cache_key, $post_id ?: 0, 'recipe_generator', DAY_IN_SECONDS);
+        wp_cache_set($cache_key, $post_id ?: 0, 'ai_powered_recipe_generator', DAY_IN_SECONDS);
     }
     
     return $post_id ?: 0;

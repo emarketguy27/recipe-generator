@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Recipe_Generator_Admin_Saved_Recipes {
+class Ai_Powered_Recipe_Generator_Admin_Saved_Recipes {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_submenu_page'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
@@ -12,34 +12,34 @@ class Recipe_Generator_Admin_Saved_Recipes {
 
     public function add_submenu_page() {
         add_submenu_page(
-            'recipe-generator',
-            __('Saved Recipes', 'recipe-generator'),
-            __('Saved Recipes', 'recipe-generator'),
+            'ai-powered-recipe-generator',
+            __('Saved Recipes', 'ai-powered-recipe-generator'),
+            __('Saved Recipes', 'ai-powered-recipe-generator'),
             'manage_options',
-            'recipe-generator-saved-recipes',
+            'ai-powered-recipe-generator-saved-recipes',
             array($this, 'render_page')
         );
     }
 
     public function enqueue_assets($hook) {
-        if ('recipe-generator_page_recipe-generator-saved-recipes' !== $hook) {
+        if ('ai-powered-recipe-generator_page_ai-powered-recipe-generator-saved-recipes' !== $hook) {
             return;
         }
 
-        $plugin = Recipe_Generator::get_instance();
+        $plugin = Ai_Powered_Recipe_Generator::get_instance();
         $plugin->enqueue_admin_assets($hook);
     }
 
     public function render_page() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have sufficient permissions.', 'recipe-generator'));
+            wp_die(esc_html__('You do not have sufficient permissions.', 'ai-powered-recipe-generator'));
         }
 
-        $saved_recipes_table = new Recipe_Generator_Saved_Recipes_List_Table();
+        $saved_recipes_table = new Ai_Powered_Recipe_Generator_Saved_Recipes_List_Table();
         $saved_recipes_table->prepare_items();
         ?>
-        <div class="wrap recipe-generator-admin">
-            <h1><?php esc_html_e('Saved Recipes', 'recipe-generator'); ?></h1>
+        <div class="wrap ai-powered-recipe-generator-admin">
+            <h1><?php esc_html_e('Saved Recipes', 'ai-powered-recipe-generator'); ?></h1>
             
             <form method="post">
                 <?php wp_nonce_field('bulk-' . $saved_recipes_table->_args['plural']); ?>
@@ -54,12 +54,12 @@ if (!class_exists('WP_List_Table')) {
     require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
+class Ai_Powered_Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     // Add bulk actions
     public function get_bulk_actions() {
         return [
-            'create_post' => __('Create WordPress Post', 'recipe-generator'),
-            'delete' => __('Delete', 'recipe-generator')
+            'create_post' => __('Create WordPress Post', 'ai-powered-recipe-generator'),
+            'delete' => __('Delete', 'ai-powered-recipe-generator')
         ];
     }
 
@@ -67,7 +67,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     public function process_bulk_action() {
         $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])) : '';
         if (!wp_verify_nonce($nonce, 'bulk-' . $this->_args['plural'])) {
-            wp_die(esc_html__('Invalid request.', 'recipe-generator'));
+            wp_die(esc_html__('Invalid request.', 'ai-powered-recipe-generator'));
         }
 
         if ($this->current_action() !== 'delete' || !current_user_can('manage_options')) {
@@ -102,12 +102,12 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     public function get_columns() {
         return [
             'cb'            => '<input type="checkbox" />',
-            'recipe_name'    => __('Recipe Name', 'recipe-generator'),
-            'description'    => __('Description', 'recipe-generator'),
-            'dietary_tags'   => __('Dietary Tags', 'recipe-generator'),
-            'saved_date'    => __('Saved Date', 'recipe-generator'),
-            'user_name'     => __('User', 'recipe-generator'),
-            'post_status'   => __('Post Status', 'recipe-generator'), 
+            'recipe_name'    => __('Recipe Name', 'ai-powered-recipe-generator'),
+            'description'    => __('Description', 'ai-powered-recipe-generator'),
+            'dietary_tags'   => __('Dietary Tags', 'ai-powered-recipe-generator'),
+            'saved_date'    => __('Saved Date', 'ai-powered-recipe-generator'),
+            'user_name'     => __('User', 'ai-powered-recipe-generator'),
+            'post_status'   => __('Post Status', 'ai-powered-recipe-generator'), 
         ];
     }
 
@@ -167,7 +167,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
                     'id'            => $recipe_id,
                     'user_id'       => $user->ID,
                     'user_name'     => $user->display_name,
-                    'recipe_name'   => $recipe['name'] ?? __('Untitled Recipe', 'recipe-generator'),
+                    'recipe_name'   => $recipe['name'] ?? __('Untitled Recipe', 'ai-powered-recipe-generator'),
                     'description'   => $description,
                     'dietary_tags'  => $dietary_tags,
                     'saved_date'    => $recipe['saved_at'] ?? '',
@@ -181,7 +181,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
         if (!empty($_GET['orderby']) || !empty($_GET['order'])) {
             $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
             if (!wp_verify_nonce($nonce, 'recipe-list-nonce')) {
-                wp_die(esc_html__('Invalid request.', 'recipe-generator'));
+                wp_die(esc_html__('Invalid request.', 'ai-powered-recipe-generator'));
             }
         }
 
@@ -217,7 +217,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
             'view' => sprintf(
                 '<a href="#" class="view-recipe" data-recipe-html="%s">%s</a>',
                 esc_attr(wp_json_encode($item['html'])),
-                esc_html__('View', 'recipe-generator')
+                esc_html__('View', 'ai-powered-recipe-generator')
             ),
             'delete' => sprintf(
                 '<a href="%s" class="submitdelete">%s</a>',
@@ -229,7 +229,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
                     ], admin_url('admin.php')),
                     'delete_recipe_' . $item['id']
                 ),
-                __('Delete', 'recipe-generator')
+                __('Delete', 'ai-powered-recipe-generator')
             )
         ];
 
@@ -249,7 +249,7 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     }
 
     public function no_items() {
-        esc_html_e('No saved recipes found.', 'recipe-generator');
+        esc_html_e('No saved recipes found.', 'ai-powered-recipe-generator');
     }
 
     public function column_post_status($item) {
@@ -257,31 +257,31 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
         $post_id = $this->find_recipe_post($item['id']);
         
         if (!$post_id) {
-            return '<span class="recipe-status"><span class="dashicons dashicons-no-alt"></span> '.esc_html__('No Post', 'recipe-generator').'</span>';
+            return '<span class="recipe-status"><span class="dashicons dashicons-no-alt"></span> '.esc_html__('No Post', 'ai-powered-recipe-generator').'</span>';
         }
         
         $post = get_post($post_id);
         if (!$post) {
-            return '<span class="recipe-status"><span class="dashicons dashicons-warning"></span> '.esc_html__('Invalid Post', 'recipe-generator').'</span>';
+            return '<span class="recipe-status"><span class="dashicons dashicons-warning"></span> '.esc_html__('Invalid Post', 'ai-powered-recipe-generator').'</span>';
         }
         
         $status_map = [
-            'publish' => ['dashicons dashicons-yes-alt', __('Published', 'recipe-generator')],
-            'draft'   => ['dashicons dashicons-edit', __('Draft', 'recipe-generator')],
-            'pending' => ['dashicons dashicons-clock', __('Pending', 'recipe-generator')],
-            'future'  => ['dashicons dashicons-calendar', __('Scheduled', 'recipe-generator')],
-            'private' => ['dashicons dashicons-lock', __('Private', 'recipe-generator')],
-            'trash'   => ['dashicons dashicons-trash', __('Trashed', 'recipe-generator')]
+            'publish' => ['dashicons dashicons-yes-alt', __('Published', 'ai-powered-recipe-generator')],
+            'draft'   => ['dashicons dashicons-edit', __('Draft', 'ai-powered-recipe-generator')],
+            'pending' => ['dashicons dashicons-clock', __('Pending', 'ai-powered-recipe-generator')],
+            'future'  => ['dashicons dashicons-calendar', __('Scheduled', 'ai-powered-recipe-generator')],
+            'private' => ['dashicons dashicons-lock', __('Private', 'ai-powered-recipe-generator')],
+            'trash'   => ['dashicons dashicons-trash', __('Trashed', 'ai-powered-recipe-generator')]
         ];
         
-        $status_info = $status_map[$post->post_status] ?? ['dashicons dashicons-warning', __('Unknown', 'recipe-generator')];
+        $status_info = $status_map[$post->post_status] ?? ['dashicons dashicons-warning', __('Unknown', 'ai-powered-recipe-generator')];
         
         return sprintf(
             '<span class="recipe-status"><span class="%s"></span> %s <a href="%s" target="_blank">%s</a></span>',
             $status_info[0],
             $status_info[1],
             esc_url(get_edit_post_link($post_id)),
-            esc_html__('(Edit)', 'recipe-generator')
+            esc_html__('(Edit)', 'ai-powered-recipe-generator')
         );
     }
 
@@ -299,6 +299,6 @@ class Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table {
     }
     
     private function find_recipe_post($recipe_id) {
-        return recipe_generator_find_recipe_post($recipe_id);
+        return ai_powered_recipe_generator_find_recipe_post($recipe_id);
     }
 }
