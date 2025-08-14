@@ -3,7 +3,7 @@
  * Plugin Name: AI Powered Recipe Generator
  * Plugin URI: https://jamesdennis.org/recipe-generator.html
  * Description: ✨ AI-Powered Recipe Generation - Transform your food blog — SEO-optimized recipes in seconds! Perfect for bloggers, chefs, and content creators.
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: James Dennis
  * Author URI: https://jamesdennis.org
  * License: GPL v3.0
@@ -58,7 +58,7 @@ class Ai_Powered_Recipe_Generator {
     }
 
     public function output_recipe_schema() {
-        if (is_singular('ai_recipe')) {
+        if (is_singular('aiprg_recipe')) {
             Ai_Powered_Recipe_Generator_Schema::output_recipe_schema(get_the_ID());
         }
     }
@@ -68,7 +68,7 @@ class Ai_Powered_Recipe_Generator {
 
     // Reister Custom Post Type
     public function register_post_types() {
-        if (!post_type_exists('ai_recipe')) {
+        if (!post_type_exists('aiprg_recipe')) {
             $args = [
                 'labels' => [
                     'name' => __('AI Recipes', 'ai-powered-recipe-generator'),
@@ -114,14 +114,14 @@ class Ai_Powered_Recipe_Generator {
                 'can_export' => true
             ];
 
-            register_post_type('ai_recipe', $args);            
+            register_post_type('aiprg_recipe', $args);            
         }
     }
 
     // register & init Custom Post Type Taxonimies
     private function register_recipe_taxonomies() {
         // Recipe Categories (hierarchical)
-        register_taxonomy('ai_recipe_category', 'ai_recipe', [
+        register_taxonomy('aiprg_recipe_category', 'aiprg_recipe', [
             'hierarchical' => true,
             'labels' => [
                 'name' => __('Recipe Categories', 'ai-powered-recipe-generator'),
@@ -154,7 +154,7 @@ class Ai_Powered_Recipe_Generator {
         ]);
 
         // Dietary Tags (non-hierarchical)
-        register_taxonomy('ai_recipe_tag', 'ai_recipe', [
+        register_taxonomy('aiprg_recipe_tag', 'aiprg_recipe', [
             'hierarchical' => false,
             'labels' => [
                 'name' => __('Dietary Tags', 'ai-powered-recipe-generator'),
@@ -277,16 +277,16 @@ add_action('init', function() {
 }, 20);
 
 add_filter('archive_template_hierarchy', function($templates) {
-    if (is_post_type_archive('ai_recipe') || 
-        is_tax('ai_recipe_tag') || 
-        is_tax('ai_recipe_category')) {
+    if (is_post_type_archive('aiprg_recipe') || 
+        is_tax('aiprg_recipe_tag') || 
+        is_tax('aiprg_recipe_category')) {
         array_unshift($templates, 'archive-recipe.php');
     }
     return $templates;
 });
 
 add_filter('render_block', function($block_content, $block) {
-    if (is_singular('ai_recipe')) {
+    if (is_singular('aiprg_recipe')) {
         // Add schema markup to core/paragraph blocks with specific classes
         if ($block['blockName'] === 'core/paragraph') {
             if (strpos($block['attrs']['className'] ?? '', 'recipe-servings') !== false) {
@@ -310,7 +310,7 @@ add_filter('render_block', function($block_content, $block) {
 }, 10, 2);
 
 add_filter('dashboard_glance_items', function($items) {
-    $post_type = 'ai_recipe';
+    $post_type = 'aiprg_recipe';
     $count = wp_count_posts($post_type);
     
     if ($count && $count->publish) {

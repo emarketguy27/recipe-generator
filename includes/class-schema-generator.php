@@ -13,7 +13,7 @@ class Ai_Powered_Recipe_Generator_Schema {
      */
     public static function get_recipe_schema($post_id) {
         $post = get_post($post_id);
-        if (!$post || $post->post_type !== 'ai_recipe') {
+        if (!$post || $post->post_type !== 'aiprg_recipe') {
             return false;
         }
 
@@ -126,7 +126,7 @@ class Ai_Powered_Recipe_Generator_Schema {
         }
 
         // Keywords from tags
-        $tags = wp_get_post_terms($post_id, 'ai_recipe_tag', ['fields' => 'names']);
+        $tags = wp_get_post_terms($post_id, 'aiprg_recipe_tag', ['fields' => 'names']);
         if (!empty($tags)) {
             $schema['keywords'] = implode(', ', $tags);
         }

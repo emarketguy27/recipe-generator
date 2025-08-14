@@ -228,10 +228,10 @@ class Ai_Powered_Recipe_Generator_Admin_Main {
                             <h4><?php echo esc_html__('To display them:', 'ai-powered-recipe-generator'); ?></h4>
                             <ul>
                                 <li><?php echo esc_html__('Use the dedicated "AI Recipes" menu for management', 'ai-powered-recipe-generator'); ?></li>
-                                <li><?php echo esc_html__('If confident with adding code - Create query loops with post type', 'ai-powered-recipe-generator'); ?> <code>ai_recipe</code></li>
+                                <li><?php echo esc_html__('If confident with adding code - Create query loops with post type', 'ai-powered-recipe-generator'); ?> <code>aiprg_recipe</code></li>
                                 <li><?php echo esc_html__('Recipe tags will generate automatically with each recipe - and are set by the selection of "Dietary Options"', 'ai-powered-recipe-generator'); ?></li>
                                 <li><?php echo esc_html__('Recipe Categories are created in the same way as normal wordpress posts"', 'ai-powered-recipe-generator'); ?></li>
-                                <li><?php echo esc_html__('Taxonomies available:', 'ai-powered-recipe-generator'); ?> <code>ai_recipe_category</code> <?php echo esc_html__('and', 'ai-powered-recipe-generator'); ?> <code>ai_recipe_tag</code></li>
+                                <li><?php echo esc_html__('Taxonomies available:', 'ai-powered-recipe-generator'); ?> <code>aiprg_recipe_category</code> <?php echo esc_html__('and', 'ai-powered-recipe-generator'); ?> <code>aiprg_recipe_tag</code></li>
                             </ul>
                             <p><?php echo esc_html__('Example using the editor:', 'ai-powered-recipe-generator'); ?></p>
                             <pre>

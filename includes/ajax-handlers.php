@@ -207,7 +207,7 @@ add_action('wp_ajax_ai_powered_recipe_generator_test_prompt', function() {
 
 add_action('wp_ajax_ai_powered_recipe_generator_generate_recipe', 'ai_powered_recipe_generator_handle_frontend_request');
 add_action('wp_ajax_nopriv_ai_powered_recipe_generator_generate_recipe', 'ai_powered_recipe_generator_handle_frontend_request');
-add_action('wp_ajax_save_ai_recipe_to_favorites', 'handle_save_ai_recipe_to_favorites');
+add_action('wp_ajax_save_aiprg_recipe_to_favorites', 'handle_save_aiprg_recipe_to_favorites');
 
 add_action('wp_ajax_delete_saved_recipe', function() {
     check_ajax_referer('ai_powered_recipe_generator_frontend_nonce', '_wpnonce');
@@ -218,11 +218,11 @@ add_action('wp_ajax_delete_saved_recipe', function() {
     
     $user_id = get_current_user_id();
     $recipe_id = isset($_POST['recipe_id']) ? sanitize_text_field(wp_unslash($_POST['recipe_id'])) : '';
-    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    $saved_recipes = get_user_meta($user_id, 'aiprg_saved_recipes', true) ?: [];
     
     if (isset($saved_recipes[$recipe_id])) {
         unset($saved_recipes[$recipe_id]);
-        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+        update_user_meta($user_id, 'aiprg_saved_recipes', $saved_recipes);
         wp_send_json_success();
     }
     
@@ -239,11 +239,11 @@ add_action('admin_action_delete_recipe', function() {
 
     check_admin_referer('delete_recipe_' . $recipe_id);
 
-    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    $saved_recipes = get_user_meta($user_id, 'aiprg_saved_recipes', true) ?: [];
     
     if (isset($saved_recipes[$recipe_id])) {
         unset($saved_recipes[$recipe_id]);
-        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+        update_user_meta($user_id, 'aiprg_saved_recipes', $saved_recipes);
     }
 
     wp_redirect(admin_url('admin.php?page=ai-powered-recipe-generator-saved-recipes'));
@@ -281,7 +281,7 @@ add_action('wp_ajax_ai_powered_recipe_generator_bulk_create_posts', function() {
         $user_id = $recipe_data['user_id'];
         
         // Get the full recipe data
-        $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+        $saved_recipes = get_user_meta($user_id, 'aiprg_saved_recipes', true) ?: [];
         
         $recipe = $saved_recipes[$recipe_id];
 
@@ -475,7 +475,7 @@ add_action('wp_ajax_ai_powered_recipe_generator_bulk_create_posts', function() {
             'post_content' => implode("\n\n", $blocks),
             'post_status'  => 'draft',
             'post_author'  => $user_id,
-            'post_type'    => 'ai_recipe',
+            'post_type'    => 'aiprg_recipe',
             'meta_input'   => array_merge([
                 '_recipe_servings' => $servings,
                 '_recipe_prep_time' => $prep_mins,
@@ -494,24 +494,24 @@ add_action('wp_ajax_ai_powered_recipe_generator_bulk_create_posts', function() {
         // }
 
         // Set category and tags
-        $default_category = get_term_by('slug', 'main-dishes', 'ai_recipe_category');
+        $default_category = get_term_by('slug', 'main-dishes', 'aiprg_recipe_category');
         if ($default_category) {
-            wp_set_object_terms($post_id, $default_category->term_id, 'ai_recipe_category');
+            wp_set_object_terms($post_id, $default_category->term_id, 'aiprg_recipe_category');
         }
         
         if (!empty($recipe['dietary_tags'])) {
             // Convert tag names to term IDs or create new terms
             $term_ids = array();
             foreach ($recipe['dietary_tags'] as $tag_name) {
-                $term = term_exists($tag_name, 'ai_recipe_tag');
+                $term = term_exists($tag_name, 'aiprg_recipe_tag');
                 if (!$term) {
-                    $term = wp_insert_term($tag_name, 'ai_recipe_tag');
+                    $term = wp_insert_term($tag_name, 'aiprg_recipe_tag');
                 }
                 if (!is_wp_error($term)) {
                     $term_ids[] = (int)$term['term_id'];
                 }
             }
-            wp_set_object_terms($post_id, $term_ids, 'ai_recipe_tag');
+            wp_set_object_terms($post_id, $term_ids, 'aiprg_recipe_tag');
         }
 
         // Add custom meta
@@ -639,7 +639,7 @@ function ai_powered_recipe_generator_format_recipe_for_display($recipe_data) {
     return ob_get_clean();
 }
 
-function handle_save_ai_recipe_to_favorites() {
+function handle_save_aiprg_recipe_to_favorites() {
     check_ajax_referer('ai_powered_recipe_generator_frontend_nonce', '_wpnonce');
     
     if (!is_user_logged_in()) {
@@ -682,7 +682,7 @@ function handle_save_ai_recipe_to_favorites() {
     }
     
     // Get existing saved recipes
-    $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+    $saved_recipes = get_user_meta($user_id, 'aiprg_saved_recipes', true) ?: [];
     
     // Add new recipe with all metadata
     $saved_recipes[$recipe_id] = [
@@ -695,7 +695,7 @@ function handle_save_ai_recipe_to_favorites() {
         'saved_at_gmt' => current_time('mysql', true)
     ];
 
-    update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+    update_user_meta($user_id, 'aiprg_saved_recipes', $saved_recipes);
     
     wp_send_json_success([
         'recipe_name' => $recipe_name,

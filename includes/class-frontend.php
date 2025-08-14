@@ -94,7 +94,7 @@ class Ai_Powered_Recipe_Generator_Frontend {
             return '<p>Please log in to view your saved recipes.</p>';
         }
         
-        $saved_recipes = get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) ?: [];
+        $saved_recipes = get_user_meta(get_current_user_id(), 'aiprg_saved_recipes', true) ?: [];
         $recipe_count = count($saved_recipes);
         
         if (empty($saved_recipes)) {
@@ -267,7 +267,7 @@ class Ai_Powered_Recipe_Generator_Frontend {
             [
                 'ajaxurl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('ai_powered_recipe_generator_frontend_nonce'),
-                'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'ai_saved_recipes', true) : []
+                'saved_recipes' => is_user_logged_in() ? get_user_meta(get_current_user_id(), 'aiprg_saved_recipes', true) : []
             ]
         );
     }

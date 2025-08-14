@@ -84,11 +84,11 @@ class Ai_Powered_Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table
             return;
         }
 
-        $saved_recipes = get_user_meta($user_id, 'ai_saved_recipes', true) ?: [];
+        $saved_recipes = get_user_meta($user_id, 'aiprg_saved_recipes', true) ?: [];
         foreach ($recipe_ids as $recipe_id) {
             unset($saved_recipes[$recipe_id]);
         }
-        update_user_meta($user_id, 'ai_saved_recipes', $saved_recipes);
+        update_user_meta($user_id, 'aiprg_saved_recipes', $saved_recipes);
     }
 
     public function __construct() {
@@ -142,14 +142,14 @@ class Ai_Powered_Recipe_Generator_Saved_Recipes_List_Table extends WP_List_Table
          */
         $users = get_users([
             // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-            'meta_key' => 'ai_saved_recipes',
+            'meta_key' => 'aiprg_saved_recipes',
             'meta_compare' => 'EXISTS'
         ]);
         
         $data = [];
         
         foreach ($users as $user) {
-            $saved_recipes = get_user_meta($user->ID, 'ai_saved_recipes', true) ?: [];
+            $saved_recipes = get_user_meta($user->ID, 'aiprg_saved_recipes', true) ?: [];
             
             foreach ($saved_recipes as $recipe_id => $recipe) {
                 // Use stored description if available

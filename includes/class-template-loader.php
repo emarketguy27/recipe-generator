@@ -45,7 +45,7 @@ class Ai_Powered_Recipe_Generator_Template_Loader {
             'title'       => __( 'Recipe Archive', 'ai-powered-recipe-generator' ),
             'description' => __( 'Displays recipe posts archives, taxonomies and searches.', 'ai-powered-recipe-generator' ),
             'content'     => self::get_template_content( 'archive-recipe' ),
-            'post_types'  => ['ai_recipe'] // Explicitly associate ai recipe CPT
+            'post_types'  => ['aiprg_recipe'] // Explicitly associate ai recipe CPT
         ] );
     }
 

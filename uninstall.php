@@ -12,7 +12,7 @@ if (defined('AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && AI_POWERE
     // POSTS & ATTACHMENTS
     // ======================
     $posts = get_posts([
-        'post_type'      => 'ai_recipe',
+        'post_type'      => 'aiprg_recipe',
         'post_status'    => 'any',
         'posts_per_page' => -1,
         'fields'         => 'ids'
@@ -37,10 +37,10 @@ if (defined('AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && AI_POWERE
     // TAXONOMIES & TERMS
     // ======================
     // First register the taxonomies - Required to ensure explicit registration during clean environment of Uninstall.
-    register_taxonomy('ai_recipe_category', 'ai_recipe');
-    register_taxonomy('ai_recipe_tag', 'ai_recipe');
+    register_taxonomy('aiprg_recipe_category', 'aiprg_recipe');
+    register_taxonomy('aiprg_recipe_tag', 'aiprg_recipe');
 
-    $taxonomies = ['ai_recipe_category', 'ai_recipe_tag'];
+    $taxonomies = ['aiprg_recipe_category', 'aiprg_recipe_tag'];
     foreach ($taxonomies as $taxonomy) {
         $terms = get_terms([
             'taxonomy'   => $taxonomy,
@@ -57,13 +57,13 @@ if (defined('AI_POWERED_RECIPE_GENERATOR_REMOVE_DATA_ON_UNINSTALL') && AI_POWERE
     }
 
     // Unregister taxonomies
-    unregister_taxonomy('ai_recipe_category');
-    unregister_taxonomy('ai_recipe_tag');
+    unregister_taxonomy('aiprg_recipe_category');
+    unregister_taxonomy('aiprg_recipe_tag');
 
     // ======================
     // USER SAVED RECIPES
     // ======================
-    delete_metadata('user', 0, 'ai_saved_recipes', '', true);
+    delete_metadata('user', 0, 'aiprg_saved_recipes', '', true);
 
     $batch_size = 100;
     $offset = 0;
