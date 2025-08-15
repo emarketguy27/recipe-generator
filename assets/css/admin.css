@@ -1,18 +1,20 @@
 .recipe-generator-settings {
     max-width: 1200px;
-    h1 {
-        margin-bottom: 1em;
-    }
-    .btn-grp {
-        width: 80%;
-        display: flex;
-        justify-content: space-around;
-        gap: 1em;
-        button {
-            min-width: 30%;
-        }
-    }
 }
+.recipe-generator-settings h1{
+    margin-bottom: 1em;
+}
+.recipe-generator-settings .btn-grp{
+    width: 80%;
+    display: flex;
+    justify-content: space-around;
+    gap: 1em;
+    
+}
+.recipe-generator-settings .btn-grp buttonbutton {
+    min-width: 30%;
+}
+
 /* Main Admin Page Instructions Section */
 .notice-info {
     background: none;
@@ -42,7 +44,6 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
     margin: 5px 15px 2px;
     padding: 0px 12px 10px;
-
     border-bottom: 1px solid #eee;
 }
 .instruction-section:last-child {
@@ -80,44 +81,44 @@ pre {
     border: 1px solid #ccd0d448;
     box-shadow: 0 1px 1px rgba(0,0,0,0.04);
     border-radius: 6px;
-    & tbody{
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        & tr {
-            display: flex;
-            width: 50%;
-            & th {
-                width: 12em;
-                & label {
-                    display: flex;
-                }
-            }
-            & td {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: .3em;
-                margin-bottom: 0;
-                & .description {
-                    text-align: center;
-                    font-style: italic;
-                    font-weight: 600;
-                }
-            }
-        }
-    }
-    & .prompt-section {
-        flex-direction: column;
-        & tr {
-            width: unset;
-        }
-    }
-    .cards-wrapper {
-        display: flex;
-        gap: 1em;
-    }
+}
+.settings-section tbody{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+.settings-section tbody tr{
+    display: flex;
+    width: 50%;
+}
+.settings-section tbody tr th{
+    width: 12em;
+}
+.settings-section tbody tr th label{
+    display: flex;
+}
+.settings-section tbody tr td{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3em;
+    margin-bottom: 0;
+}
+.settings-section tbody tr td .description{
+    text-align: center;
+    font-style: italic;
+    font-weight: 600;
+}
+.settings-section .prompt-section{
+    flex-direction: column; 
+}
+.settings-section .prompt-section tr{
+    width: unset;
+}
+.settings-section .cards-wrapper{
+    display: flex;
+    gap: 1em;
 }
 .important-info {
     border: 1px solid red;
@@ -129,23 +130,19 @@ pre {
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
-
 .meta-group {
     display: flex;
     align-items: center;
     gap: 0.3rem;
 }
-
 .meta-icon .dashicons {
     font-size: 1.4em;
     color: var(--wp--preset--color--primary);
 }
-
 .meta-icon p,
 .meta-value p {
     margin: 0;
 }
-
 /* Editor-specific fixes */
 .block-editor .meta-group {
     white-space: nowrap;
@@ -153,24 +150,10 @@ pre {
     padding: 0.5em;
     border-radius: 4px;
 }
-
 /* Fix for editor compatibility */
 .block-editor .recipe-meta-item {
     white-space: nowrap;
 }
-/* .recipe-meta .dashicons-before::before {
-    font-family: dashicons;
-    display: inline-block;
-    line-height: 1;
-    font-weight: 400;
-    font-style: normal;
-    text-decoration: inherit;
-    text-transform: none;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    margin-right: 5px;
-    vertical-align: middle;
-} */
 .has-dashicon .dashicons {
     font-family: dashicons;
     display: inline-block;
@@ -256,13 +239,11 @@ pre {
     float: none;
     margin: 0 0 0 5px;
 }
-
 /* Technical Parameters Section */
 .technical-param-slider {
     width: 300px;
     margin-right: 10px;
 }
-
 /* Prompt Editor Section */
 .prompt-section {
     flex-direction: column;
@@ -280,7 +261,6 @@ pre {
     border-top: 1px solid rgba(128, 128, 128, 0.26);
     margin-top: 20px;
     border-radius: 15px;
-    
 }
 .submit-section p.submit {
     margin-top: 0;
@@ -296,44 +276,40 @@ pre {
     margin-bottom: 0;
     box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.24);
 }
-
 /* Dietary Options Section */
-#current-dietary-options {
-    li {
-        display: flex;
-        justify-content: space-between;
-        gap: 3em;
-        font-weight: 600;
-        text-transform: uppercase;
-        a {
-            text-decoration: none;
-        }
-    }
+#current-dietary-options li{
+    display: flex;
+    justify-content: space-between;
+    gap: 3em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+#current-dietary-options li a{
+    text-decoration: none;
 }
 .new-diet-options {
     display: flex;
     flex-direction: column;
     gap: 1em;
 }
-
 /* Test Prompt Section */
 .form-test-prompt tr:nth-child(1) {
-    width: 100%!important;
-    & th {
-        width: 12%;
-    }
+    width: 100%!important; 
+}
+.form-test-prompt tr:nth-child(1) th{
+    width: 12%;
 }
 .form-test-prompt tr:nth-child(4) {
     width: 100%!important;
-    & th {
-        width: 12%;
-    }
-    & td {
-        display: flex;
-        justify-content: space-evenly;
-        flex-direction: row!important;
-        width: 100%;
-    }
+}
+.form-test-prompt tr:nth-child(4) th{
+    width: 12%;
+}
+.form-test-prompt tr:nth-child(4) td{
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row!important;
+    width: 100%;
 }
 /* Test Recipe Loading Animation */
 #test-prompt-container {
@@ -351,11 +327,9 @@ pre {
     border-radius: 5px;
 }
 .loading-bar.active {
-    /* width: 90%; */
     background-color: #2271b1;
     animation: loadingAnimation 1.5s ease-in-out infinite;
 }
-
 /* ADMIN API Response - RECIPE TEST SECTION */
 .recipe-json-output {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
@@ -396,7 +370,6 @@ pre {
     border-radius: 3px;
     font-size: 0.85em;
 }
-
 /* Token Usage Styles */
 .token-usage {
     margin-top: 30px;
@@ -426,7 +399,6 @@ pre {
     min-width: 100px;
     color: #50575e;
 }
-
 /* Saved Recipes Table */
 .wp-list-table .column-recipe_name {
     width: 20%;
@@ -446,7 +418,6 @@ pre {
 .wp-list-table .column-post_status {
     width: 10%;
 }
-
 /* Post Status column */
 .column-post_status {
     width: 120px;
@@ -471,7 +442,6 @@ pre {
 .recipe-status .dashicons-trash { color: #d63638; }
 .recipe-status .dashicons-warning { color: #d63638; }
 .recipe-status .dashicons-no-alt { color: #a7aaad; }
-
 /* Bulk Actions */
 .tablenav.top .bulkactions {
     margin-bottom: 10px;
@@ -490,7 +460,6 @@ pre {
 .column-cb {
     width: 40px;
 }
-
 /* Recipe Post Indicator */
 .post-state .recipe-source {
     display: inline-block;
@@ -518,7 +487,6 @@ pre {
 .recipe-modal .recipe-content h2 {
     margin-top: 0;
 }
-
 /* Responsive adjustments */
 @media screen and (max-width: 782px) {
     .wp-list-table .column-actions {

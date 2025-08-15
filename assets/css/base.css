@@ -14,7 +14,6 @@
   --rg-border-radius: 8px;
   --rg-box-shadow: 0 0 16px 6px rgba(0,0,0,0.05);
 }
-
 .meta-group .dashicons, .meta-icon .dashicons, .recipe-meta .dashicons {
   width:2rem;
   height:2rem;
