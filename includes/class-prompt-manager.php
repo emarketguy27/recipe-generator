@@ -1,10 +1,10 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-class Ai_Powered_Recipe_Generator_Prompt_Manager {
+class Recipe_Generator_Prompt_Manager {
     private static $instance;
     private $default_prompt;
-    private $dietary_options_option = 'ai_powered_recipe_generator_dietary_options';
-    private $prompt_option = 'ai_powered_recipe_generator_prompt_template';
+    private $dietary_options_option = 'recipe_generator_dietary_options';
+    private $prompt_option = 'recipe_generator_prompt_template';
     private $default_dietary_options;
 
     public static function get_instance() {

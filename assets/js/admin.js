@@ -275,14 +275,6 @@ jQuery(document).ready(function($) {
                             );
                         });
                     }
-                    
-                    // Show success message
-                    $('#wpbody-content').before(
-                        '<div class="notice notice-success is-dismissible"><p>' +
-                        response.data.message + ' ' +
-                        '<a href="' + adminurl + 'edit.php?post_status=draft&post_type=post">View drafts</a>' +
-                        '</p></div>'
-                    );
                     window.location.reload();
                 } else {
                     alert('Error: ' + (response.data || 'Operation failed'));

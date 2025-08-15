@@ -158,7 +158,6 @@ class Recipe_Generator_Admin_AI_Settings {
             <form method="post" action="options.php">
                 <?php 
                 settings_fields('recipe_generator_ai_settings');
-                wp_nonce_field('recipe_generator_ai_settings-options');
                 ?>                
                 <div class="settings-section">
                     <h2 class="title"><?php esc_html_e('API Configuration', 'recipe-generator'); ?></h2>
