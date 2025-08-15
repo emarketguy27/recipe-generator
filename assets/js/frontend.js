@@ -356,7 +356,7 @@ jQuery(document).ready(function($) {
                 break;
             case 'pinterest':
                 // Note: Pinterest requires an image - using a placeholder
-                const imageUrl = encodeURIComponent('https://via.placeholder.com/300x200?text=Recipe');
+                const imageUrl = encodeURIComponent('/assets/images/ai-powered-recipe-generator-placeholder-image.jpg');
                 shareUrl = `https://pinterest.com/pin/create/button/?url=${recipeUrl}&media=${imageUrl}&description=${recipeTitle}`;
                 break;
             case 'reddit':

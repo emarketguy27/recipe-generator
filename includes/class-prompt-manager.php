@@ -1,9 +1,10 @@
 <?php
-class Recipe_Generator_Prompt_Manager {
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+class Ai_Powered_Recipe_Generator_Prompt_Manager {
     private static $instance;
     private $default_prompt;
-    private $dietary_options_option = 'recipe_generator_dietary_options';
-    private $prompt_option = 'recipe_generator_prompt_template';
+    private $dietary_options_option = 'ai_powered_recipe_generator_dietary_options';
+    private $prompt_option = 'ai_powered_recipe_generator_prompt_template';
     private $default_dietary_options;
 
     public static function get_instance() {
@@ -18,51 +19,6 @@ class Recipe_Generator_Prompt_Manager {
         $this->default_dietary_options = $this->get_default_dietary_options();
     }
 
-    // private function get_default_prompt() {
-    //     return <<<EOT
-    //     Create a recipe that strictly follows all requirements below. Respond ONLY with valid JSON following these EXACT rules:
-    //     1. All property names and string values MUST use double quotes
-    //     2. The dietary_tags array MUST be properly formatted like this: 
-    //     "dietary_tags": ["value1", "value2"]
-    //     3. No trailing commas in arrays or objects
-    //     4. No comments or markdown formatting
-
-    //     - Cuisine type: {cuisine}
-    //     - Dietary requirements: {dietary}
-    //     - Must include: {include_ingredients}
-    //     - Must exclude: {exclude_ingredients}
-    //     - Servings: {servings}
-    //     - Skill level: {skill_level}
-
-    //     The recipe should include:
-    //     1. A descriptive title
-    //     2. Complete ingredient list with measurements
-    //     3. Detailed step-by-step instructions
-    //     4. Cooking time and preparation time
-    //     5. Nutritional information
-
-    //     Make the recipe {creativity_level} and suitable for {servings} people. If Dietary requirements are requested, the recipe must adhere to these choices.
-
-    //     EXAMPLE VALID RESPONSE:
-    //     {
-    //         "recipe_name": "Name",
-    //         "description": "Description",
-    //         "servings": 1,
-    //         "preparation_time": "10 mins",
-    //         "cooking_time": "20 mins",
-    //         "ingredients": ["item1", "item2"],
-    //         "method": ["step1", "step2"],
-    //         "nutritional_information": {
-    //             "calories": 300 kCal,
-    //             "carbs": 20g,
-    //             "net carbs": 10g,
-    //             "protein": 20g,
-    //             "fat": 30g
-    //         },
-    //         "dietary_tags": ["keto", "low-carb"]
-    //     }
-    //     EOT;
-    // }
     private function get_default_prompt() {
         return "Create a recipe that strictly follows all requirements below. Respond ONLY with valid JSON following these EXACT rules:\n" .
             "1. All property names and string values MUST use double quotes\n" .
